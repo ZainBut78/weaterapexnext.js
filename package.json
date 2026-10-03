@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:hostinger": "next build --webpack",
     "start": "next start",
     "seo-check": "node scripts/seo-check.mjs",
     "check:icons": "node scripts/check-icons.mjs",
