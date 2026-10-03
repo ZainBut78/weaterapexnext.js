@@ -1,0 +1,28 @@
+# npm install ka banaya hua — GitHub par kabhi nahi jata
+/node_modules
+
+# Next.js ke build/dev ki banayi hui files
+/.next/
+/out/
+next-env.d.ts
+
+# Secrets — .env.local kabhi GitHub par nahi jani chahiye
+.env*.local
+.env
+.env.development
+.env.production
+# .env.example tracked rehti hai (sirf khaali placeholders, koi secret nahi)
+!.env.example
+
+# Logs / system files
+npm-debug.log*
+*.log
+/coverage/
+.DS_Store
+Thumbs.db
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

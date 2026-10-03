@@ -1,0 +1,25 @@
+# WeatherApex
+
+> WeatherApex turns weather data into travel decisions: day-by-day trip scoring, outdoor event risk, and month-by-month climate guides for 155 cities in 53 countries and territories, based on 20 years of historical weather data (Open-Meteo).
+
+All climate figures are historical monthly averages (2006–2025), not forecasts. Temperatures are shown in °C and °F.
+
+## Climate guides
+
+- [Weather by country and month](https://weatherapex.com/weather): hub of all countries, grouped by region.
+- Country pages, e.g. [United Kingdom](https://weatherapex.com/weather/united-kingdom): each city's average high by month and the best months to visit.
+- City-by-month pages, e.g. [London weather by month](https://weatherapex.com/weather/united-kingdom/london): all 12 months with highs, lows, rainfall, rainy days, sunshine and a Great/Good/Fair/Poor verdict.
+- Month pages, e.g. [London weather in October](https://weatherapex.com/weather/united-kingdom/london/october): one month in detail, compared with the rest of the year, who the month suits and packing tips.
+- 20-year city climate guides, e.g. [London climate guide](https://weatherapex.com/weather/london): charts and the full monthly averages table.
+- [All city climate guides](https://weatherapex.com/climate-guides)
+
+## Tools
+
+- [Trip Planner](https://weatherapex.com/trip-planner): scores every day of a trip on rain, wind and temperature.
+- [Outdoor Event Risk](https://weatherapex.com/events): weather risk for weddings, concerts, marathons and other outdoor events, with better nearby dates.
+- [API documentation](https://weatherapex.com/api-docs): trip scoring, event risk and current weather over HTTP/JSON.
+
+## More
+
+- [Blog](https://weatherapex.com/blog)
+- [Sitemap](https://weatherapex.com/sitemap.xml)

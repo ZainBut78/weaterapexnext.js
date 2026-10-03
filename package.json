@@ -1,0 +1,37 @@
+{
+  "name": "weatherapex-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seo-check": "node scripts/seo-check.mjs",
+    "check:icons": "node scripts/check-icons.mjs",
+    "test:e2e": "playwright test",
+    "content-check": "node scripts/content-check.mjs",
+    "season-check": "node scripts/season-daylight-check.mjs",
+    "guides:list": "node scripts/guides-list.mjs",
+    "cities:diff": "node scripts/cities-diff.mjs"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "5.101.4",
+    "axios": "1.18.1",
+    "framer-motion": "12.43.0",
+    "leaflet": "1.9.4",
+    "lucide-react": "1.27.0",
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-leaflet": "5.0.0",
+    "recharts": "3.10.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "tailwindcss": "4.3.3"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}
