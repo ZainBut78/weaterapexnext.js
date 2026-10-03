@@ -50,10 +50,21 @@ const ForecastTable = () => {
       timeZone: 'UTC',
     });
 
-    const code = forecast.weather_code[idx];
+    // Icon: din ke ghanton ka NUMAINDA haal (backend display_code — weather/
+    // conditions.py). Purana backend / purani cache → daily weather_code
+    // (din ka "sab se shadeed" haal; ek geela ghanta = poora din barish).
+    const dailyCode = forecast.weather_code[idx];
+    const code = forecast.display_code?.[idx] ?? dailyCode;
     const precip = forecast.precipitation_probability_max[idx];
     const weatherInfo = getWeatherDescription(code, precip ?? 0);
     const iconUrl = getMeteoconIcon(code, false);
+    // 1–2 geele ghante (icon dry raha) / thunder 40–60% → saaf alfaaz
+    const notes = [];
+    if (forecast.shower_risk?.[idx]) {
+      const p = forecast.shower_probability?.[idx] ?? precip;
+      notes.push(p > 0 ? `Mostly dry — a passing shower is possible (${p}% chance).` : 'Mostly dry — a passing shower is possible.');
+    }
+    if (forecast.thunder_risk?.[idx]) notes.push(`Thunderstorm possible (${forecast.thunder_probability?.[idx]}% chance).`);
 
     return {
       day: dayName,
@@ -62,8 +73,9 @@ const ForecastTable = () => {
       hi: `${units.temp(forecast.temperature_2m_max[idx])}°`,
       lo: `${units.temp(forecast.temperature_2m_min[idx])}°`,
       title: weatherInfo.title,
-      desc: weatherInfo.desc,
-      night: getNightDescription(code),
+      desc: notes.length ? notes.join(' ') : weatherInfo.desc,
+      // Raat ka haal pehle jaisa (daily code) — din ka icon sirf din ke ghanton se
+      night: getNightDescription(dailyCode),
       precip: precip != null ? `${precip}%` : '—',
       isHighlighted: isToday,
     };

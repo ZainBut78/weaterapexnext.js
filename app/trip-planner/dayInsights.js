@@ -65,10 +65,21 @@ export function formatDay(dateStr) {
   return { weekday, short, long: `${weekday}, ${short}` };
 }
 
+// ── Din ka icon (backend weather/conditions.py) ──
+// display_code = din ke ghanton ka NUMAINDA haal; purana backend / 16 din se
+// aage (historical estimate) → weather_code. Wet codes backend jaise.
+const WET_CODES = new Set([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 71, 73, 75, 77, 85, 86, 95, 96, 99]);
+export const isWetCode = (code) => code != null && WET_CODES.has(Number(code));
+export const dayIconCode = (day) => day?.display_code ?? day?.weather_code;
+
 // Backend ki day score formula (scoring.py) — din ke hisson ko compare
-// karne ke liye usi ka chhota roop.
+// karne ke liye usi ka chhota roop. Hisse ka icon geela ho to bari penalty
+// (woh hissa kabhi "Best time" nahi), shower / thunder badge par thodi.
 function partPenalty(p) {
   let pen = 0;
+  if (isWetCode(p.display_code)) pen += 5;
+  if (p.shower_risk) pen += 0.5;
+  if (p.thunder_risk) pen += 2;
   const rain = p.rain_probability ?? 0;
   if (rain > T.RAIN_SCORE) pen += Math.min(0.5 + ((rain - T.RAIN_SCORE) / 80) * 4.5, 5);
   if (p.wind_kmh != null && p.wind_kmh > T.WIND_SCORE) pen += Math.min(((p.wind_kmh - T.WIND_SCORE) / 10) * 0.5, 2);
@@ -101,10 +112,13 @@ export function activityReason(day, units) {
   const tTxt = (c) => `${units.temp(c)}°`;
   const wTxt = (k) => `${units.wind(k)} ${units.windUnit}`;
 
+  const wetDay = isWetCode(day.display_code);
   let line;
   switch (day.recommended_activity) {
     case 'indoor_museum':
-      line = `${rain}% chance of rain — indoor plans are the safest bet.`;
+      line = wetDay && day.wet_hours
+        ? `Rain expected for about ${day.wet_hours} daytime hour${day.wet_hours === 1 ? '' : 's'} — indoor plans are the safest bet.`
+        : `${rain}% chance of rain — indoor plans are the safest bet.`;
       break;
     case 'indoor_sheltered':
       line = `Strong wind up to ${wTxt(wind)} — choose sheltered spots.`;
@@ -129,9 +143,18 @@ export function activityReason(day, units) {
         : `Comfortable (${tTxt(tMax)}) for walking around the city.`;
   }
 
-  // Chhoti ehtiyaat — wahi thresholds; activity se takrati nahi
+  // Chhoti ehtiyaat — wahi thresholds; activity se takrati nahi.
+  // Icon dry + 1–2 geele ghante (shower_risk) → umbrella wali line ki jagah
+  // saaf baat: "Mostly dry — a passing shower is possible (26% chance)".
   const tips = [];
-  if (day.recommended_activity !== 'indoor_museum' && rain > T.RAIN_SCORE) tips.push(`${rain}% rain chance — pack an umbrella.`);
+  if (day.shower_risk) {
+    const p = day.shower_probability ?? rain;
+    // imkaan 0% ho (sirf mm ki wajah se geela ghanta) to "(0% chance)" ajeeb lagta hai
+    tips.push(p > 0 ? `Mostly dry — a passing shower is possible (${p}% chance).` : 'Mostly dry — a passing shower is possible.');
+  } else if (day.recommended_activity !== 'indoor_museum' && rain > T.RAIN_SCORE) {
+    tips.push(`${rain}% rain chance — pack an umbrella.`);
+  }
+  if (day.thunder_risk) tips.push(`A thunderstorm is possible (${day.thunder_probability}% chance) — keep an eye on the sky.`);
   if (day.recommended_activity !== 'indoor_sheltered' && wind != null && wind > T.WIND_SCORE) tips.push(`Breezy, up to ${wTxt(wind)}.`);
   return [line, ...tips].join(' ');
 }
