@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:hostinger": "next build --webpack",
+    "build": "next build --webpack",
+    "build:turbo": "next build",
     "start": "next start",
     "seo-check": "node scripts/seo-check.mjs",
     "check:icons": "node scripts/check-icons.mjs",
