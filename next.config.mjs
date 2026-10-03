@@ -27,6 +27,24 @@ const nextConfig = {
     '/**': ['./content/guides/**/*', './app/og-image/*.woff'],
   },
 
+  // ── www → weatherapex.com (EK permanent redirect, 308) ──
+  // Google par purana "Powered by CapRover" result `http://www…` ka tha.
+  // Sab kuch https://weatherapex.com par ikattha ho. Sirf Host
+  // `www.weatherapex.com` par — localhost, Hostinger ka temporary domain aur
+  // api.weatherapex.com par koi asar nahi. proxy.js mein NAHI: us ka matcher
+  // /sitemap.xml aur /robots.txt jaisi files chhod deta hai. Query string
+  // Next.js khud saath le jata hai.
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.weatherapex.com' }],
+        destination: 'https://weatherapex.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     if (!NOINDEX) return [];
     return [
