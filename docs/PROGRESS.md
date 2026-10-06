@@ -1125,3 +1125,55 @@ Owner: "haan — redirect rakho, author Zain Butt, pehle code banao".
 - JSON-LD validation (parse, no duplicate @type, valid dates): `/`, London October, Orlando November,
   `/weather/london` → PASS. Blog post page could not be rendered (live backend has 0 posts, local Django down).
 - Checks: build (webpack) OK · seo-check 343 / 10 (same 10: 0 live blog posts) · e2e 24 passed / 1 skipped.
+
+---
+
+## 2026-10-06 — 3 UX fixes (docs/CLAUDE_CODE_UX_FIXES_PROMPT.md)
+Owner: "haan — plan approve. Search from another page: 160 list → /weather/<slug>, else home. Historical
+estimate KHATAM NA karo: city mode 16-day chips (default) + 'Planning further ahead?'; country mode only chips."
+
+### PART 0.5 — line endings
+- `git status` was already clean (seo-check's 2-line change had been committed), but 8 files were CRLF on disk
+  and LF in git (`core.autocrlf=true` hid it). New `.gitattributes`: `* text=auto eol=lf` (+ png/jpg/webp/ico/
+  woff/pdf `binary`). The 8 files were re-checked-out as LF. `git diff --ignore-cr-at-eol` showed zero real changes.
+
+### PART A — mobile search always visible
+- `components/Navbar.jsx`: below `lg`, a full-width search row under the logo row (server HTML, no layout shift).
+  The search was removed from the ☰ menu. Tap target 48px; `inputmode/enterkeyhint=search`, `autocomplete=off`,
+  `aria-label`.
+- Search behaviour: on `/` it is the same as before (sets the city). On other pages: a city from our 160 list → `/weather/<slug>`;
+  anything else → set the city + go to `/`. (Before, searching from another page changed nothing on screen.)
+
+### PART B — spelling help
+- `utils/fuzzyCity.js`: Damerau-Levenshtein (OSA) over the 160 cities; case + accents ignored; prefix match while
+  typing. barcelna→Barcelona, pheonix→Phoenix, new yrok→New York, zürich→Zurich. Zero API calls.
+- `hooks/useCitySuggest.js`: local first, then `/trips/plan/cities/search/` — ≥2 chars, 300 ms debounce, AbortController,
+  memory cache per query, merged without duplicates. Used by navbar and trip planner.
+- `components/CitySearchBox.jsx`: ARIA combobox (↑ ↓ Enter Esc), "Did you mean…?" header for spelling matches.
+- `components/WeatherCard.jsx`: 404 → "We couldn't find "x". Did you mean: Barcelona, Spain" (clickable) or
+  "Check the spelling or try a nearby big city." Only the message changed; the card is the same.
+- `hooks/useWeather.js`: no retry on 4xx (before: 3 retries → 4 geocoding calls per typo and a ~7 s delay).
+- Trip planner city field: same suggestions + combobox ARIA; trip 404 → "Did you mean".
+- **Backend report:** `fetchCitySuggestions` → `city_search_view` = DB only (`name__icontains`, 8 rows), no Open-Meteo
+  and no cache (cheap). It cannot catch typos — local fuzzy does that. Enter on an unknown name → `/weather/current/`
+  → geocoding once (misses are not cached in the backend; once per Enter, never per keystroke). No backend change.
+
+### PART C — trip planner dates
+- Backend: `date.today()` = UTC (Django TIME_ZONE='UTC'); `end - today <= 16` → forecast, otherwise historical
+  estimate; max trip 20 days. Open-Meteo test (Oct 6): the last valid `end_date` = **UTC today + 15** (+16 → "out of
+  allowed range", Honolulu too).
+- `utils/forecastWindow.js`: forecast = browser today … UTC today+15 (16 days; 15 in Pakistan between 00:00 and 05:00).
+  Estimate end ≥ UTC today+17 (with +16 the backend would ask for a forecast and Open-Meteo would refuse → 503).
+- `app/trip-planner/ForecastDayPicker.jsx` (option b, 0 KB library): day chips, tap first then last day, tap the same
+  day twice = 1 day. Helper: "Forecast available for the next 16 days: Oct 6 – Oct 21". Placeholder chips before
+  mount (no CLS). Works on iOS (no native min/max needed).
+- City mode: "Live forecast" (default) + "Planning further ahead?" → date inputs with the label "Estimate based on
+  20 years of climate data — not a forecast"; 20-day max kept. Country mode: chips only.
+- Validation on submit; out-of-range dates never reach the backend; the window is recomputed at submit (tab open
+  past midnight). "Did you mean" / country-switch reuse the already-validated dates.
+
+### Checks
+- build (webpack) OK · seo-check 343 / 10 (same 10: 0 live blog posts) · e2e **45 passed / 1 skipped**
+  (new `tests/e2e/ux-fixes.spec.mjs` 21 tests; old trip test now taps chips). "barcelona" typed fast → 1 suggestion
+  call. Screenshots 390 + 1440: navbar, typeahead, chips, estimate.
+- Tested against the live API (local Django down); trip plans were mocked in e2e.

@@ -11,6 +11,7 @@ import { getWeatherDescription } from '../utils/weatherDescriptions';
 import WeatherBackground from './WeatherBackground';
 import { WeatherCardSkeleton } from './HomeSkeletons';
 import { useUnits } from '../context/UnitsContext';
+import { matchCities } from '../utils/fuzzyCity';
 
 // windUnit: 'km/h' ya 'mph' (UnitsContext). Pehle yahan 'm/s' likha tha —
 // ghalat: backend km/h bhejta hai (Open-Meteo default). Audit 3.2.
@@ -177,9 +178,42 @@ function HourlyStrip({ hours, activeTab, windUnit }) {
   );
 }
 
+// Shehar nahi mila (backend 404) — generic error ki jagah madad: hamari
+// 160 cities se "Did you mean" (local, zero API calls). UX fixes B3.
+// Sirf message badla hai, card wahi hai.
+function CityNotFoundMessage({ query, onPick }) {
+  const matches = matchCities(query, { partial: false, limit: 3 });
+  return (
+    <div className="text-lg">
+      <p className="text-red-500">
+        We couldn&apos;t find &ldquo;{query}&rdquo;.
+        {matches.length > 0 && ' Did you mean:'}
+      </p>
+      {matches.length > 0 ? (
+        <p className="mt-3 flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
+          {matches.map((m, i) => (
+            <React.Fragment key={m.slug}>
+              {i > 0 && <span className="text-gray-300" aria-hidden="true">·</span>}
+              <button
+                type="button"
+                onClick={() => onPick(m.name)}
+                className="min-h-11 px-3 font-bold text-[#0077b6] hover:underline"
+              >
+                {m.name}, {m.country}
+              </button>
+            </React.Fragment>
+          ))}
+        </p>
+      ) : (
+        <p className="mt-2 text-base text-gray-500">Check the spelling or try a nearby big city.</p>
+      )}
+    </div>
+  );
+}
+
 const WeatherCard = () => {
-  const { city } = useCity();
-  const { data, isLoading, isError } = useCurrentWeather(city);
+  const { city, setCity } = useCity();
+  const { data, isLoading, isError, error } = useCurrentWeather(city);
   const [activeTab, setActiveTab] = useState('Temperature');
   // °C/°F + km/h/mph (audit 3.2) — hook early return se PEHLE
   const units = useUnits();
@@ -197,7 +231,11 @@ const WeatherCard = () => {
     return (
       <div className="p-8">
         <div className="bg-white rounded-3xl shadow-xl p-10 max-w-[900px] mx-auto text-[#0077b6] text-center">
-          <p className="text-lg text-red-500">Could not load weather data.</p>
+          {error?.response?.status === 404 ? (
+            <CityNotFoundMessage query={city} onPick={(name) => setCity(name.toLowerCase())} />
+          ) : (
+            <p className="text-lg text-red-500">Could not load weather data.</p>
+          )}
         </div>
       </div>
     );

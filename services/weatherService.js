@@ -13,8 +13,9 @@ export const fetchCountryRecommend = (country, start, end) =>
   apiClient.get(ENDPOINTS.trips.recommend, { params: { country, start, end } })
     .then(res => res.data);
 
-export const fetchCitySuggestions = (q) =>
-  apiClient.get(ENDPOINTS.trips.citySearch, { params: { q } })
+// `signal` (AbortController) — purani, ab-bekaar request cancel ho jaye
+export const fetchCitySuggestions = (q, { signal } = {}) =>
+  apiClient.get(ENDPOINTS.trips.citySearch, { params: { q }, signal })
     .then(res => res.data);
 
 export const fetchEventRisk = ({ city, date, type, time }) => {

@@ -2,18 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import NavLink from './NavLink';
-import { MapPin, User, LogOut, Menu, X } from 'lucide-react';
+import { User, LogOut, Menu, X } from 'lucide-react';
 import { useCity } from '../context/CityContext';
 import { useAuth } from '../context/AuthContext';
+import CitySearchBox from './CitySearchBox';
+import { isKnownCity } from '@/data/cities';
+import { exactCity } from '@/utils/fuzzyCity';
 
 const Navbar = () => {
   const { setCity } = useCity();
   const { user, logout } = useAuth();
-  const [searchValue, setSearchValue] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const navLinks = [
     { to: '/', label: 'Home', end: true },
@@ -35,10 +38,24 @@ const Navbar = () => {
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
-  const handleSearch = (e) => {
-    if (e.key === 'Enter' && searchValue.trim()) {
-      setCity(searchValue.trim().toLowerCase());
-      setMenuOpen(false);
+  // Search (UX fixes, owner ka faisla):
+  //  • Home par — pehle jaisa: city set, weather card wahi badal jata hai.
+  //  • Kisi aur page par — shehar hamari 160 ki list mein ho to seedha
+  //    us ka city page; warna city set kar ke home par (pehle yahan sirf
+  //    city set hoti thi aur screen par kuch nahi hota tha).
+  const handleSearch = (text, item) => {
+    const name = item?.name || text;
+    setMenuOpen(false);
+    if (pathname === '/') {
+      setCity(name.toLowerCase());
+      return;
+    }
+    const known = item && isKnownCity(item.slug) ? item : exactCity(name);
+    if (known) {
+      router.push(`/weather/${known.slug}`);
+    } else {
+      setCity(name.toLowerCase());
+      router.push('/');
     }
   };
 
@@ -72,17 +89,10 @@ const Navbar = () => {
             input ko apni min-content width se chhota nahi hone deta aur
             poora navbar viewport se bahar chala jata hai. */}
         <div className="hidden lg:block flex-1 min-w-0 max-w-xl mx-4">
-          <div className="relative flex items-center">
-            <MapPin className="absolute left-4 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleSearch}
-              placeholder="Search city or zip code"
-              className="w-full pl-11 pr-4 py-3 bg-[#f0f5ff] text-gray-700 placeholder-gray-400 text-sm rounded-full border border-[#d6e4ff] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all"
-            />
-          </div>
+          <CitySearchBox
+            onSubmit={handleSearch}
+            inputClassName="w-full pl-11 pr-4 py-3 bg-[#f0f5ff] text-gray-700 placeholder-gray-400 text-sm rounded-full border border-[#d6e4ff] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all"
+          />
         </div>
 
         {/* Right Auth Buttons — desktop */}
@@ -125,23 +135,20 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile menu — search + nav links + auth, sab ek jagah */}
+      {/* Mobile/tablet search — hamesha nazar aaye, menu kholne ki zaroorat
+          nahi (UX fixes A). Server HTML mein hi hai → layout shift nahi.
+          text-base (16px) — iOS chhote font par zoom kar deta hai. */}
+      <div className="lg:hidden px-4 pb-3">
+        <CitySearchBox
+          onSubmit={handleSearch}
+          inputClassName="w-full min-w-0 pl-11 pr-4 h-12 bg-[#f0f5ff] text-gray-700 placeholder-gray-400 text-base rounded-full border border-[#d6e4ff] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all"
+        />
+      </div>
+
+      {/* Mobile menu — nav links + auth (search ab upar, hamesha khula) */}
       {menuOpen && (
         <div id="mobile-menu" className="lg:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-4 space-y-4">
-            {/* Search */}
-            <div className="relative flex items-center">
-              <MapPin className="absolute left-4 w-5 h-5 text-gray-400 pointer-events-none" />
-              <input
-                type="text"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                onKeyDown={handleSearch}
-                placeholder="Search city or zip code"
-                className="w-full min-w-0 pl-11 pr-4 h-12 bg-[#f0f5ff] text-gray-700 placeholder-gray-400 text-base rounded-full border border-[#d6e4ff] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all"
-              />
-            </div>
-
             {/* Nav links */}
             <nav className="flex flex-col">
               {navLinks.map((link) => (

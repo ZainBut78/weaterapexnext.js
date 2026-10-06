@@ -234,9 +234,13 @@ for (const vp of [MOBILE, DESKTOP]) {
     await page.setViewportSize(vp);
     await page.goto('/trip-planner');
     await page.getByPlaceholder(/e\.g\. London/).fill('Barcelona');
-    const dates = page.locator('input[type="date"]');
-    await dates.nth(0).fill(fx.days[0].date);
-    await dates.nth(1).fill(fx.days[4].date);
+    await page.getByPlaceholder(/e\.g\. London/).press('Escape');
+    // Tareekhein ab "16 din" chips se (UX fixes C) — date inputs nahi
+    const chip = (iso) => page.getByRole('button', {
+      name: new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }),
+    });
+    await chip(fx.days[0].date).click();
+    await chip(fx.days[4].date).click();
     await page.getByRole('button', { name: 'Plan Trip' }).click();
 
     await expect(page.getByText('Day score (out of 10):')).toBeVisible();

@@ -5,10 +5,16 @@ import {
   Search, Award, Sun,
   CloudRain, MapPin, Globe,
   ShoppingBag, ChevronDown, Droplets, Sun as SunIcon, Footprints,
-  Shirt, Backpack, X, Calendar, CalendarRange
+  Shirt, Backpack, X, Calendar, CalendarRange, Info
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchTripPlan, fetchCountryRecommend, fetchCitySuggestions } from '@/services/weatherService';
+import { fetchTripPlan, fetchCountryRecommend } from '@/services/weatherService';
+import useCitySuggest from '@/hooks/useCitySuggest';
+import { matchCities } from '@/utils/fuzzyCity';
+import {
+  forecastWindow, inForecast, fmtShort, daysBetween,
+} from '@/utils/forecastWindow';
+import ForecastDayPicker from './ForecastDayPicker';
 import CityNeededNotice from '@/components/CityNeededNotice';
 import { formatDay } from './dayInsights';
 import DayCard, { ScoreLegend } from './DayCard';
@@ -105,16 +111,16 @@ function TripPlannerTool({ intro }) {
   const [mode, setMode] = useState('city');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
-  // Local date. toISOString() UTC deta hai, jis se UTC+5 mein raat 12 se
-  // subah 5 baje tak "aaj" ki tareekh bhi past lagti hai.
-  //
-  // Next.js: component pehle SERVER par bhi banta hai (timezone alag ho
-  // sakta hai) — is liye "aaj" browser mein useEffect ke andar.
-  const [todayStr, setTodayStr] = useState('');
+  // Tareekhon ki window (utils/forecastWindow — browser vs UTC vs
+  // Open-Meteo ka hisaab wahan). Next.js: component pehle SERVER par bhi
+  // banta hai (timezone alag) — is liye "aaj" browser mein useEffect mein.
+  const [win, setWin] = useState(null);
   useEffect(() => {
-    const d = new Date();
-    setTodayStr(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+    setWin(forecastWindow());
   }, []);
+  // 'forecast' = 16 din ke chips (default) · 'estimate' = aage ki tareekhein,
+  // 20 saal ke records se andaza (owner ka faisla — sirf city mode)
+  const [rangeMode, setRangeMode] = useState('forecast');
 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -122,16 +128,19 @@ function TripPlannerTool({ intro }) {
   const [selectedCitySlug, setSelectedCitySlug] = useState(null);
   const [countryQuery, setCountryQuery] = useState('');
 
-  const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
-  const debounceRef = useRef(null);
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
 
   const [formErrors, setFormErrors] = useState({});
 
   const isCityMode = mode === 'city';
+  const isEstimate = isCityMode && rangeMode === 'estimate';
+
+  // Suggestions: local fuzzy (160 cities, zero API) + API — debounce,
+  // abort aur cache hook ke andar (UX fixes B4)
+  const { items: suggestions, didYouMean } = useCitySuggest(city, { enabled: isCityMode });
 
   const { data: tripData, isLoading: tripLoading, error: tripError } = useQuery({
     queryKey: ['tripPlan', searched.query, searched.start, searched.end],
@@ -148,27 +157,6 @@ function TripPlannerTool({ intro }) {
   });
 
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!isCityMode || city.trim().length < 2) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetchCitySuggestions(city.trim());
-        setSuggestions(res.results || []);
-        setShowSuggestions(res.results?.length > 0);
-        setHighlightIdx(-1);
-      } catch {
-        setSuggestions([]);
-        setShowSuggestions(false);
-      }
-    }, 300);
-    return () => clearTimeout(debounceRef.current);
-  }, [city, isCityMode]);
-
-  useEffect(() => {
     const handleClick = (e) => {
       if (
         dropdownRef.current && !dropdownRef.current.contains(e.target) &&
@@ -183,8 +171,8 @@ function TripPlannerTool({ intro }) {
 
   const selectSuggestion = (s) => {
     setCity(s.name);
-    setSuggestions([]);
     setShowSuggestions(false);
+    setHighlightIdx(-1);
   };
 
   const handleKeyDown = (e) => {
@@ -204,25 +192,39 @@ function TripPlannerTool({ intro }) {
   };
 
   // Backend 20 din se zyada ki trip support nahi karta (trip_planner ka
-  // "Max 20 days supported for now"). Pehle user 3 mahine ki dates de kar
-  // submit kar deta tha aur seedha 400 error aata tha. Ab pehle yahin
-  // saaf message.
+  // "Max 20 days supported for now") — estimate mode mein yeh had wahi.
   const MAX_TRIP_DAYS = 20;
 
+  // Window se bahar ki tareekh backend tak KABHI nahi jaati (UX fixes C).
   const validateForm = useCallback(() => {
     const errors = {};
     if (isCityMode && !city.trim()) errors.city = 'Please enter a city name';
     if (!isCityMode && !country.trim()) errors.country = 'Please enter a country name';
-    if (!startDate) errors.startDate = 'Please select a start date';
-    if (!endDate) errors.endDate = 'Please select an end date';
-    if (startDate && endDate) {
-      if (endDate < startDate) {
-        errors.endDate = 'End date must be on or after the start date';
-      } else {
-        const days =
-          Math.round(
-            (new Date(`${endDate}T00:00:00`) - new Date(`${startDate}T00:00:00`)) / 86400000
-          ) + 1;
+    // Taaza window — tab raat 12 ke paar khula rahe to purana "aaj" na chale
+    const fresh = win ? forecastWindow() : null;
+    if (fresh && fresh.end !== win.end) setWin(fresh);
+    if (!fresh) {
+      errors.dates = 'Please wait a moment and try again';
+    } else if (!isEstimate) {
+      const range = `${fmtShort(fresh.start)} and ${fmtShort(fresh.end)}`;
+      if (!startDate) errors.dates = 'Please tap your first and last trip day';
+      else if (!endDate) errors.dates = 'Now tap your last trip day (tap the same day again for a one-day trip)';
+      else if (!inForecast(fresh, startDate) || !inForecast(fresh, endDate) || endDate < startDate) {
+        errors.dates = `Please choose dates between ${range} — that's as far as the forecast goes.`;
+      }
+    } else {
+      if (!startDate) errors.startDate = 'Please select a start date';
+      else if (startDate < fresh.start || startDate > fresh.estimateMax) {
+        errors.startDate = `Please choose a start date between ${fmtShort(fresh.start)} and ${fmtShort(fresh.estimateMax)}`;
+      }
+      if (!endDate) errors.endDate = 'Please select an end date';
+      else if (startDate && endDate < startDate) errors.endDate = 'End date must be on or after the start date';
+      else if (endDate < fresh.estimateFrom) {
+        errors.endDate = `Estimates are for trips ending ${fmtShort(fresh.estimateFrom)} or later — for earlier dates use the live forecast.`;
+      } else if (endDate > fresh.estimateMax) {
+        errors.endDate = `Please choose an end date before ${fmtShort(fresh.estimateMax)}`;
+      } else if (startDate) {
+        const days = daysBetween(startDate, endDate) + 1;
         if (days > MAX_TRIP_DAYS) {
           errors.endDate = `Trips up to ${MAX_TRIP_DAYS} days are supported (you selected ${days})`;
         }
@@ -230,7 +232,27 @@ function TripPlannerTool({ intro }) {
     }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
-  }, [city, country, startDate, endDate, isCityMode]);
+  }, [city, country, startDate, endDate, isCityMode, isEstimate, win]);
+
+  // Forecast <-> estimate badalne par purani tareekhein saaf (ek ki tareekh
+  // doosre mein ghalat hoti hai)
+  const switchRange = (next) => {
+    setRangeMode(next);
+    setStartDate('');
+    setEndDate('');
+    setFormErrors((prev) => {
+      const copy = { ...prev };
+      delete copy.dates; delete copy.startDate; delete copy.endDate;
+      return copy;
+    });
+  };
+
+  const switchMode = (next) => {
+    setMode(next);
+    setSelectedCitySlug(null);
+    // Country mode sirf forecast — estimate ki tareekhein wahan nahi chaltin
+    if (next === 'country' && rangeMode === 'estimate') switchRange('forecast');
+  };
 
   const handlePlan = (e) => {
     e.preventDefault();
@@ -265,12 +287,15 @@ function TripPlannerTool({ intro }) {
   const needsCity = errKind === 'country' || errKind === 'region';
   const freeLimit = error?.response?.data?.code === 'free_limit_reached';
 
+  // Searched (pehle se validate shuda) tareekhein hi dobara — form mein
+  // baad mein chhedi gayi tareekh bina check ke backend tak na jaye
   const pickSuggestedCity = (name) => {
     setMode('city');
     setSelectedCitySlug(null);
     setCity(name);
+    setShowSuggestions(false);
     setSearched({ type: 'city', query: name.trim().toLowerCase(),
-                  start: startDate, end: endDate });
+                  start: searched.start, end: searched.end });
   };
 
   const switchToCountryMode = () => {
@@ -278,10 +303,20 @@ function TripPlannerTool({ intro }) {
     setMode('country');
     setSelectedCitySlug(null);
     setCountry(place);
+    // Country mode sirf forecast: estimate ki tareekhein ho to user chips se chune
+    const forecastDates = win && inForecast(win, searched.start) && inForecast(win, searched.end);
+    if (!forecastDates) {
+      switchRange('forecast');
+      return;
+    }
     if (place) {
-      setSearched({ type: 'country', query: place, start: startDate, end: endDate });
+      setSearched({ type: 'country', query: place, start: searched.start, end: searched.end });
     }
   };
+
+  // Shehar nahi mila (404) -> local "Did you mean" (UX fixes B4)
+  const cityNotFound = searched.type === 'city' && error?.response?.status === 404;
+  const notFoundMatches = cityNotFound ? matchCities(searched.query, { partial: false, limit: 3 }) : [];
   const showCityResult = data && 'days' in (data || {});
 
   const inputClass = (field) =>
@@ -300,13 +335,13 @@ function TripPlannerTool({ intro }) {
 
         <form onSubmit={handlePlan} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8" noValidate>
           <div className="flex gap-2 mb-5">
-            <button type="button" onClick={() => { setMode('city'); setSelectedCitySlug(null); }}
+            <button type="button" onClick={() => switchMode('city')}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 isCityMode ? 'bg-[#0077b6] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}>
               <MapPin className="inline w-3.5 h-3.5 mr-1" /> Search by City
             </button>
-            <button type="button" onClick={() => { setMode('country'); setSelectedCitySlug(null); }}
+            <button type="button" onClick={() => switchMode('country')}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 !isCityMode ? 'bg-[#0077b6] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}>
@@ -314,7 +349,9 @@ function TripPlannerTool({ intro }) {
             </button>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 items-start">
+          {/* City upar, neeche tareekhein (chips poori chaurai lete hain),
+              aakhir mein button — pehle teeno ek line mein the */}
+          <div className="flex flex-col gap-5">
             <div className="flex-1 w-full">
               <label className="block text-sm font-semibold text-gray-600 mb-1.5">
                 {isCityMode ? 'City' : 'Country'}
@@ -332,6 +369,8 @@ function TripPlannerTool({ intro }) {
                   onChange={(e) => {
                     if (isCityMode) {
                       setCity(e.target.value);
+                      setShowSuggestions(true);
+                      setHighlightIdx(-1);
                       clearError('city');
                     } else {
                       setCountry(e.target.value);
@@ -343,15 +382,34 @@ function TripPlannerTool({ intro }) {
                   placeholder={isCityMode ? 'e.g. London, Tokyo, Dubai' : 'e.g. Spain, Italy, Japan'}
                   className={isCityMode ? inputClass('city') : inputClass('country')}
                   autoComplete="off"
+                  {...(isCityMode ? {
+                    role: 'combobox',
+                    'aria-label': 'City',
+                    'aria-autocomplete': 'list',
+                    'aria-expanded': showSuggestions && suggestions.length > 0,
+                    'aria-controls': 'trip-city-suggestions',
+                    'aria-activedescendant': highlightIdx >= 0 ? `trip-city-opt-${highlightIdx}` : undefined,
+                  } : {})}
                 />
-                {showSuggestions && isCityMode && (
+                {showSuggestions && isCityMode && suggestions.length > 0 && (
                   <ul
                     ref={dropdownRef}
+                    id="trip-city-suggestions"
+                    role="listbox"
+                    aria-label="City suggestions"
                     className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto"
                   >
+                    {didYouMean && (
+                      <li role="presentation" className="px-4 pt-2 pb-1 text-xs font-semibold text-gray-500">
+                        Did you mean…?
+                      </li>
+                    )}
                     {suggestions.map((s, i) => (
                       <li
-                        key={s.slug}
+                        key={s.slug || `${s.name}-${s.country}`}
+                        id={`trip-city-opt-${i}`}
+                        role="option"
+                        aria-selected={i === highlightIdx}
                         onClick={() => selectSuggestion(s)}
                         onMouseEnter={() => setHighlightIdx(i)}
                         className={`flex items-center gap-2 px-4 py-2.5 text-sm cursor-pointer transition-colors ${
@@ -369,37 +427,93 @@ function TripPlannerTool({ intro }) {
               {formErrors.city && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><X className="w-3 h-3" />{formErrors.city}</p>}
               {formErrors.country && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><X className="w-3 h-3" />{formErrors.country}</p>}
             </div>
-            <div className="w-full md:w-44">
-              <label className="block text-sm font-semibold text-gray-600 mb-1.5">Start Date</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => { setStartDate(e.target.value); clearError('startDate'); }}
-                  min={todayStr}
-                  className={dateInputClass('startDate')}
-                />
+            <div className="w-full">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="text-sm font-semibold text-gray-600">Trip dates</span>
+                {isEstimate ? (
+                  <span className="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                    Estimate
+                  </span>
+                ) : (
+                  <span className="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+                    Live forecast
+                  </span>
+                )}
               </div>
-              {formErrors.startDate && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><X className="w-3 h-3" />{formErrors.startDate}</p>}
-            </div>
-            <div className="w-full md:w-44">
-              <label className="block text-sm font-semibold text-gray-600 mb-1.5">End Date</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => { setEndDate(e.target.value); clearError('endDate'); }}
-                  min={startDate || todayStr}
-                  className={dateInputClass('endDate')}
+
+              {!isEstimate ? (
+                <ForecastDayPicker
+                  win={win}
+                  start={startDate}
+                  end={endDate}
+                  invalid={!!formErrors.dates}
+                  onChange={(s, e) => { setStartDate(s); setEndDate(e); clearError('dates'); }}
                 />
-              </div>
-              {formErrors.endDate && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><X className="w-3 h-3" />{formErrors.endDate}</p>}
+              ) : (
+                <>
+                  <p className="flex items-start gap-2 text-sm font-semibold bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-3 py-2 mb-3">
+                    <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                    Estimate based on 20 years of climate data — not a forecast
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="trip-est-start" className="block text-sm font-semibold text-gray-600 mb-1.5">Start Date</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
+                        <input
+                          id="trip-est-start"
+                          type="date"
+                          value={startDate}
+                          onChange={(e) => { setStartDate(e.target.value); clearError('startDate'); }}
+                          min={win?.start}
+                          max={win?.estimateMax}
+                          className={dateInputClass('startDate')}
+                        />
+                      </div>
+                      {formErrors.startDate && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><X className="w-3 h-3" />{formErrors.startDate}</p>}
+                    </div>
+                    <div>
+                      <label htmlFor="trip-est-end" className="block text-sm font-semibold text-gray-600 mb-1.5">End Date</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
+                        <input
+                          id="trip-est-end"
+                          type="date"
+                          value={endDate}
+                          onChange={(e) => { setEndDate(e.target.value); clearError('endDate'); }}
+                          min={win ? (startDate > win.estimateFrom ? startDate : win.estimateFrom) : undefined}
+                          max={win?.estimateMax}
+                          className={dateInputClass('endDate')}
+                        />
+                      </div>
+                      {formErrors.endDate && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><X className="w-3 h-3" />{formErrors.endDate}</p>}
+                    </div>
+                  </div>
+                  {win && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      For trips ending {fmtShort(win.estimateFrom)} or later · up to 20 days
+                    </p>
+                  )}
+                </>
+              )}
+
+              {formErrors.dates && <p className="text-xs text-red-500 mt-2 flex items-center gap-1"><X className="w-3 h-3 shrink-0" />{formErrors.dates}</p>}
+
+              {/* Aage ki tareekhein — sirf city mode (country mode sirf forecast) */}
+              {isCityMode && (
+                <button
+                  type="button"
+                  onClick={() => switchRange(isEstimate ? 'forecast' : 'estimate')}
+                  className="mt-2 inline-flex items-center gap-1.5 min-h-11 text-sm font-semibold text-[#0077b6] hover:underline"
+                >
+                  <CalendarRange className="w-4 h-4" />
+                  {isEstimate ? 'Back to the live forecast' : 'Planning further ahead?'}
+                </button>
+              )}
             </div>
             <button
               type="submit"
-              className="w-full md:w-auto px-8 py-2.5 bg-[#0077b6] hover:bg-[#005f8f] text-white font-semibold rounded-lg transition-colors shadow-sm mt-[26px]"
+              className="w-full md:w-auto md:self-end px-8 py-2.5 bg-[#0077b6] hover:bg-[#005f8f] text-white font-semibold rounded-lg transition-colors shadow-sm"
             >
               {isCityMode ? 'Plan Trip' : 'Explore Country'}
             </button>
@@ -427,10 +541,39 @@ function TripPlannerTool({ intro }) {
         {error && !needsCity && !freeLimit && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
             <CloudRain className="w-10 h-10 text-red-400 mx-auto mb-2" />
-            <p className="text-red-600 font-semibold">Could not fetch data</p>
-            <p className="text-red-400 text-sm mt-1">
-              {error.response?.data?.detail || error.response?.data?.error || error.message}
-            </p>
+            {cityNotFound ? (
+              <>
+                <p className="text-red-600 font-semibold">
+                  We couldn&apos;t find &ldquo;{searched.query}&rdquo;.
+                  {notFoundMatches.length > 0 && ' Did you mean:'}
+                </p>
+                {notFoundMatches.length > 0 ? (
+                  <p className="mt-2 flex flex-wrap justify-center items-center gap-x-2 gap-y-1">
+                    {notFoundMatches.map((m, i) => (
+                      <span key={m.slug} className="inline-flex items-center gap-2">
+                        {i > 0 && <span className="text-red-300" aria-hidden="true">·</span>}
+                        <button
+                          type="button"
+                          onClick={() => pickSuggestedCity(m.name)}
+                          className="min-h-11 px-2 font-bold text-[#0077b6] hover:underline"
+                        >
+                          {m.name}, {m.country}
+                        </button>
+                      </span>
+                    ))}
+                  </p>
+                ) : (
+                  <p className="text-red-400 text-sm mt-1">Check the spelling or try a nearby big city.</p>
+                )}
+              </>
+            ) : (
+              <>
+                <p className="text-red-600 font-semibold">Could not fetch data</p>
+                <p className="text-red-400 text-sm mt-1">
+                  {error.response?.data?.detail || error.response?.data?.error || error.message}
+                </p>
+              </>
+            )}
           </div>
         )}
 
