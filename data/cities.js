@@ -8,7 +8,9 @@
 //  backend call se PEHLE 404 hota hai (audit 2.1).
 //
 //  Source (read-only copy): backend
-//  weather/management/commands/fetch_all_cities.py → CITIES (154 shehar).
+//  weather/management/commands/fetch_all_cities.py → CITIES (159 shehar
+//  yahan + Singapore EXTRA mein = 160; Oct 2026: Key West, Anchorage,
+//  Reykjavik, Nassau, San Juan jode — SEO plan ke blog posts).
 //  Slug bilkul backend ke tareeqe se:
 //    name.lower().replace(" ", "-").replace(",", "")
 //  Backend list badle to yeh file bhi badlein.
@@ -19,7 +21,7 @@
 //  list mein nahi — 1.3521, 103.8198 (Singapore ka aam markazi point).
 //  tz: IANA timezone (daylight ke local waqt ke liye, content round B1) —
 //  script se check: har tz Intl mein valid, aur UTC offset shehar ke
-//  longitude ÷ 15 se 3.5 ghante ke andar (155/155 pass).
+//  longitude ÷ 15 se 3.5 ghante ke andar (160/160 pass).
 // ─────────────────────────────────────────────────────────────
 
 const BACKEND_CITIES = [
@@ -177,6 +179,12 @@ const BACKEND_CITIES = [
   { slug: 'medellin', name: 'Medellin', country: 'Colombia', region: 'other', lat: 6.2476, lon: -75.5658, tz: 'America/Bogota' },
   { slug: 'quito', name: 'Quito', country: 'Ecuador', region: 'other', lat: -0.1807, lon: -78.4678, tz: 'America/Guayaquil' },
   { slug: 'san-jose', name: 'San Jose', country: 'Costa Rica', region: 'other', lat: 9.9281, lon: -84.0907, tz: 'America/Costa_Rica' },
+  // SEO plan (Oct 2026) — blog posts ke liye naye shehar (backend list mein bhi)
+  { slug: 'key-west', name: 'Key West', country: 'USA', region: 'usa', lat: 24.5551, lon: -81.78, tz: 'America/New_York' },
+  { slug: 'anchorage', name: 'Anchorage', country: 'USA', region: 'usa', lat: 61.2181, lon: -149.9003, tz: 'America/Anchorage' },
+  { slug: 'reykjavik', name: 'Reykjavik', country: 'Iceland', region: 'europe', lat: 64.1466, lon: -21.9426, tz: 'Atlantic/Reykjavik' },
+  { slug: 'nassau', name: 'Nassau', country: 'Bahamas', region: 'other', lat: 25.0443, lon: -77.3504, tz: 'America/Nassau' },
+  { slug: 'san-juan', name: 'San Juan', country: 'Puerto Rico', region: 'other', lat: 18.4655, lon: -66.1057, tz: 'America/Puerto_Rico' },
 ];
 
 // Singapore: Climate Guides + Popular Destinations par hai, backend ke DB

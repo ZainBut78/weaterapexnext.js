@@ -23,7 +23,15 @@ export const ORGANIZATION = {
   '@type': 'Organization',
   name: SITE_NAME,
   url: SITE_URL,
-  logo: `${SITE_URL}/logo.png`,
+  logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` },
+};
+
+// Blog posts ka author (owner ka faisla, Oct 2026). Backend post ka author
+// abhi nahi bhejta — saare articles Zain likhte / review karte hain.
+export const AUTHOR = {
+  '@type': 'Person',
+  name: 'Zain Butt',
+  url: SITE_URL,
 };
 
 export const breadcrumbs = (items) => ({

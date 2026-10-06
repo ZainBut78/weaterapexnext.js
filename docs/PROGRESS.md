@@ -1091,3 +1091,37 @@ secondary data catch). Paths from `config/endpoints.js`.
   `https://weatherapex.com/…`; query string kept (`/trip-planner?city=london&x=1`). localhost, Host
   `weatherapex.com`, `api.weatherapex.com` and a Hostinger temp host → 200 (no redirect).
 - seo-check 341 / 10 (same 10 from 0 live blog posts) · e2e 24 passed / 1 skipped.
+
+---
+
+## 2026-10-06 — 5 SEO-plan cities + schema (docs/CLAUDE_CODE_SEO_CITIES_PROMPT.md)
+Owner: "haan — redirect rakho, author Zain Butt, pehle code banao".
+
+### PART A — cities
+| City | lat, lon | backend country / region | tz | frontend country (hub region) |
+|---|---|---|---|---|
+| Key West | 24.5551, -81.7800 | USA / usa | America/New_York | United States |
+| Anchorage | 61.2181, -149.9003 | USA / usa | America/Anchorage | United States |
+| Reykjavik | 64.1466, -21.9426 | Iceland / europe | Atlantic/Reykjavik | Iceland IS (europe) |
+| Nassau | 25.0443, -77.3504 | Bahamas / other | America/Nassau | Bahamas BS (latin-america) |
+| San Juan | 18.4655, -66.1057 | Puerto Rico / other | America/Puerto_Rico | Puerto Rico PR (latin-america) |
+- Backend: `fetch_all_cities.py` (160 entries, 160 unique slugs; the 5 slugs = key-west, nassau, anchorage,
+  reykjavik, san-juan), `seed_city_tags.py` (all 5 coastal; Anchorage + Reykjavik hiking). 106 tests OK.
+- Frontend: `data/cities.js` (160), `data/countries.js` (+Iceland, Bahamas, Puerto Rico), `data/cityTags.js`,
+  `app/sitemap.js` comment. tz check 160/160 pass. `historyReady.js` NOT changed (local-dev snapshot only;
+  local DB has no data for the 5).
+- 1-city countries keep the owner rule (owner "redirect rakho"): `/weather/bahamas` → 308 → `/weather/bahamas/nassau`,
+  same for iceland → reykjavik and puerto-rico → san-juan.
+- Sitemap 2,221 → **2,291** (14 URLs per new city). Unknown slug still 404.
+- New city pages were NOT opened (production backend has no data yet — opening them would make the backend
+  geocode + fetch 20 years). Real-data test after the VPS seeding.
+
+### PART B — schema
+- Blog `Article`: author now `Person` "Zain Butt" (`components/JsonLd.jsx` `AUTHOR`); publisher logo `ImageObject`.
+  Already had headline, description, datePublished, dateModified (`updated_at`), image, mainEntityOfPage.
+- Month pages: `Dataset` (name, description, url, temporalCoverage `2006/2025`, spatialCoverage Place + GeoCoordinates,
+  variableMeasured, creator WeatherApex, isBasedOn Open-Meteo, license CC BY 4.0). No FAQPage.
+- seo-check: month pages must have `Dataset` (SEO_ALL loop).
+- JSON-LD validation (parse, no duplicate @type, valid dates): `/`, London October, Orlando November,
+  `/weather/london` → PASS. Blog post page could not be rendered (live backend has 0 posts, local Django down).
+- Checks: build (webpack) OK · seo-check 343 / 10 (same 10: 0 live blog posts) · e2e 24 passed / 1 skipped.

@@ -21,7 +21,7 @@ import { isKnownCity } from '@/data/cities';
 import { cityPath } from '@/data/countries';
 import ProductImage from './ProductImage';
 import { pageMetadata, ogImageUrl, SITE_URL } from '@/utils/seo';
-import JsonLd, { ORGANIZATION, breadcrumbs } from '@/components/JsonLd';
+import JsonLd, { AUTHOR, ORGANIZATION, breadcrumbs } from '@/components/JsonLd';
 
 const BLOG_REVALIDATE = 600;
 export const revalidate = 600;
@@ -78,8 +78,9 @@ export default async function BlogPostPage({ params }) {
   // apne pages hain). Purana backend `cities` na bheje → [] (box nahi).
   const weatherCities = (data.cities || []).filter((c) => isKnownCity(c.slug));
 
-  // Article + Breadcrumb structured data (audit 2.4). Author =
-  // WeatherApex organization (backend author nahi bhejta — owner, 2.4-c).
+  // Article + Breadcrumb structured data (audit 2.4). Author = Person
+  // "Zain Butt" (owner, Oct 2026 — backend abhi author nahi bhejta);
+  // publisher = WeatherApex Organization + logo (ImageObject).
   const postUrl = `${SITE_URL}/blog/${slug}`;
   const articleLd = {
     '@context': 'https://schema.org',
@@ -89,7 +90,7 @@ export default async function BlogPostPage({ params }) {
     datePublished: published_at,
     ...(data.updated_at ? { dateModified: data.updated_at } : {}),
     image: [featured_image || `${SITE_URL}${ogImageUrl(title, category || 'WeatherApex Blog')}`],
-    author: ORGANIZATION,
+    author: AUTHOR,                 // Person (owner, Oct 2026)
     publisher: ORGANIZATION,
     mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
     ...(category ? { articleSection: category } : {}),

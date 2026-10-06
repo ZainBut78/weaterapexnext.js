@@ -212,6 +212,8 @@ async function allSection2Pages() {
       await checkPage(p, r);
       const types = jsonLdTypes(r.html, p);
       ok(types.includes('BreadcrumbList'), p, 'JSON-LD BreadcrumbList');
+      // Month page (/weather/<country>/<city>/<month>) → Dataset (climate normals)
+      if (p.split('/').length === 5) ok(types.includes('Dataset'), p, 'JSON-LD Dataset');
     }
   };
   await Promise.all(Array.from({ length: 6 }, worker));

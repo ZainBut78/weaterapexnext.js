@@ -1,5 +1,5 @@
 // Shehar ke tags — backend weather/management/commands/seed_city_tags.py
-// (CITY_TAGS) ki read-only copy (154 shehar). Backend ki activity rules
+// (CITY_TAGS) ki read-only copy (159 shehar). Backend ki activity rules
 // (trip_planner/activity.py) beach ke liye coastal aur hiking ke liye trails dekhti
 // hain; month page ka "Who {Month} suits" wahi rules use karta hai.
 // List mein na ho (jaise Singapore) → dono false. Backend badle to yeh bhi.
@@ -158,6 +158,12 @@ export const CITY_TAGS = {
   'medellin': { coastal: false, hiking: false },
   'quito': { coastal: false, hiking: true },
   'san-jose': { coastal: false, hiking: false },
+  // SEO plan cities (Oct 2026)
+  'key-west': { coastal: true, hiking: false },
+  'nassau': { coastal: true, hiking: false },
+  'anchorage': { coastal: true, hiking: true },
+  'reykjavik': { coastal: true, hiking: true },
+  'san-juan': { coastal: true, hiking: false },
 };
 
 export const cityTags = (slug) => CITY_TAGS[slug] || { coastal: false, hiking: false };

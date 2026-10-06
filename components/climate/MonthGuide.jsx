@@ -17,7 +17,8 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import JsonLd, { breadcrumbs } from '@/components/JsonLd';
+import JsonLd, { ORGANIZATION, breadcrumbs } from '@/components/JsonLd';
+import { SITE_URL } from '@/utils/seo';
 import { UnitTemp, UnitDeltaSigned } from './UnitText';
 import { QuickAnswer, heroLine, tableIntro, FeelSection, RainSection, DaylightSection, CompareSection, quickQuestions, suitWhy, tipText } from './MonthStory';
 import { monthFacts } from '@/utils/monthNarrative';
@@ -67,6 +68,28 @@ export default function MonthGuide({ data, city, country, month, photo, crumbs, 
   return (
     <div className="min-h-screen bg-[#f3f7ff]">
       <JsonLd data={breadcrumbs(crumbs)} />
+      {/* Dataset (SEO cities round, owner "haan"): page asal mein 2006–2025 ke
+          climate normals hain — Article + banawati dateModified se zyada sahi.
+          FAQPage nahi (Google aam sites par FAQ rich results nahi dikhata). */}
+      <JsonLd data={{
+        '@context': 'https://schema.org',
+        '@type': 'Dataset',
+        name: `${city.name} weather in ${month.name}: ${years.start}–${years.end} climate averages`,
+        description: `Monthly climate normals for ${place} in ${month.name}: average high and low temperature, total rainfall, rainy days, daily sunshine hours and humidity, averaged over ${years.start}–${years.end} from historical weather data.`,
+        url: `${SITE_URL}${crumbs[crumbs.length - 1].path}`,
+        temporalCoverage: `${years.start}/${years.end}`,
+        ...(typeof geo.lat === 'number' ? {
+          spatialCoverage: {
+            '@type': 'Place',
+            name: place,
+            geo: { '@type': 'GeoCoordinates', latitude: geo.lat, longitude: geo.lon },
+          },
+        } : {}),
+        variableMeasured: ['Average high temperature', 'Average low temperature', 'Total precipitation', 'Rainy days', 'Sunshine hours', 'Relative humidity'],
+        creator: ORGANIZATION,
+        isBasedOn: 'https://open-meteo.com/',
+        license: 'https://creativecommons.org/licenses/by/4.0/',
+      }} />
       <Navbar />
 
       {/* 1. Hero */}

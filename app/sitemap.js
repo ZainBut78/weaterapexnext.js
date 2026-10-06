@@ -5,7 +5,7 @@
 //  • Saari blog posts — /api/blog/posts/ ke saare pages server par
 //  • Section 1: whitelist ke saare city pages /weather/<city> (data/cities.js)
 //  • Section 2 (Phase C2): /weather hub, 2+ shehar wale country pages,
-//    /weather/<country>/<city> (155) aur 12 month pages har shehar (1,860)
+//    /weather/<country>/<city> (160) aur 12 month pages har shehar (1,920)
 //    — sab data/ files se; 1-shehar mulk ka country page NAHI (308 hai)
 //
 //  History endpoint KABHI call nahi hota (Open-Meteo quota).

@@ -30,6 +30,7 @@ export const COUNTRIES = [
   { source: 'Germany', name: 'Germany', slug: 'germany', iso2: 'DE', region: 'europe' },
   { source: 'Greece', name: 'Greece', slug: 'greece', iso2: 'GR', region: 'europe' },
   { source: 'Hungary', name: 'Hungary', slug: 'hungary', iso2: 'HU', region: 'europe' },
+  { source: 'Iceland', name: 'Iceland', slug: 'iceland', iso2: 'IS', region: 'europe' },
   { source: 'Ireland', name: 'Ireland', slug: 'ireland', iso2: 'IE', region: 'europe' },
   { source: 'Italy', name: 'Italy', slug: 'italy', iso2: 'IT', region: 'europe' },
   { source: 'Netherlands', name: 'Netherlands', slug: 'netherlands', iso2: 'NL', region: 'europe' },
@@ -49,6 +50,10 @@ export const COUNTRIES = [
   { source: 'Colombia', name: 'Colombia', slug: 'colombia', iso2: 'CO', region: 'latin-america' },
   { source: 'Costa Rica', name: 'Costa Rica', slug: 'costa-rica', iso2: 'CR', region: 'latin-america' },
   { source: 'Ecuador', name: 'Ecuador', slug: 'ecuador', iso2: 'EC', region: 'latin-america' },
+  // Oct 2026 (SEO plan). Caribbean → "Latin America" hub region. Puerto Rico
+  // ka apna naam backend mein bhi (log "puerto rico" search karte hain).
+  { source: 'Bahamas', name: 'Bahamas', slug: 'bahamas', iso2: 'BS', region: 'latin-america' },
+  { source: 'Puerto Rico', name: 'Puerto Rico', slug: 'puerto-rico', iso2: 'PR', region: 'latin-america' },
   { source: 'UAE', name: 'United Arab Emirates', slug: 'united-arab-emirates', iso2: 'AE', region: 'middle-east-africa' },
   { source: 'Turkey', name: 'Turkey', slug: 'turkey', iso2: 'TR', region: 'middle-east-africa' },
   { source: 'Iran', name: 'Iran', slug: 'iran', iso2: 'IR', region: 'middle-east-africa' },
