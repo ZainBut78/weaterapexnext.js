@@ -4,17 +4,18 @@
 //  "Aaj" teen jagah alag ho sakta hai:
 //   • browser (user ki local date) — user calendar par yahi dekhta hai
 //   • backend — `date.today()` Django TIME_ZONE='UTC' par = UTC date;
-//     `end - today <= 16` ho to forecast, warna historical estimate
+//     `end - today <= 15` ho to forecast, warna historical estimate
+//     (pehle `<= 16` tha — +16 par forecast maangta aur 503; Oct 2026 fix)
 //   • Open-Meteo — end_date zyada se zyada UTC aaj + 15 (Oct 2026 test:
 //     Honolulu ke liye bhi +16 par "out of allowed range")
 //  Is liye:
 //   • forecast: pehla din = browser ka aaj, aakhri = UTC aaj + 15
 //     (Pakistan mein raat 12–5 baje 15 din, warna 16)
-//   • estimate: aakhri din >= UTC aaj + 17 — +16 par backend forecast
-//     maangta aur Open-Meteo mana kar deta (503)
+//   • estimate: aakhri din >= UTC aaj + 16 — forecast ke foran baad, koi
+//     khaali din nahi. Backend ka `<= 15` fix PEHLE deploy hona zaroori.
 // ─────────────────────────────────────────────────────────────
 export const FORECAST_LAST_OFFSET = 15;
-export const ESTIMATE_FIRST_END_OFFSET = 17;
+export const ESTIMATE_FIRST_END_OFFSET = 16;
 export const ESTIMATE_MAX_AHEAD_DAYS = 365;
 
 const pad = (n) => String(n).padStart(2, '0');

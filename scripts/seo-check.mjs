@@ -174,7 +174,8 @@ async function checkPage(route, r) {
     for (const t of JSONLD_REQUIRED[route] || []) ok(types.includes(t), route, `JSON-LD ${t}`);
     if (route.startsWith('/blog/')) {
       ok(types.includes('Article') && types.includes('BreadcrumbList'), route, 'JSON-LD Article + BreadcrumbList');
-      const aff = [...r.html.matchAll(/<a [^>]*target="_blank"[^>]*>/g)].map((m) => m[0]);
+      // Sirf affiliate box ke links (data-affiliate) — Sources / content ke naye-tab links affiliate nahi
+      const aff = [...r.html.matchAll(/<a [^>]*data-affiliate[^>]*>/g)].map((m) => m[0]);
       for (const a of aff) ok(/rel="[^"]*sponsored/.test(a), route, 'affiliate link rel has sponsored');
       if (!aff.length) results.push(`info  ${route.padEnd(28)} (no affiliate links on this post)`);
       ok(!/\| WeatherApex Blog \| WeatherApex Blog/.test(title), route, 'title has no doubled suffix', title);

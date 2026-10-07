@@ -22,6 +22,10 @@ import { cityPath } from '@/data/countries';
 import ProductImage from './ProductImage';
 import { pageMetadata, ogImageUrl, SITE_URL } from '@/utils/seo';
 import JsonLd, { AUTHOR, ORGANIZATION, breadcrumbs } from '@/components/JsonLd';
+import BlogToc from '@/components/blog/BlogToc';
+import BlogFaq from '@/components/blog/BlogFaq';
+import { FurtherReading, Sources } from '@/components/blog/BlogLinks';
+import { prepareBlogHtml } from '@/utils/blogHtml';
 
 const BLOG_REVALIDATE = 600;
 export const revalidate = 600;
@@ -51,8 +55,9 @@ export async function generateMetadata({ params }) {
       description,
       path: `/blog/${slug}`,
       type: 'article',
-      // Post ki apni tasveer ho to wahi share image, warna generated
-      image: data.featured_image || undefined,
+      // Share image: backend ki 1200×630 (og_image, upload se khud bani) →
+      // featured image → warna generated
+      image: data.og_image || data.featured_image || undefined,
       openGraph: { publishedTime: data.published_at },
     }),
     ...(data.meta_keywords ? { keywords: data.meta_keywords } : {}),
@@ -74,6 +79,12 @@ export default async function BlogPostPage({ params }) {
   if (!data) notFound();
 
   const { title, category, excerpt, content, featured_image, affiliate_products, published_at } = data;
+  // Blog editor round 2 — naye fields (purana backend na bheje → khaali, block nahi)
+  const faqs = data.faqs || [];
+  const furtherReading = data.further_reading || [];
+  const sources = data.sources || [];
+  const featuredAlt = data.featured_image_alt || title;
+  const { html: contentHtml, toc } = prepareBlogHtml(content);
   // Backend round B4: article ke linked shehar — sirf whitelist wale (unke
   // apne pages hain). Purana backend `cities` na bheje → [] (box nahi).
   const weatherCities = (data.cities || []).filter((c) => isKnownCity(c.slug));
@@ -89,16 +100,32 @@ export default async function BlogPostPage({ params }) {
     description: data.meta_description || excerpt || undefined,
     datePublished: published_at,
     ...(data.updated_at ? { dateModified: data.updated_at } : {}),
-    image: [featured_image || `${SITE_URL}${ogImageUrl(title, category || 'WeatherApex Blog')}`],
+    // Upload ki hui tasveer (featured + 1200×630 OG), warna generated
+    image: [featured_image, data.og_image].filter(Boolean).length
+      ? [featured_image, data.og_image].filter(Boolean)
+      : [`${SITE_URL}${ogImageUrl(title, category || 'WeatherApex Blog')}`],
     author: AUTHOR,                 // Person (owner, Oct 2026)
     publisher: ORGANIZATION,
     mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
     ...(category ? { articleSection: category } : {}),
   };
 
+  // FAQPage — sirf jab FAQ hon (Google rich result kam dikhata hai, magar
+  // Bing / AI search parhte hain; nuqsaan nahi). Jawab saada text.
+  const faqLd = faqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  } : null;
+
   return (
     <div className="min-h-screen bg-[#f3f7ff]">
       <JsonLd data={articleLd} />
+      {faqLd && <JsonLd data={faqLd} />}
       <JsonLd
         data={breadcrumbs([
           { name: 'Home', path: '/' },
@@ -116,9 +143,20 @@ export default async function BlogPostPage({ params }) {
           <ArrowLeft className="w-4 h-4" /> Back to Blog
         </Link>
 
+        {/* Featured image — LCP: priority, width/height (backend) → jagah
+            pehle se (CLS nahi). Alt admin se. */}
         {featured_image && (
           <div className="rounded-3xl overflow-hidden mb-8 shadow-sm">
-            <img src={featured_image} alt={title} className="w-full max-h-96 object-cover" />
+            <img
+              src={featured_image}
+              alt={featuredAlt}
+              {...(data.featured_image_width && data.featured_image_height
+                ? { width: data.featured_image_width, height: data.featured_image_height }
+                : {})}
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-auto max-h-96 object-cover"
+            />
           </div>
         )}
 
@@ -145,7 +183,12 @@ export default async function BlogPostPage({ params }) {
         {/* NOTE: dangerouslySetInnerHTML zaroori hai kyunki content CKEditor se
             RICH HTML mein aata hai (bold, links, images). Yeh safe hai kyunki
             content sirf TRUSTED admin se aata hai, public users se nahi. */}
-        <div className="blog-content" dangerouslySetInnerHTML={{ __html: content }} />
+        <BlogToc items={toc} />
+        <div className="blog-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
+
+        <BlogFaq faqs={faqs} />
+        <FurtherReading links={furtherReading} />
+        <Sources sources={sources} />
 
         {affiliate_products.length > 0 && (
           <div className="mt-10 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
@@ -158,6 +201,7 @@ export default async function BlogPostPage({ params }) {
                   target="_blank"
                   // Affiliate (paid) link — Google ka rule: rel="sponsored" (audit 1.5)
                   rel="sponsored nofollow noopener noreferrer"
+                  data-affiliate=""
                   className="bg-[#f3f7ff] rounded-2xl overflow-hidden flex flex-col hover:shadow-md transition-shadow border border-transparent hover:border-[#0077b6] group"
                 >
                   <div className="h-36 bg-white p-3 flex items-center justify-center">

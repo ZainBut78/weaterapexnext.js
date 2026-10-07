@@ -24,7 +24,7 @@ function Card({ post }) {
       <div className="h-36 w-full overflow-hidden relative bg-gray-100">
         {post.featured_image ? (
           <img
-            loading="lazy" decoding="async" src={post.featured_image} alt={post.title}
+            loading="lazy" decoding="async" src={post.featured_image} alt={post.featured_image_alt || post.title}
             width={400} height={144}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />

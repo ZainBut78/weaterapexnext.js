@@ -1177,3 +1177,44 @@ estimate KHATAM NA karo: city mode 16-day chips (default) + 'Planning further ah
   (new `tests/e2e/ux-fixes.spec.mjs` 21 tests; old trip test now taps chips). "barcelona" typed fast → 1 suggestion
   call. Screenshots 390 + 1440: navbar, typeahead, chips, estimate.
 - Tested against the live API (local Django down); trip plans were mocked in e2e.
+- **Follow-up (owner "haan"):** backend `trip_planner/views.py` `<= 16` → `<= 15` (+ `tests_forecast_window.py`,
+  108 tests OK). Frontend `ESTIMATE_FIRST_END_OFFSET` 17 → 16: the estimate now starts right after the last forecast
+  day (no gap day). Deploy the backend first. e2e 45 passed / 1 skipped again.
+
+---
+
+## 2026-10-06 — Blog editor Round 1 (backend only)
+TinyMCE 7 editor, image uploads (WebP), FAQ / Further reading / Sources, live SEO panel, scheduled posts,
+/media/ in production. Details + deploy steps: `Apex_Weather/CHANGES_REPORT_2.md`. Backend 128 tests OK.
+The API is backward-compatible (new keys only); frontend Round 2 (blog page blocks) comes after the owner checks the local admin.
+
+---
+
+## 2026-10-07 — Blog editor Round 1 fixes (backend) + Round 2 (frontend blog page)
+Backend fixes after the owner's local admin test (post 14), all in `Apex_Weather/CHANGES_REPORT_2.md`:
+relative `/media/` in content (the API makes it absolute with `MEDIA_BASE_URL`), width/height on uploaded images (also added by
+the API for old posts), alt check in the browser before Save (the featured file is not lost), slug hint keeps focus-keyword
+words, sticky toolbar. Backend 130 tests OK.
+
+### Round 2 — `/blog/<slug>` renders everything from the API (an empty block is hidden)
+- `utils/blogHtml.js` (server): `<h2>` gets an `id` (unique, accent-free slug) → TOC; `<table>` → `.table-scroll` box
+  (role=region, keyboard focus); `<img>` lazy + async (backend width/height → no CLS); `target=_blank` gets `noopener`.
+- `components/blog/BlogToc.jsx`: "On this page" from 2+ H2s — `<details>` (closed) on mobile, always open on desktop.
+- `components/blog/BlogFaq.jsx`: `<details>/<summary>` accordion; answers are in the HTML; plain text with line breaks.
+- `components/blog/BlogLinks.jsx`: Further reading (internal `Link`s) + Sources (new tab, `rel` from the admin).
+- `app/blog/[slug]/page.js`: featured image with admin alt, width/height, `fetchPriority="high"`; **FAQPage JSON-LD**
+  when there are FAQs; Article `image` = uploaded featured + OG (fallback: generated); share image = `og_image`.
+  Affiliate links get `data-affiliate` (seo-check now checks `sponsored` only on those, not on Sources).
+- `app/globals.css`: h4, hr, `scroll-margin-top` on h2, figure/figcaption, table scroll box + header + zebra rows,
+  Safari `<details>` marker hidden. Same colours and radius.
+- Blog list + RelatedArticles: alt = `featured_image_alt`.
+- Images stay plain `<img>` (no `next/image` / `remotePatterns`): Hostinger image optimisation would use server CPU, and the
+  backend already serves WebP ≤ 1600px with width/height.
+
+### Checks (local backend :8000, `next start` :3100)
+- build (webpack) OK · **seo-check 404 / 0** (local has posts) · **e2e 48 passed / 0 skipped** (new `tests/e2e/blog-post.spec.mjs`:
+  FAQ open/close, FAQPage = API FAQs, TOC anchors, Further reading, Sources target/rel, no overflow, featured alt/width, CLS < 0.1;
+  skips when a backend has no post with FAQs).
+- JSON-LD validation PASS: post 14 + post 13 (Article, FAQPage, BreadcrumbList), old post `paris-timing` (Article, BreadcrumbList).
+- 390 + 1440: table scrolls inside its box on mobile (no page overflow), FAQ toggles, CLS 0, featured 1600×960 `fetchpriority=high`.
+- Post 14 `published_at` was set to now (owner allowed) for this test.

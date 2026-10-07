@@ -260,6 +260,8 @@ test('trip planner: "Planning further ahead?" uses clearly-labelled estimates, b
   await page.getByPlaceholder(/e\.g\. London/).press('Escape');
   await page.getByRole('button', { name: 'Planning further ahead?' }).click();
   await expect(page.getByText('Estimate based on 20 years of climate data — not a forecast')).toBeVisible();
+  // Forecast ke aakhri din ke foran baad se estimate — beech mein khaali din nahi
+  await expect(page.getByText(`For trips ending ${fmtShort(addDays(win.end, 1))} or later`)).toBeVisible();
 
   // Aakhri din forecast window ke andar → mana, backend tak nahi gaya
   await page.getByLabel('Start Date').fill(addDays(win.end, -3));
