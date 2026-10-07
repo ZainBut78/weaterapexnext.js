@@ -46,8 +46,15 @@ const nextConfig = {
   },
 
   async headers() {
-    if (!NOINDEX) return [];
+    // Mausam ke icons (public/icons/meteocons) — har page par dobara na
+    // aayein. Naam hash nahi, is liye 1 hafta (icon badle to hafte mein pohnch jaye).
+    const icons = {
+      source: '/icons/:path*',
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }],
+    };
+    if (!NOINDEX) return [icons];
     return [
+      icons,
       {
         source: '/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],

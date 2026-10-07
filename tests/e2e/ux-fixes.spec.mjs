@@ -105,13 +105,23 @@ test('typing "barcelona" quickly makes at most 2 suggestion calls', async ({ pag
   const calls = await mockCitySearch(page);
   await page.setViewportSize(DESKTOP);
   await page.goto('/');
+  await page.waitForLoadState('networkidle');      // hydration ke dauran typing nahi
   const input = page.locator('header input[role="combobox"]').first();
   await input.click();
-  await input.pressSequentially('barcelona', { delay: 60 });
+  // Har keystroke ka asal waqt (browser mein) — dheemi machine par do harfon
+  // ke beech 300 ms se zyada guzre to debounce ka call bhejna SAHI hai.
+  await page.evaluate(() => {
+    window.__keyTimes = [];
+    document.addEventListener('input', () => window.__keyTimes.push(performance.now()), true);
+  });
+  await input.pressSequentially('barcelona', { delay: 40 });
   await expect(page.getByRole('option', { name: /Barcelona/ }).first()).toBeVisible();
   await page.waitForTimeout(800);
-  expect(calls.length).toBeLessThanOrEqual(2);
+  const times = await page.evaluate(() => window.__keyTimes);
+  const longGaps = times.slice(1).filter((t, i) => t - times[i] >= 300).length;
   expect(calls.length).toBeGreaterThanOrEqual(1);
+  // Tez typing (koi lamba waqfa nahi) → zyada se zyada 2 calls
+  expect(calls.length).toBeLessThanOrEqual(2 + longGaps);
 });
 
 test('keyboard: ↓ + Enter picks the suggestion, Esc closes the list', async ({ page }) => {

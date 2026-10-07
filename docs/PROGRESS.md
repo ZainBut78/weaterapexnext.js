@@ -1218,3 +1218,17 @@ words, sticky toolbar. Backend 130 tests OK.
 - JSON-LD validation PASS: post 14 + post 13 (Article, FAQPage, BreadcrumbList), old post `paris-timing` (Article, BreadcrumbList).
 - 390 + 1440: table scrolls inside its box on mobile (no page overflow), FAQ toggles, CLS 0, featured 1600×960 `fetchpriority=high`.
 - Post 14 `published_at` was set to now (owner allowed) for this test.
+
+---
+
+## 2026-10-07 — Live fixes: local weather icons (+ backend MEDIA_BASE_URL / editor, see CHANGES_REPORT_2)
+- **Meteocons without a CDN:** cdn.meteocons.com (3.0.0-next.10) often did not load. The 20 icons we use (fill, same version,
+  MIT, `LICENSE-meteocons.txt`) are now in `public/icons/meteocons/` (~108 KB in total; scanned: no script or external refs).
+  `utils/meteoconsMap.js` `METEOCONS_BASE = "/icons/meteocons"`.
+  `next.config.mjs`: `/icons/*` gets `Cache-Control: public, max-age=604800, stale-while-revalidate=86400`.
+- `scripts/check-icons.mjs` now checks local files (every WMO code × day/night has a file, it is an SVG with no
+  script/external link, unknown → cloudy) — no internet needed. All passed.
+- e2e: the "barcelona typed quickly" test was flaky on a slow machine (typing during hydration and gaps of 300 ms or more).
+  It now waits for `networkidle` and allows one call per keystroke gap of 300 ms or more; with fast typing the limit is still ≤ 2. 5/5 passed.
+- Checks (live API, :3001): build OK · e2e 48 passed (1 flaky test fixed, then 5/5) · seo-check 361 / 9 — the 9 are all
+  `/blog?page=2`, which does not exist on live yet (only 1 post), so it is data, not code (local with 10+ posts: 404 / 0).

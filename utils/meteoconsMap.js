@@ -1,7 +1,10 @@
-// Meteocons animated weather icons — https://meteocons.com
-// CDN: cdn.meteocons.com par sirf v3 pre-releases live hain (v2 kabhi upload nahi hua),
-// isliye current version "3.0.0-next.10" pin kiya hai (tested — saare names 200).
-const METEOCONS_BASE = "https://cdn.meteocons.com/3.0.0-next.10/svg/fill";
+// Meteocons animated weather icons — https://meteocons.com (MIT, Bas Milius)
+// Pehle cdn.meteocons.com (3.0.0-next.10) se aate the — live par kabhi load
+// hi nahi hote the. Ab wahi 20 SVG (fill, 3.0.0-next.10) apni site par:
+// public/icons/meteocons/ — koi bahar ki CDN nahi (owner, Oct 2026).
+// Naya icon name map mein daalo to us ki SVG bhi wahan rakho
+// (scripts/check-icons.mjs har name ki file check karta hai).
+const METEOCONS_BASE = "/icons/meteocons";
 
 // ══════════════════════════════════════════════════════════════════════
 // WMO Weather interpretation codes (WW) — Open-Meteo ka poora set.
