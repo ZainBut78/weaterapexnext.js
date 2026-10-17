@@ -59,6 +59,22 @@ export const getHistory = (citySlug) =>
     revalidate: HISTORY_REVALIDATE,
   });
 
+// Whitelist shehar (URL sahi) magar backend ke paas data abhi nahi (jaise
+// naya shehar seeding se pehle). Pehle yahan notFound() tha → ISR 404 ko
+// 1 din + 1 saal SWR cache kar leta, aur data aane ke baad bhi purana 404
+// (soft 404) dikhta. Ab 503 throw — Next errors cache NAHI karta, purana
+// achha page (agar ho) rehta hai; data aate hi page ban jata hai.
+// Ghalat URL (whitelist se bahar) ab bhi resolveCity() mein asli 404.
+export async function requireHistory(citySlug) {
+  const data = await getHistory(citySlug);
+  if (!data) {
+    const err = new Error(`Climate history not available yet for ${citySlug}`);
+    err.status = 503;
+    throw err;
+  }
+  return data;
+}
+
 /**
  * @param {string[]} slugs    — tarteeb ahem: pehle wale pehle
  * @param {object}   o

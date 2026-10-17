@@ -11,6 +11,9 @@ const NOINDEX = process.env.SITE_NOINDEX === '1';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // ISR pages ki stale-while-revalidate 1 saal ki jagah zyada se zyada 2 din
+  // (sab se lamba page revalidate 1 din). SEO fixes Oct 2026.
+  expireTime: 172800,
   // ── Standalone (Hostinger khud `output: 'standalone'` lagata hai) ──
   // Local test ke liye sirf env switch: NEXT_OUTPUT=standalone npm run build.
   // Hamesha nahi — standalone ke saath local `next start` (aur hamare

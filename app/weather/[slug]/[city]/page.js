@@ -9,7 +9,6 @@
 //  use karte hain (same URL + cache).
 //  Params ghalat → 404, backend call se pehle (../resolve.js).
 // ─────────────────────────────────────────────────────────────
-import { notFound } from 'next/navigation';
 import { resolveCity } from '../resolve';
 import { getCity } from '@/data/cities';
 import CityByMonth from '@/components/climate/CityByMonth';
@@ -17,7 +16,7 @@ import RelatedArticles from '@/components/RelatedArticles';
 import { citiesOfCountry, cityPath, countryPath, hasCountryPage, monthPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
-import { getHistory, yearsOf } from '@/services/history';
+import { requireHistory, yearsOf } from '@/services/history';
 import { bestMonths, yearExtremes } from '@/utils/climateMath';
 
 export const revalidate = 86400;
@@ -29,8 +28,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const p = await params;
   const { country, city } = resolveCity(p.slug, p.city);
-  const data = await getHistory(city.slug);
-  if (!data) return { title: 'Page not found' };
+  const data = await requireHistory(city.slug);
   const x = yearExtremes(data.monthly_data);
   const best = bestMonths(data.monthly_data, 3).map((m) => m.name);
   return pageMetadata({
@@ -47,8 +45,7 @@ export async function generateMetadata({ params }) {
 export default async function CityByMonthPage({ params }) {
   const p = await params;
   const { country, city } = resolveCity(p.slug, p.city);
-  const data = await getHistory(city.slug);
-  if (!data) notFound();
+  const data = await requireHistory(city.slug);
   // Backend round A6: photo isi history jawab se (0 extra calls)
   const photo = await photoFromHistory(data, city.slug);
 

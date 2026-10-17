@@ -7,7 +7,13 @@
 //   • Title/description `generateMetadata` se (purana Helmet).
 //   • Post na mile → notFound() = asli HTTP 404 (pehle 200 ke sath
 //     "Post not found" dikhta tha).
-//   • Pehli dafa khulne par page banta hai, phir 10 min cache (ISR).
+//   • SEO fixes (Oct 2026): page DYNAMIC (ISR HTML cache nahi). Wajah: koi
+//     post publish se pehle link ho jati to us slug ka 404 ISR mein
+//     (s-maxage=600, SWR 1 saal) cache ho jata; publish ke baad bhi purana
+//     "not found" (200 STALE) dikhta — soft 404. Ab 404 kabhi cache nahi,
+//     aur post publish/schedule hote hi dikhti hai. Backend phir bhi kam:
+//     post ka data Next fetch cache mein 10 min (sirf 200 jawab cache hote
+//     hain), aur Django save par /api/revalidate path saaf karta hai.
 // ─────────────────────────────────────────────────────────────
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -27,14 +33,8 @@ import BlogFaq from '@/components/blog/BlogFaq';
 import { FurtherReading, Sources } from '@/components/blog/BlogLinks';
 import { prepareBlogHtml } from '@/utils/blogHtml';
 
-const BLOG_REVALIDATE = 600;
-export const revalidate = 600;
-
-// Build ke waqt koi post pehle se nahi banti — har post pehli visit par
-// banti hai aur cache hoti hai (on-demand ISR).
-export async function generateStaticParams() {
-  return [];
-}
+const BLOG_REVALIDATE = 600;   // sirf data (fetch) cache
+export const dynamic = 'force-dynamic';
 
 // generateMetadata aur page dono yahi call karte hain — Next.js ek hi
 // URL ki fetch ko ek request mein mila deta hai (backend ko 1 call).
