@@ -3,7 +3,7 @@
 //
 //  • Static public pages (login/signup/pricing NAHI — noindex hain)
 //  • Saari blog posts — /api/blog/posts/ ke saare pages server par
-//  • Section 1: whitelist ke saare city pages /weather/<city> (data/cities.js)
+//  • Section 1 (/weather/<city>) NAHI — SEO fixes Oct 2026: merge + 301
 //  • Section 2 (Phase C2): /weather hub, 2+ shehar wale country pages,
 //    /weather/<country>/<city> (160) aur 12 month pages har shehar (1,920)
 //    — sab data/ files se; 1-shehar mulk ka country page NAHI (308 hai)
@@ -52,7 +52,6 @@ export default async function sitemap() {
       // Backend round B4: updated_at (har save par) — purana backend → published_at
       ...((post.updated_at || post.published_at) ? { lastModified: new Date(post.updated_at || post.published_at) } : {}),
     })),
-    ...CITIES.map((c) => ({ url: url(`/weather/${c.slug}`) })),
     // Section 2
     { url: url('/weather') },
     ...COUNTRIES.filter((c) => hasCountryPage(c.slug)).map((c) => ({ url: url(countryPath(c.slug)) })),

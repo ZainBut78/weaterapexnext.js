@@ -1,18 +1,55 @@
 // ─────────────────────────────────────────────────────────────
-//  CITY WEATHER BY MONTH — /weather/<country>/<city>  (Phase C2, Section 2)
-//  Server component. Historical page (Section 1) ki copy NAHI:
-//  intro (saal ke extremes), relative best months, 12 month cards (har
-//  card us mahine ka apna data + faisla + link), Section 1 ka link,
-//  usi mulk ke doosre shehar. Data: wahi ek history call (0 izafi).
+//  CITY WEATHER BY MONTH + CLIMATE GUIDE — /weather/<country>/<city>
+//
+//  SEO fixes (Oct 2026, owner option 1 "merge, then 301"): purana Section 1
+//  page (/weather/<city>, "City Climate & Weather Guide") isi page mein mil
+//  gaya — /weather/<city> ab 301 → yahan (proxy.js). Upar wahi Section 2
+//  (H1, intro, best months, 12 month cards); neeche Section 1 ka content:
+//  stat tiles, temperature/rain/sun charts (lazy — LCP par asar nahi), poori
+//  monthly table (server HTML), packing tips, trip planner CTA.
+//  Section 1 ki narrative nahi dohrayi — wahi baatein intro (#2) mein hain
+//  (ek page par ek hi summary; mahine ki tafseel month pages par).
+//  Data: wahi ek history call (0 izafi).
 // ─────────────────────────────────────────────────────────────
 import Link from 'next/link';
-import { ArrowRight, CalendarRange, MapPin, Sparkles, Info, Droplets, CloudRain, Sun, BookOpen } from 'lucide-react';
+import {
+  ArrowRight, CalendarRange, MapPin, Sparkles, Info, Droplets, CloudRain, Sun,
+  BookOpen, Thermometer, Shirt, Umbrella,
+} from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import JsonLd, { breadcrumbs } from '@/components/JsonLd';
+import JsonLd, { ORGANIZATION, breadcrumbs } from '@/components/JsonLd';
 import { UnitTemp } from './UnitText';
+import MonthlyTable from './MonthlyTable';
+import LazyClimateChart from './LazyClimateChart';
 import { pexelsSized, pexelsSrcSet } from '@/services/cityPhoto';
 import { MONTHS, rowFor, visitVerdict, yearExtremes, bestMonths, mmToIn } from '@/utils/climateMath';
+import { MONTH_SHORT } from '@/utils/climateNarrative';
+import { SITE_URL } from '@/utils/seo';
+
+// Purane Section 1 wali packing (wahi qawaid, wahi text)
+function packingFor(monthly) {
+  const withHighs = monthly.filter((m) => typeof m.avg_high === 'number');
+  const withRain = monthly.filter((m) => typeof m.avg_rainfall === 'number');
+  const packing = [{ icon: Shirt, title: 'Versatile Layers', text: 'Light layers that work for both mild afternoons and cooler evenings.' }];
+  if (withRain.length) {
+    const wettest = withRain.reduce((a, b) => (a.avg_rainfall > b.avg_rainfall ? a : b));
+    if (wettest.avg_rainfall > 60) {
+      packing.push({ icon: Umbrella, title: 'Rain Protection', text: 'A compact umbrella and a light rain jacket for the wettest months.' });
+    }
+  }
+  if (withHighs.length) {
+    const hottest = withHighs.reduce((a, b) => (a.avg_high > b.avg_high ? a : b));
+    if (hottest.avg_high > 30) {
+      packing.push({ icon: Sun, title: 'Sun Protection', text: 'Sunscreen, a wide-brimmed hat and sunglasses for hot, sunny days.' });
+    }
+    const coldest = withHighs.reduce((a, b) => (a.avg_high < b.avg_high ? a : b));
+    if (coldest.avg_high < 10) {
+      packing.push({ icon: CloudRain, title: 'Warm Layers', text: 'A warm jacket or fleece for chilly mornings and evenings.' });
+    }
+  }
+  return packing;
+}
 
 export const VERDICT_STYLE = {
   Great: 'bg-green-50 text-green-700 ring-green-200',
@@ -28,20 +65,51 @@ export const VERDICT_STYLE = {
  * @param p.photo      Pexels URL | null
  * @param p.crumbs
  * @param p.monthHref  (monthSlug) => URL
- * @param p.section1Href  /weather/<city>
  * @param p.others     [{ slug, name, href }]
  * @param p.years      { start, end }
+ * @param p.geo        { lat, lon } (data/cities.js) — Dataset JSON-LD
+ * @param p.tripHref   trip planner link
  */
-export default function CityByMonth({ data, city, country, photo, crumbs, monthHref, section1Href, others, years, related = null }) {
+export default function CityByMonth({ data, city, country, photo, crumbs, monthHref, others, years, geo = {}, tripHref, related = null }) {
   const monthly = data.monthly_data || [];
   // "Singapore, Singapore" nahi
   const place = city.name === country.name ? city.name : `${city.name}, ${country.name}`;
   const x = yearExtremes(monthly);
   const best = bestMonths(monthly, 3);
+  const packing = packingFor(monthly);
+  const chartData = monthly.map((m) => ({
+    month: MONTH_SHORT[(m.month || 1) - 1],
+    high: m.avg_high,
+    low: m.avg_low,
+    rain: m.avg_rainfall,
+    sunshine: m.sunshine_hours,
+    humidity: m.humidity,
+  }));
+  const withRain = monthly.filter((m) => typeof m.avg_rainfall === 'number');
 
   return (
     <div className="min-h-screen bg-[#f3f7ff]">
       <JsonLd data={breadcrumbs(crumbs)} />
+      {/* Dataset — page 20 saal ke monthly climate normals hai (month pages jaisa) */}
+      <JsonLd data={{
+        '@context': 'https://schema.org',
+        '@type': 'Dataset',
+        name: `${city.name} weather by month: ${years.start}–${years.end} climate averages`,
+        description: `Monthly climate normals for ${place}: average high and low temperature, total rainfall, rainy days, daily sunshine hours and humidity for every month, averaged over ${years.start}–${years.end} from historical weather data.`,
+        url: `${SITE_URL}${crumbs[crumbs.length - 1].path}`,
+        temporalCoverage: `${years.start}/${years.end}`,
+        ...(typeof geo.lat === 'number' ? {
+          spatialCoverage: {
+            '@type': 'Place',
+            name: place,
+            geo: { '@type': 'GeoCoordinates', latitude: geo.lat, longitude: geo.lon },
+          },
+        } : {}),
+        variableMeasured: ['Average high temperature', 'Average low temperature', 'Total precipitation', 'Rainy days', 'Sunshine hours', 'Relative humidity'],
+        creator: ORGANIZATION,
+        isBasedOn: 'https://open-meteo.com/',
+        license: 'https://creativecommons.org/licenses/by/4.0/',
+      }} />
       <Navbar />
 
       {/* 1. Hero */}
@@ -140,17 +208,95 @@ export default function CityByMonth({ data, city, country, photo, crumbs, monthH
           </div>
         </section>
 
-        {/* 5. Section 1 ka link */}
-        <Link href={section1Href} className="group flex items-center justify-between gap-3 bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 hover:border-blue-300 hover:shadow-md transition-all">
-          <span className="flex items-center gap-3">
-            <BookOpen className="w-6 h-6 text-[#0077b6] shrink-0" />
-            <span>
-              <span className="block text-lg font-bold text-[#002244]">Full 20-year climate guide for {city.name}</span>
-              <span className="text-sm text-gray-500">Charts, the monthly averages table and packing tips</span>
-            </span>
-          </span>
-          <ArrowRight className="w-5 h-5 text-[#0077b6] shrink-0 transition-transform group-hover:translate-x-1" />
-        </Link>
+        {/* 5. Purana Section 1 (climate guide) — ab isi page par. Us ka H1
+            yahan H2; andar ke dabbe H3 (heading order seedha). Design wahi
+            safed cards / rang jo Section 1 par the. */}
+        <section aria-labelledby="climate-guide" className="space-y-8">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="w-5 h-5 text-[#0077b6]" />
+              <h2 id="climate-guide" className="text-xl font-bold text-[#002244]">{city.name} Climate &amp; Weather Guide</h2>
+            </div>
+            <p className="text-gray-600">
+              Temperature, rainfall and sunshine through the year — {years.start}–{years.end} averages.
+            </p>
+          </div>
+
+          {/* Saal ki 4 jhalkiyan (numbers; jumle intro #2 mein hain) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-3">
+              <p className="text-orange-700 font-bold"><UnitTemp c={x.warmest?.row.avg_high} /></p>
+              <p className="text-gray-600 text-xs">Hottest month avg high</p>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+              <p className="text-blue-700 font-bold"><UnitTemp c={x.coolest?.row.avg_high} /></p>
+              <p className="text-gray-600 text-xs">Coolest month avg high</p>
+            </div>
+            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
+              <p className="text-indigo-700 font-bold">{withRain.length ? Math.round(withRain.reduce((a, b) => (a.avg_rainfall > b.avg_rainfall ? a : b)).avg_rainfall) : '—'}mm</p>
+              <p className="text-gray-600 text-xs">Wettest month avg</p>
+            </div>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+              <p className="text-emerald-700 font-bold">{withRain.length ? Math.round(withRain.reduce((a, b) => (a.avg_rainfall < b.avg_rainfall ? a : b)).avg_rainfall) : '—'}mm</p>
+              <p className="text-gray-600 text-xs">Driest month avg</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Thermometer className="w-5 h-5 text-[#0077b6]" />
+              <h3 className="text-xl font-bold text-[#002244]">Temperature by Month</h3>
+            </div>
+            <LazyClimateChart kind="temperature" chartData={chartData} label={`${city.name} average high and low temperature by month`} />
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+              <div className="flex items-center gap-2 mb-6">
+                <Droplets className="w-5 h-5 text-blue-500" />
+                <h3 className="text-xl font-bold text-[#002244]">Rainfall by Month</h3>
+              </div>
+              <LazyClimateChart kind="rainfall" chartData={chartData} label={`${city.name} average rainfall by month`} />
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+              <div className="flex items-center gap-2 mb-6">
+                <Sun className="w-5 h-5 text-amber-500" />
+                <h3 className="text-xl font-bold text-[#002244]">Sunshine Hours</h3>
+              </div>
+              <LazyClimateChart kind="sunshine" chartData={chartData} label={`${city.name} average daily sunshine hours by month`} />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-6">
+              <CalendarRange className="w-5 h-5 text-[#0077b6]" />
+              <h3 className="text-xl font-bold text-[#002244]">Monthly Averages</h3>
+            </div>
+            <MonthlyTable monthly={monthly} />
+          </div>
+
+          <div className="bg-[#EFF6FF] rounded-2xl p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-1">
+              <Shirt className="w-5 h-5 text-[#0077b6]" />
+              <h3 className="text-lg font-bold text-[#002244]">What to Pack</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">Suggested packing for {city.name}&apos;s climate.</p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {packing.map((p) => {
+                const Icon = p.icon;
+                return (
+                  <div key={p.title} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                    <div className="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
+                      <Icon className="w-5 h-5 text-[#0077b6]" />
+                    </div>
+                    <h4 className="text-sm font-bold text-[#002244] mb-1">{p.title}</h4>
+                    <p className="text-xs text-gray-600 leading-snug">{p.text}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
 
         {/* 6. Usi mulk ke doosre shehar */}
         {others.length > 0 && (
@@ -172,6 +318,40 @@ export default function CityByMonth({ data, city, country, photo, crumbs, monthH
 
         {/* 7. Related articles (backend round B5) — khaali ho to kuch nahi */}
         {related}
+
+        {/* 8. Trip planner CTA (purane Section 1 se). Photo neeche hai → lazy */}
+        {tripHref && (
+          <section className="relative overflow-hidden bg-gradient-to-r from-[#0077b6] to-[#00a8e8] rounded-2xl p-8 sm:p-10 text-center text-white">
+            {photo && (
+              <>
+                <img
+                  src={pexelsSized(photo, 1280)}
+                  srcSet={pexelsSrcSet(photo, [640, 960, 1280])}
+                  sizes="(min-width: 1152px) 1088px, 100vw"
+                  alt=""
+                  aria-hidden="true"
+                  width={1280}
+                  height={720}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#001528]/85 via-[#001528]/70 to-[#001528]/70" />
+              </>
+            )}
+            <div className="relative">
+              <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">Planning a trip to {city.name}?</h2>
+              <p className="text-white/90 mb-6">Get a day-by-day weather plan for your exact travel dates.</p>
+              <Link
+                href={tripHref}
+                className="inline-flex items-center gap-2 bg-white text-[#0077b6] font-bold px-7 py-3.5 rounded-full hover:bg-blue-50 transition-colors"
+              >
+                Use our Trip Planner
+                <ArrowRight size={18} />
+              </Link>
+            </div>
+          </section>
+        )}
 
         <p className="text-sm text-gray-500 leading-relaxed">
           <Info className="inline w-4 h-4 -mt-0.5 mr-1.5 align-middle" />

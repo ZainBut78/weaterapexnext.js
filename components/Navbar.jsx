@@ -9,6 +9,7 @@ import { useCity } from '../context/CityContext';
 import { useAuth } from '../context/AuthContext';
 import CitySearchBox from './CitySearchBox';
 import { isKnownCity } from '@/data/cities';
+import { cityPath } from '@/data/countries';
 import { exactCity } from '@/utils/fuzzyCity';
 
 const Navbar = () => {
@@ -52,7 +53,7 @@ const Navbar = () => {
     }
     const known = item && isKnownCity(item.slug) ? item : exactCity(name);
     if (known) {
-      router.push(`/weather/${known.slug}`);
+      router.push(cityPath(known.slug));   // merged city page (purana /weather/<city> 301 hai)
     } else {
       setCity(name.toLowerCase());
       router.push('/');

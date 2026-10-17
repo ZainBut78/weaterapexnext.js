@@ -31,9 +31,9 @@ const BACKEND_LOG = process.env.BACKEND_LOG;
 const PUBLIC = [
   '/', '/trip-planner', '/events', '/climate-guides', '/blog', '/blog?page=2',
   '/api-docs', '/about', '/terms', '/privacy',
-  '/weather/london', '/weather/new-york', '/weather/singapore',
-  // Section 2 (Phase C2)
-  '/weather', '/weather/united-kingdom', '/weather/united-kingdom/london',
+  // Section 2 (Phase C2) — purana Section 1 (/weather/<city>) ab 301 (SEO fixes Oct 2026)
+  '/weather', '/weather/united-kingdom', '/weather/australia', '/weather/united-kingdom/london',
+  '/weather/australia/brisbane',
   '/weather/united-kingdom/london/october', '/weather/united-states/new-york/july',
   '/weather/singapore/singapore', '/weather/hungary/budapest',
 ];
@@ -45,10 +45,9 @@ const NOT_FOUND = ['/koi-ghalat-page', '/blog/nahi-hai-xyz', '/blog?page=99', '/
 // JSON-LD jo lazmi hona chahiye
 const JSONLD_REQUIRED = {
   '/': ['Organization', 'WebSite'],
-  '/weather/london': ['BreadcrumbList'],
   '/weather': ['BreadcrumbList'],
   '/weather/united-kingdom': ['BreadcrumbList'],
-  '/weather/united-kingdom/london': ['BreadcrumbList'],
+  '/weather/united-kingdom/london': ['BreadcrumbList', 'Dataset'],
   '/weather/united-kingdom/london/october': ['BreadcrumbList'],
   '/weather/singapore/singapore': ['BreadcrumbList'],
 };
@@ -123,31 +122,22 @@ async function main() {
   await restChecks();
 }
 
-// ── Section 1 (/weather/{city}) vs Section 2 (/weather/{country}/{city}) ──
-// Content round A4: Section 1 = "climate / 20-year averages / charts",
-// Section 2 = "weather by month". Descriptions alag hon (word Jaccard < 35%),
-// Section 1 mein "month by month" na ho, aur "X, X" (Singapore, Singapore) na ho.
+// ── City pages (/weather/{country}/{city}) — merged page ka description ──
+// SEO fixes (Oct 2026): Section 1 merge ho gaya. Ab: "X, X" (Singapore,
+// Singapore) na ho, aur har shehar ka description alag (unique) ho.
 function cannibalizationCheck() {
-  const words = (s) => new Set(s.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter((w) => w.length > 2));
-  let pairs = 0;
-  let worst = 0;
+  const seen = new Map();
+  let n = 0;
   for (const c of CITIES) {
-    const s1 = descOf.get(`/weather/${c.slug}`);
-    if (!s1) continue;
-    ok(!/month[- ]by[- ]month/i.test(s1), `/weather/${c.slug}`, 'Section 1 description has no "month by month"', s1.slice(0, 60));
-    ok(!new RegExp(`${c.name}, ${c.name}`).test(s1), `/weather/${c.slug}`, 'no doubled name in description', s1.slice(0, 60));
-    const s2 = descOf.get(`/weather/${countryOfCity(c)?.slug}/${c.slug}`);
-    if (!s2) continue;
-    const a = words(s1);
-    const b = words(s2);
-    let inter = 0;
-    for (const w of a) if (b.has(w)) inter++;
-    const j = inter / (a.size + b.size - inter || 1);
-    worst = Math.max(worst, j);
-    pairs++;
-    ok(j < 0.35, `/weather/${c.slug}`, 'Section 1 vs Section 2 description overlap < 35%', `${Math.round(j * 100)}%`);
+    const route = `/weather/${countryOfCity(c)?.slug}/${c.slug}`;
+    const d = descOf.get(route);
+    if (!d) continue;
+    n++;
+    ok(!new RegExp(`${c.name}, ${c.name}`).test(d), route, 'no doubled name in description', d.slice(0, 60));
+    ok(!seen.has(d), route, 'description unique among city pages', seen.get(d) || '');
+    seen.set(d, route);
   }
-  results.push(`info  Section 1 ↔ 2 descriptions     ${pairs} city pairs compared, max word overlap ${Math.round(worst * 100)}%`);
+  results.push(`info  city page descriptions      ${n} checked`);
 }
 
 async function checkPage(route, r) {
@@ -229,8 +219,7 @@ function offlineTitleCheck() {
   add('Weather by Country & Month — WeatherApex', '/weather');
   for (const c of COUNTRIES) if (hasCountryPage(c.slug)) add(`${c.name} Weather by Month & City — WeatherApex`, `/weather/${c.slug}`);
   for (const c of CITIES) {
-    add(`${c.name} Climate & Weather Guide — WeatherApex`, `/weather/${c.slug}`);
-    add(`${c.name} Weather by Month: Climate & Best Time to Visit`, `/weather/…/${c.slug}`);
+    add(`${c.name} Weather by Month: Climate, Rain & Best Time to Visit`, `/weather/…/${c.slug}`);
     for (const m of MONTHS) add(`${c.name} Weather in ${m.name}: Temperature, Rain & Tips`, `/weather/…/${c.slug}/${m.slug}`);
   }
   const dups = [...t.entries()].filter(([, u]) => u.length > 1);
@@ -241,8 +230,6 @@ function offlineTitleCheck() {
 async function redirectChecks() {
   const cases = [
     ['/about/', '/about'],
-    ['/weather/London', '/weather/london'],
-    ['/weather/london/', '/weather/london'],
     ['/weather/United-Kingdom/London/October/', '/weather/united-kingdom/london/october'],
     ['/weather/hungary', '/weather/hungary/budapest'],
     ['/weather/Hungary/', '/weather/hungary/budapest'],
@@ -256,9 +243,25 @@ async function redirectChecks() {
     const r2 = await get(loc || '/');
     ok(r2.status === 200, from, 'one hop (target is 200, no chain)', `target ${r2.status}`);
   }
-  for (const p of ['/weather/singapore', '/weather/hong-kong', '/weather/singapore/singapore', '/weather/hong-kong/hong-kong', '/weather/london']) {
+  // Purana city URL (Section 1) → merged page: 301, ek hop (SEO fixes Oct 2026)
+  for (const [from, to] of [
+    ['/weather/brisbane', '/weather/australia/brisbane'],
+    ['/weather/paris', '/weather/france/paris'],
+    ['/weather/London', '/weather/united-kingdom/london'],
+    ['/weather/london/', '/weather/united-kingdom/london'],
+    ['/weather/singapore', '/weather/singapore/singapore'],
+    ['/weather/hong-kong', '/weather/hong-kong/hong-kong'],
+  ]) {
+    const r = await get(from);
+    ok(r.status === 301, from, '301 redirect (old city URL)', `got ${r.status}`);
+    const loc = (r.location || '').replace(BASE, '');
+    ok(loc === to, from, `→ ${to}`, loc || 'none');
+    const r2 = await get(loc || '/');
+    ok(r2.status === 200, from, 'one hop (target is 200, no chain)', `target ${r2.status}`);
+  }
+  for (const p of ['/weather/australia', '/weather/united-kingdom', '/weather/singapore/singapore', '/weather/hong-kong/hong-kong']) {
     const r = await get(p);
-    ok(r.status === 200, p, 'no redirect (Section 1 / no loop)', `got ${r.status}`);
+    ok(r.status === 200, p, 'no redirect (country hub / merged page)', `got ${r.status}`);
   }
   for (const p of ['/api/weather/current/?city=london', '/api/blog/posts/?page=1']) {
     const r = await get(p);
@@ -331,11 +334,11 @@ async function restChecks() {
   ok(!locs.some((l) => /\/(login|signup|pricing)$/.test(l)), '/sitemap.xml', 'no login/signup/pricing');
   const expectCountries = COUNTRIES.filter((c) => hasCountryPage(c.slug)).length;
   const w = locs.map((l) => l.replace(SITE, ''));
-  const s1 = CITIES.filter((c) => w.includes(`/weather/${c.slug}`)).length;
+  const legacy = CITIES.filter((c) => w.includes(`/weather/${c.slug}`)).length;
   const monthPages = w.filter((p) => p.split('/').length === 5).length;
   const byMonth = w.filter((p) => p.split('/').length === 4 && p.startsWith('/weather/')).length;
   const countryPages = w.filter((p) => p.split('/').length === 3 && p.startsWith('/weather/') && COUNTRIES.find((c) => c.slug === p.split('/')[2]) && !CITIES.find((c) => c.slug === p.split('/')[2])).length;
-  ok(s1 === CITIES.length, '/sitemap.xml', `Section 1 city pages ${s1}/${CITIES.length}`);
+  ok(legacy === 0, '/sitemap.xml', 'no old /weather/<city> URLs (301)', `${legacy} found`);
   ok(w.includes('/weather'), '/sitemap.xml', 'has /weather hub');
   ok(countryPages === expectCountries, '/sitemap.xml', `country pages ${countryPages}/${expectCountries} (2+ cities)`);
   ok(byMonth === CITIES.length, '/sitemap.xml', `city-by-month pages ${byMonth}/${CITIES.length}`);

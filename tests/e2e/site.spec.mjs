@@ -38,8 +38,8 @@ test('Popular Destinations "Climate guide" link opens the city page', async ({ p
   await mockCurrentWeather(page);
   await page.goto('/');
   await page.getByRole('button', { name: /Show weather for Paris/ }).getByRole('link', { name: /Climate guide/ }).click();
-  await expect(page).toHaveURL(/\/weather\/paris$/);
-  await expect(page.locator('h1')).toHaveText(/Paris Climate & Weather Guide/);
+  await expect(page).toHaveURL(/\/weather\/france\/paris$/);   // seedha naya URL (redirect hop nahi)
+  await expect(page.locator('h1')).toHaveText(/Paris Weather by Month/);
 });
 
 test('Popular Destinations: failed city shows "—" and no weather icon', async ({ page }) => {
@@ -185,7 +185,7 @@ const SECTION2 = ['/weather', '/weather/united-kingdom', '/weather/united-kingdo
   '/weather/united-kingdom/london/october', '/weather/singapore/singapore', '/weather/japan/tokyo/april'];
 
 const ROUTES = ['/', '/trip-planner', '/events', '/climate-guides', '/blog', '/api-docs', '/about',
-  '/terms', '/privacy', '/pricing', '/login', '/signup', '/weather/london', ...SECTION2];
+  '/terms', '/privacy', '/pricing', '/login', '/signup', ...SECTION2];
 
 for (const vp of [MOBILE, TABLET, DESKTOP]) {
   test(`no console errors and no horizontal scroll at ${vp.width}px`, async ({ page }) => {
@@ -260,7 +260,7 @@ for (const vp of [MOBILE, DESKTOP]) {
   });
 }
 
-// ── Phase C2: Section 2 pages — CLS, 1 H1, Section 1 ↔ 2 links ─
+// ── Phase C2: Section 2 pages — CLS, 1 H1, old city URL 301 ─
 for (const vp of [MOBILE, TABLET, DESKTOP]) {
   test(`Section 2 pages: CLS < 0.1 at ${vp.width}px`, async ({ page }) => {
     test.setTimeout(180_000);
@@ -283,13 +283,29 @@ for (const vp of [MOBILE, TABLET, DESKTOP]) {
   });
 }
 
-test('Section 1 ↔ Section 2 links both ways', async ({ page }) => {
-  await page.goto('/weather/london');
-  await page.getByRole('link', { name: /See London weather month by month/ }).click();
+// SEO fixes (Oct 2026): Section 1 (/weather/<city>) merge ho gaya → 301
+test('old city URL 301s to the merged city page (one H1, guide is an H2)', async ({ page, request }) => {
+  const r = await request.get('/weather/london', { maxRedirects: 0 });
+  expect(r.status()).toBe(301);
+  expect(new URL(r.headers().location, 'http://x').pathname).toBe('/weather/united-kingdom/london');
+  await page.goto('/weather/London/');
   await expect(page).toHaveURL((u) => u.pathname === '/weather/united-kingdom/london');
+  await expect(page.locator('h1')).toHaveCount(1);
   await expect(page.locator('h1')).toHaveText('London Weather by Month');
-  await page.getByRole('link', { name: /Full 20-year climate guide for London/ }).click();
-  await expect(page).toHaveURL((u) => u.pathname === '/weather/london');
+  await expect(page.getByRole('heading', { level: 2, name: 'London Climate & Weather Guide' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 3, name: 'Monthly Averages' })).toBeVisible();
+  // Table server HTML mein (12 rows), purane Section 1 ka link nahi
+  expect(await page.locator('table tbody tr').count()).toBeGreaterThanOrEqual(12);
+  await expect(page.getByRole('link', { name: /Full 20-year climate guide/ })).toHaveCount(0);
+  // 12 month links
+  for (const m of ['january', 'july', 'december']) {
+    await expect(page.locator(`a[href="/weather/united-kingdom/london/${m}"]`).first()).toBeAttached();
+  }
+});
+
+test('country hub stays 200, no redirect', async ({ request }) => {
+  const r = await request.get('/weather/australia', { maxRedirects: 0 });
+  expect(r.status()).toBe(200);
 });
 
 test('month page: table rows and chips link to other months', async ({ page }) => {
@@ -304,7 +320,8 @@ test('1-city country redirects to its city in one hop; Singapore has no loop', a
   const r = await page.goto('/weather/hungary');
   expect(new URL(page.url()).pathname).toBe('/weather/hungary/budapest');
   expect(r.status()).toBe(200);
+  // Singapore: shehar aur mulk ek naam — ab merged page par, ek hop, loop nahi
   const s1 = await page.goto('/weather/singapore');
   expect(s1.status()).toBe(200);
-  expect(new URL(page.url()).pathname).toBe('/weather/singapore');
+  expect(new URL(page.url()).pathname).toBe('/weather/singapore/singapore');
 });

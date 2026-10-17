@@ -240,11 +240,10 @@ export default async function BlogPostPage({ params }) {
               {weatherCities.map((c) => (
                 <li key={c.slug} className="rounded-2xl bg-[#f3f7ff] p-4">
                   <p className="font-bold text-[#002244] mb-2">{c.name}</p>
-                  <Link href={`/weather/${c.slug}`} className="flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:underline">
-                    {c.name} climate & 20-year averages <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                  <Link href={cityPath(c.slug)} className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:underline">
-                    {c.name} weather by month <ArrowRight className="w-3.5 h-3.5" />
+                  {/* SEO fixes (Oct 2026): ek hi page — purana /weather/<city>
+                      climate guide /weather/<country>/<city> mein merge (301) */}
+                  <Link href={cityPath(c.slug)} className="flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:underline">
+                    {c.name} weather by month &amp; climate <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </li>
               ))}
