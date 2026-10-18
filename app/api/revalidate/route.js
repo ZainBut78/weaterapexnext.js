@@ -8,7 +8,7 @@
 //  Secret: server-only env REVALIDATE_SECRET (NEXT_PUBLIC_ nahi). Header
 //  `Authorization: Bearer <secret>` (behtar) ya `?secret=` (query).
 //  Body: {"paths": ["/blog/<slug>", "/blog", "/sitemap.xml"],
-//         "tags": ["blog:<slug>", "blog"]}  (ya `?path=` / `?tag=`).
+//         "tags": ["blog:<slug>", "blog", "cities"]}  (ya `?path=` / `?tag=`).
 //  Tags (fetch data cache) foran expire ({ expire: 0 }) — agla visitor naya
 //  data dekhe. Sirf apni site ke path / blog tags — baqi rad.
 // ─────────────────────────────────────────────────────────────
@@ -17,7 +17,7 @@ import { timingSafeEqual } from 'node:crypto';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_TAG = /^blog(:[a-z0-9-]+)?$/;
+const ALLOWED_TAG = /^(blog(:[a-z0-9-]+)?|cities)$/;   // cities = history_complete index (1 h cache)
 const ALLOWED = /^\/(blog(\/[a-z0-9-]+)?|weather(\/[a-z0-9-]+){0,3}|sitemap\.xml|sitemap\/[a-z0-9-]+\.xml|)$/;
 
 function authorized(request) {

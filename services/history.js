@@ -68,7 +68,7 @@ const CITIES_INDEX_REVALIDATE = 60 * 60;
 
 /** slug → index row. Backend down → THROW (caller 5xx deta hai). */
 async function citiesIndexStrict() {
-  const data = await serverGet(ENDPOINTS.weather.cities, { revalidate: CITIES_INDEX_REVALIDATE });
+  const data = await serverGet(ENDPOINTS.weather.cities, { revalidate: CITIES_INDEX_REVALIDATE, tags: ['cities'] });
   return new Map((data?.cities || []).map((c) => [c.slug, c]));
 }
 
