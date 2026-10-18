@@ -2,6 +2,12 @@
 //  Next.js ki settings
 // ─────────────────────────────────────────────────────────────
 
+import bundleAnalyzer from '@next/bundle-analyzer';
+
+// Bundle report: ANALYZE=true npm run build → .next/analyze/client.html
+// (sirf jab maanga jaye; aam build par koi asar nahi)
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === 'true', openAnalyzer: false });
+
 // ── Beta par Google index na kare (SITE_NOINDEX=1) ──
 // Har response par `X-Robots-Tag: noindex, nofollow`. robots.txt JAAN BOOJH
 // kar crawling allow karta rehta hai — warna Google yeh header dekh hi na
@@ -112,4 +118,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

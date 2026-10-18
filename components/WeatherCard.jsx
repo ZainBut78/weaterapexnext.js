@@ -1,17 +1,25 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useCity } from '../context/CityContext';
 import { useCurrentWeather } from '../hooks/useWeather';
-import { getWeatherIcon } from '../utils/weatherIconMap';
-import { getMeteoconIcon } from '../utils/meteoconsMap';
 import { isNightHour } from '../utils/isNightHour';
 import { getWeatherDescription } from '../utils/weatherDescriptions';
-import WeatherBackground from './WeatherBackground';
+import MeteoconIcon from './MeteoconIcon';
+import HourlyStrip from './HourlyStrip';
 import { WeatherCardSkeleton } from './HomeSkeletons';
 import { useUnits } from '../context/UnitsContext';
 import { matchCities } from '../utils/fuzzyCity';
+
+// framer-motion (~44K gz) sirf hourly strip aur barish mein — pehle shared
+// chunk mein ja kar HAR page (blog, city…) par load hota tha. Ab alag chunk,
+// sirf yahan, data aane ke baad (perf fixes, Oct 2026). Strip: HourlyStrip.jsx
+// (pehle static items). Background: tab tak wahi safed parda.
+const WeatherBackground = dynamic(() => import('./WeatherBackground'), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-white" />,
+});
 
 // windUnit: 'km/h' ya 'mph' (UnitsContext). Pehle yahan 'm/s' likha tha —
 // ghalat: backend km/h bhejta hai (Open-Meteo default). Audit 3.2.
@@ -70,113 +78,6 @@ function getUpcomingHours(hourlyData, currentTimeStr, count = 12) {
   };
 }
 
-// Meteocons CDN icon render karta hai; load fail hone par
-// lucide-react ke getWeatherIcon fallback par degrade (graceful).
-function MeteoconIcon({ weatherCode, isNight, sizeClass }) {
-  const [failed, setFailed] = useState(false);
-
-  if (failed) {
-    const { icon: FallbackIcon, color } = getWeatherIcon(weatherCode, isNight);
-    return <FallbackIcon className={`${sizeClass} ${color}`} strokeWidth={1.5} />;
-  }
-
-  return (
-    <img
-      src={getMeteoconIcon(weatherCode, isNight)}
-      alt="weather icon"
-      loading="lazy"
-      decoding="async"
-      className={sizeClass}
-      onError={() => setFailed(true)}
-    />
-  );
-}
-
-function HourlyStrip({ hours, activeTab, windUnit }) {
-  const controls = useAnimation();
-  const trackRef = useRef(null);
-  const [isPaused, setIsPaused] = useState(false);
-  const [scrollDistance, setScrollDistance] = useState(0);
-
-  // Exact pixel width — ek complete "set" = pehle N cards + unka gap.
-  // scrollWidth/2 gap ke hisaab se half-gap off hota hai, isliye
-  // width+gap per card measure karte hain taake loop zero-jump ho.
-  useEffect(() => {
-    if (!trackRef.current || hours.length === 0) return;
-    const track = trackRef.current;
-    const cards = track.children;
-    const gap = parseFloat(getComputedStyle(track).gap) || 0;
-    let setWidth = 0;
-    for (let i = 0; i < hours.length; i++) {
-      setWidth += cards[i].offsetWidth + gap;
-    }
-    setScrollDistance(setWidth);
-  }, [hours]);
-
-  const startScroll = () => {
-    if (isPaused || scrollDistance === 0) return;
-    controls.start({
-      x: [0, -scrollDistance],
-      transition: {
-        duration: hours.length * 2.5,
-        ease: 'linear',
-        repeat: Infinity,
-      },
-    });
-  };
-
-  const pauseScroll = () => {
-    setIsPaused(true);
-    controls.stop();
-  };
-
-  const resumeScroll = () => {
-    setIsPaused(false);
-    startScroll();
-  };
-
-  useEffect(() => {
-    startScroll();
-    return () => controls.stop();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollDistance]);
-
-  const displayHours = [...hours, ...hours];
-
-  return (
-    <div
-      className="overflow-hidden px-2"
-      onMouseEnter={pauseScroll}
-      onMouseLeave={resumeScroll}
-      onTouchStart={pauseScroll}
-      onTouchEnd={resumeScroll}
-    >
-      <motion.div
-        ref={trackRef}
-        animate={controls}
-        drag="x"
-        dragConstraints={{ left: -scrollDistance, right: 0 }}
-        onDragStart={pauseScroll}
-        onDragEnd={resumeScroll}
-        className="flex gap-5 cursor-grab active:cursor-grabbing w-max"
-      >
-        {displayHours.map((point, index) => {
-          return (
-            <div key={index} className="flex flex-col items-center gap-2 w-20 shrink-0">
-              <span>{point.time}</span>
-              <MeteoconIcon weatherCode={point.weatherCode} isNight={isNightHour(point.time, point.isDay)} sizeClass="w-14 h-14" />
-              <p className="text-sm font-bold text-gray-900">
-                {activeTab === 'Precipitation' ? `${point.precip}%` :
-                 activeTab === 'Wind' ? `${point.windSpeed}${windUnit}` :
-                 `${point.temp}°`}
-              </p>
-            </div>
-          );
-        })}
-      </motion.div>
-    </div>
-  );
-}
 
 // Shehar nahi mila (backend 404) — generic error ki jagah madad: hamari
 // 160 cities se "Did you mean" (local, zero API calls). UX fixes B3.

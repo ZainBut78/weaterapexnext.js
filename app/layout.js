@@ -9,7 +9,7 @@
 //  lagata tha (Sign In/Sign Up par Navbar hai hi nahi). Design wahi
 //  rakhne ke liye wahi tareeqa.
 // ─────────────────────────────────────────────────────────────
-import 'leaflet/dist/leaflet.css';
+import { preconnect } from 'react-dom';
 import './globals.css';
 import Providers from './providers';
 
@@ -40,6 +40,10 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
+  // Bahar ki tasveerein jaldi: city/home photos (Pexels) aur blog images
+  // (api.weatherapex.com/media) — DNS + TLS pehle se (perf fixes Oct 2026)
+  preconnect('https://images.pexels.com');
+  preconnect('https://api.weatherapex.com');
   return (
     <html lang="en">
       {/* suppressHydrationWarning: browser extensions (jaise ColorZilla ka

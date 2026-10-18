@@ -10,11 +10,16 @@
 //
 //  Faida: Navbar ka code bilkul purane jaisa rehta hai — sirf
 //  `to=` aur import badla. Design par koi asar nahi.
+//
+//  prefetch default BAND (SEO/perf fixes, Oct 2026): har page par nav ke
+//  6 links apne page ka JS + `?_rsc=` payload pehle se mangwate the —
+//  mobile par faltu bytes, aur Googlebot ke 84% crawl requests yahi
+//  `?_rsc=` the. Click par page waise hi khulta hai.
 // ─────────────────────────────────────────────────────────────
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function NavLink({ to, end = false, className, children, ...rest }) {
+export default function NavLink({ to, end = false, className, children, prefetch = false, ...rest }) {
   const pathname = usePathname() || '/';
 
   // `end` = sirf exact match (Home "/" har page par active na ho jaye).
@@ -27,7 +32,7 @@ export default function NavLink({ to, end = false, className, children, ...rest 
   const resolvedChildren = typeof children === 'function' ? children({ isActive }) : children;
 
   return (
-    <Link href={to} className={resolvedClass} aria-current={isActive ? 'page' : undefined} {...rest}>
+    <Link href={to} prefetch={prefetch} className={resolvedClass} aria-current={isActive ? 'page' : undefined} {...rest}>
       {resolvedChildren}
     </Link>
   );

@@ -113,10 +113,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link href="/login" className="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors">
+              <Link prefetch={false} href="/login" className="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors">
                 Sign In
               </Link>
-              <Link href="/signup" className="text-sm font-semibold text-white bg-[#00a8e8] hover:bg-[#0092cd] px-6 py-2.5 rounded-full transition-colors shadow-sm">
+              <Link prefetch={false} href="/signup" className="text-sm font-semibold text-white bg-[#00a8e8] hover:bg-[#0092cd] px-6 py-2.5 rounded-full transition-colors shadow-sm">
                 Sign Up
               </Link>
             </>
@@ -187,6 +187,7 @@ const Navbar = () => {
               ) : (
                 <div className="flex items-center gap-3">
                   <Link
+                    prefetch={false}
                     href="/login"
                     onClick={() => setMenuOpen(false)}
                     className="flex-1 inline-flex items-center justify-center min-h-12 rounded-full border border-[#d6e4ff] text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
@@ -194,6 +195,7 @@ const Navbar = () => {
                     Sign In
                   </Link>
                   <Link
+                    prefetch={false}
                     href="/signup"
                     onClick={() => setMenuOpen(false)}
                     className="flex-1 inline-flex items-center justify-center min-h-12 rounded-full text-sm font-semibold text-white bg-[#00a8e8] hover:bg-[#0092cd] transition-colors shadow-sm"

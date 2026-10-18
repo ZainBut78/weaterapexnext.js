@@ -11,6 +11,9 @@ import { useCity } from '../context/CityContext';
 import { useUnits } from '../context/UnitsContext';
 import { isKnownCity } from '../data/cities';
 import { cityPath } from '../data/countries';
+import { pexelsSized, pexelsSrcSet } from '../utils/pexels';
+
+const CARD_RATIO = 0.73; // h-40 card ≈ 220×160
 
 // Shehar ka page: /weather/<country>/<city> (SEO fixes Oct 2026 — purana
 // /weather/<city> ab 301 hai, internal link seedha naye URL par)
@@ -185,8 +188,14 @@ const PopularDestinations = () => {
               >
                 {imageUrl ? (
                   <>
+                    {/* Card ~220×160 — 1200px ki jagah 400/800px Pexels (perf fixes Oct 2026) */}
                     <img
-                      loading="lazy" decoding="async" src={imageUrl} alt={item.city} className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy" decoding="async"
+                      src={pexelsSized(imageUrl, 400, CARD_RATIO)}
+                      srcSet={pexelsSrcSet(imageUrl, [400, 800], CARD_RATIO)}
+                      sizes="240px"
+                      width={400} height={Math.round(400 * CARD_RATIO)}
+                      alt={item.city} className="absolute inset-0 w-full h-full object-cover"
                       onError={() => setBrokenImages((prev) => new Set(prev).add(item.city))}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#002244]/85 via-[#002244]/35 to-[#002244]/10" />
