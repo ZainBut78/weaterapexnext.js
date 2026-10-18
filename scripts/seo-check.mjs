@@ -94,11 +94,30 @@ const titles = new Map();
 const descs = new Map();
 const descOf = new Map(); // route → description (Section 1 ↔ 2 takraav check)
 
+// Sitemap INDEX (Task 4, Oct 2026): /sitemap.xml → child sitemaps.
+// Sab children utha kar ek list: { locs, lastmods, children: [{name, status, ok}] }
+let _sitemap = null;
+async function sitemapAll() {
+  if (_sitemap) return _sitemap;
+  const idx = await get('/sitemap.xml');
+  const childLocs = [...idx.html.matchAll(/<sitemap><loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  const locs = [];
+  const lastmods = [];
+  const children = [];
+  for (const c of childLocs) {
+    const r = await get(c.replace(SITE, ''));
+    const urls = [...r.html.matchAll(/<url><loc>([^<]+)<\/loc>(?:<lastmod>([^<]+)<\/lastmod>)?<\/url>/g)];
+    children.push({ name: c.replace(SITE, ''), status: r.status, ok: r.status === 200 && /xml/.test(r.type) && r.html.includes('<urlset'), n: urls.length });
+    for (const u of urls) { locs.push(u[1]); lastmods.push(u[2] || null); }
+  }
+  _sitemap = { index: idx, childLocs, locs, lastmods, children };
+  return _sitemap;
+}
+
 // Blog posts: pehli 2 posts sitemap se utha kar public list mein
 async function blogSamples() {
-  const r = await get('/sitemap.xml');
-  const locs = [...r.html.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(SITE, ''));
-  return locs.filter((p) => p.startsWith('/blog/')).slice(0, 3);
+  const { locs } = await sitemapAll();
+  return locs.map((l) => l.replace(SITE, '')).filter((p) => p.startsWith('/blog/')).slice(0, 3);
 }
 
 async function main() {
@@ -177,8 +196,7 @@ async function checkPage(route, r) {
 // ── SEO_ALL: sitemap ke saare Section 2 pages (asli fetch) ─────
 async function allSection2Pages() {
   if (process.env.SEO_ALL !== '1') { results.push('skip  SEO_ALL                      all Section 2 pages (set SEO_ALL=1)'); return; }
-  const sm = await get('/sitemap.xml');
-  const locs = [...sm.html.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(SITE, '') || '/');
+  const locs = (await sitemapAll()).locs.map((l) => l.replace(SITE, '') || '/');
   const local = process.env.HISTORY_READY_LOCAL === '1';
   const cityOf = (p) => { const parts = p.split('/'); return parts.length >= 4 ? parts[3] : null; };
   const countryCities = (slug) => CITIES.filter((c) => countryOfCity(c)?.slug === slug).map((c) => c.slug);
@@ -324,10 +342,19 @@ async function restChecks() {
   for (const d of NOINDEX) ok(!robots.html.includes(`Disallow: ${d}`), '/robots.txt', `does not block noindex page ${d}`);
   ok(robots.html.includes(`Sitemap: ${SITE}/sitemap.xml`), '/robots.txt', 'links sitemap');
 
-  const sm = await get('/sitemap.xml');
-  ok(sm.status === 200, '/sitemap.xml', 'status 200');
-  ok(/xml/.test(sm.type) && sm.html.includes('<urlset'), '/sitemap.xml', 'valid urlset');
-  const locs = [...sm.html.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  const sm = await sitemapAll();
+  ok(sm.index.status === 200, '/sitemap.xml', 'status 200');
+  ok(/xml/.test(sm.index.type) && sm.index.html.includes('<sitemapindex'), '/sitemap.xml', 'valid sitemap index');
+  ok(sm.childLocs.length >= 4, '/sitemap.xml', `child sitemaps ${sm.childLocs.length} (static, blog, places, months…)`);
+  for (const c of sm.children) ok(c.ok, c.name, `child sitemap 200 + urlset (${c.n} URLs)`, `status ${c.status}`);
+  const locs = sm.locs;
+  ok(sm.lastmods.every(Boolean), '/sitemap.xml', 'every URL has <lastmod>', `${sm.lastmods.filter((x) => !x).length} missing`);
+  // Build/request ka waqt = pichle 2 ghante ka koi waqt (ghante/minute samait).
+  // Asal tareekhein ya to din (T00:00) hain ya post ka updated_at.
+  const now = Date.now();
+  const atRunTime = sm.lastmods.filter((x) => x && !x.includes('T00:00:00') && Math.abs(now - Date.parse(x)) < 2 * 3600e3).length;
+  ok(atRunTime < locs.length / 2, '/sitemap.xml', 'lastmod is not the build time on every URL', `${atRunTime}/${locs.length} stamped with the current time`);
+  ok(!locs.some((l) => /\/api-docs$/.test(l) || l.includes('?')), '/sitemap.xml', 'no api-docs / parameter URLs');
   ok(locs.every((l) => l.startsWith(SITE)), '/sitemap.xml', 'all URLs absolute on site domain');
   ok(new Set(locs).size === locs.length, '/sitemap.xml', 'no duplicate URLs');
   ok(!locs.some((l) => /\/(login|signup|pricing)$/.test(l)), '/sitemap.xml', 'no login/signup/pricing');

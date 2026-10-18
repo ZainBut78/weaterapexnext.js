@@ -11,6 +11,7 @@ import HourlyStrip from './HourlyStrip';
 import { WeatherCardSkeleton } from './HomeSkeletons';
 import { useUnits } from '../context/UnitsContext';
 import { matchCities } from '../utils/fuzzyCity';
+import { MapPin } from 'lucide-react';
 
 // framer-motion (~44K gz) sirf hourly strip aur barish mein — pehle shared
 // chunk mein ja kar HAR page (blog, city…) par load hota tha. Ab alag chunk,
@@ -113,7 +114,7 @@ function CityNotFoundMessage({ query, onPick }) {
 }
 
 const WeatherCard = () => {
-  const { city, setCity } = useCity();
+  const { city, setCity, locate, geoStatus } = useCity();
   const { data, isLoading, isError, error } = useCurrentWeather(city);
   const [activeTab, setActiveTab] = useState('Temperature');
   // °C/°F + km/h/mph (audit 3.2) — hook early return se PEHLE
@@ -237,6 +238,21 @@ const WeatherCard = () => {
               <p className="text-sm font-semibold text-[#4a607a] mt-1">
                 {weatherTitle} &bull; {displayCity}{displayCountry ? `, ${displayCountry}` : ''}
               </p>
+              {/* Location sirf is button par (page load par ijazat nahi — Task 5) */}
+              <button
+                type="button"
+                onClick={locate}
+                disabled={geoStatus === 'locating'}
+                className="mt-1 inline-flex items-center gap-1 min-h-8 text-xs font-semibold text-[#0077b6] hover:underline disabled:opacity-60"
+              >
+                <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
+                {geoStatus === 'locating' ? 'Finding your location…' : 'Use my location'}
+              </button>
+              {(geoStatus === 'denied' || geoStatus === 'error') && (
+                <p className="text-xs text-[#4a607a]" role="status">
+                  {geoStatus === 'denied' ? 'Location permission was blocked — search for your city instead.' : 'Could not find your city — search for it instead.'}
+                </p>
+              )}
             </div>
           </div>
           
