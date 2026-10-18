@@ -13,14 +13,12 @@
 import { resolveCity, resolveMonth } from '../../resolve';
 import MonthGuide from '@/components/climate/MonthGuide';
 import RelatedArticles from '@/components/RelatedArticles';
-import { citiesOfCountry, cityPath, countryPath, hasCountryPage, monthPath } from '@/data/countries';
-import { getCity } from '@/data/cities';
+import { countryPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
-import { getClimateSummary, getHistories, MAX_FANOUT, onlyReady, requireHistory, yearsOf } from '@/services/history';
+import { getClimateSummary, getHistories, MAX_FANOUT, requireHistory, yearsOf } from '@/services/history';
 import { rowFor, visitVerdict } from '@/utils/climateMath';
 import { pickElsewhere } from '@/utils/elsewhere';
-import { cityTags } from '@/data/cityTags';
 import { getTravelNote } from '@/services/guides';
 
 export const revalidate = 86400;
@@ -31,14 +29,14 @@ export async function generateStaticParams() {
 
 async function load(params) {
   const p = await params;
-  const { country, city } = resolveCity(p.slug, p.city);
   const month = resolveMonth(p.month);
-  const data = await requireHistory(city.slug);   // data na ho → 503 (cache nahi), 404 nahi
-  return { country, city, month, data };
+  const { country, city, reg } = await resolveCity(p.slug, p.city, month.slug);
+  const data = await requireHistory(city.slug);   // data adhoora → 404; backend down → 5xx (cache nahi)
+  return { country, city, month, data, reg };
 }
 
 export async function generateMetadata({ params }) {
-  const { country, city, month, data } = await load(params);
+  const { country, city, month, data, reg } = await load(params);
   const row = rowFor(data.monthly_data, month.num);
   const f = (c) => (c == null ? '—' : `${Math.round(c * 10) / 10}°C (${Math.round((c * 9 / 5 + 32) * 10) / 10}°F)`);
   const verdict = visitVerdict(row);
@@ -49,12 +47,12 @@ export async function generateMetadata({ params }) {
     kicker: country.name,
     city: city.slug,
     description: `${month.name} in ${city.name}: average high ${f(row?.avg_high)}, low ${f(row?.avg_low)}, ${row?.rainy_days ?? '—'} rainy days and ${row?.sunshine_hours ?? '—'} h of sunshine a day. ${verdict ? `${verdict.label} time to visit` : 'Climate guide'} — comparisons and packing tips.`,
-    path: monthPath(city.slug, month.slug),
+    path: reg.monthPath(city.slug, month.slug),
   });
 }
 
 export default async function MonthPage({ params }) {
-  const { country, city, month, data } = await load(params);
+  const { country, city, month, data, reg } = await load(params);
   const [photo, note, summary] = await Promise.all([
     photoFromHistory(data, city.slug),       // history ka image_url (0 calls); purana backend → cities index
     getTravelNote(city.slug, month.slug),    // content/guides/<city>/<month>.md (optional)
@@ -64,7 +62,7 @@ export default async function MonthPage({ params }) {
   // Usi mulk ke doosre shehar — saare link (internal linking). Data:
   // summary se (koi cap nahi); summary na ho → purana rasta (≤ MAX_FANOUT calls)
   // Sirf mukammal data wale shehar (adhoore ka link nahi — owner review)
-  const otherCities = await onlyReady(citiesOfCountry(country.slug).filter((c) => c.slug !== city.slug));
+  const otherCities = reg.citiesOfCountry(country.slug).filter((c) => c.slug !== city.slug);
   let rowOf;
   if (summary) {
     rowOf = (slug) => summary.get(slug)?.month_data || null;
@@ -73,26 +71,27 @@ export default async function MonthPage({ params }) {
     rowOf = (slug) => (histories.has(slug) ? rowFor(histories.get(slug).monthly_data, month.num) : null);
   }
   const others = otherCities.map((c) => ({
-    slug: c.slug, name: c.name, href: monthPath(c.slug, month.slug), row: rowOf(c.slug),
+    slug: c.slug, name: c.name, href: reg.monthPath(c.slug, month.slug), row: rowOf(c.slug),
   }));
 
   // Warmer / drier places — sirf summary ho to (asal numbers, max 5, 2 se kam → nahi)
   const elsewhere = summary
     ? pickElsewhere({
-      city: getCity(city.slug),
+      city,
+      cities: reg.cities,   // static + DB ke mukammal shehar
       row: rowFor(data.monthly_data, month.num),
       summary,
-      hrefFor: (slug) => monthPath(slug, month.slug),
+      hrefFor: (slug) => reg.monthPath(slug, month.slug),
     })
     : [];
 
-  const cityHref = cityPath(city.slug);
+  const cityHref = reg.cityPath(city.slug);
   const crumbs = [
     { name: 'Home', path: '/' },
     { name: 'Weather', path: '/weather' },
-    ...(hasCountryPage(country.slug) ? [{ name: country.name, path: countryPath(country.slug) }] : []),
+    ...(reg.hasCountryPage(country.slug) ? [{ name: country.name, path: countryPath(country.slug) }] : []),
     { name: city.name, path: cityHref },
-    { name: month.name, path: monthPath(city.slug, month.slug) },
+    { name: month.name, path: reg.monthPath(city.slug, month.slug) },
   ];
 
   return (
@@ -104,11 +103,11 @@ export default async function MonthPage({ params }) {
       photo={photo}
       crumbs={crumbs}
       cityHref={cityHref}
-      monthHref={(m) => monthPath(city.slug, m)}
+      monthHref={(m) => reg.monthPath(city.slug, m)}
       others={others}
       elsewhere={elsewhere}
       years={yearsOf(data)}
-      tags={cityTags(city.slug)}
+      tags={city.tags}
       note={note}
       related={<RelatedArticles city={city.slug} month={month.num} limit={3} />}
     />

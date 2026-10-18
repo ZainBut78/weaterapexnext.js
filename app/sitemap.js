@@ -15,10 +15,9 @@
 // ─────────────────────────────────────────────────────────────
 import { serverGet } from '@/services/serverApi';
 import { ENDPOINTS } from '@/config/endpoints';
-import { CITIES } from '@/data/cities';
-import { onlyReady } from '@/services/history';
+import { getCityRegistry } from '@/services/cityRegistry';
 import { SITE_URL } from '@/utils/seo';
-import { COUNTRIES, hasCountryPage, countryPath, cityPath, monthPath } from '@/data/countries';
+import { COUNTRIES, countryPath } from '@/data/countries';
 import { MONTHS } from '@/utils/climateMath';
 
 export const revalidate = 3600;
@@ -44,8 +43,10 @@ async function allPosts() {
 
 export default async function sitemap() {
   const posts = await allPosts();
-  // Sirf mukammal data wale shehar (adhoore = 404, sitemap mein nahi)
-  const cities = await onlyReady(CITIES);
+  // Registry: static 160 + DB ke mukammal shehar (adhoore = 404, sitemap mein nahi;
+  // DB duplicate jaise "newyork" alias hai — sirf asli URL)
+  const reg = await getCityRegistry();
+  const cities = reg.cities;
   const url = (p) => `${SITE_URL}${p === '/' ? '' : p}`;
 
   return [
@@ -57,8 +58,8 @@ export default async function sitemap() {
     })),
     // Section 2
     { url: url('/weather') },
-    ...COUNTRIES.filter((c) => hasCountryPage(c.slug)).map((c) => ({ url: url(countryPath(c.slug)) })),
-    ...cities.map((c) => ({ url: url(cityPath(c.slug)) })),
-    ...cities.flatMap((c) => MONTHS.map((m) => ({ url: url(monthPath(c.slug, m.slug)) }))),
+    ...COUNTRIES.filter((c) => reg.hasCountryPage(c.slug)).map((c) => ({ url: url(countryPath(c.slug)) })),
+    ...cities.map((c) => ({ url: url(reg.cityPath(c.slug)) })),
+    ...cities.flatMap((c) => MONTHS.map((m) => ({ url: url(reg.monthPath(c.slug, m.slug)) }))),
   ];
 }

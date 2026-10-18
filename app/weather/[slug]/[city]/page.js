@@ -10,13 +10,12 @@
 //  Params ghalat → 404, backend call se pehle (../resolve.js).
 // ─────────────────────────────────────────────────────────────
 import { resolveCity } from '../resolve';
-import { getCity } from '@/data/cities';
 import CityByMonth from '@/components/climate/CityByMonth';
 import RelatedArticles from '@/components/RelatedArticles';
-import { citiesOfCountry, cityPath, countryPath, hasCountryPage, monthPath } from '@/data/countries';
+import { countryPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
-import { onlyReady, requireHistory, yearsOf } from '@/services/history';
+import { requireHistory, yearsOf } from '@/services/history';
 import { bestMonths, yearExtremes } from '@/utils/climateMath';
 
 export const revalidate = 86400;
@@ -27,7 +26,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }) {
   const p = await params;
-  const { country, city } = resolveCity(p.slug, p.city);
+  const { country, city, reg } = await resolveCity(p.slug, p.city);
   const data = await requireHistory(city.slug);
   const x = yearExtremes(data.monthly_data);
   const best = bestMonths(data.monthly_data, 3).map((m) => m.name);
@@ -38,26 +37,27 @@ export async function generateMetadata({ params }) {
     city: city.slug,
     // Har shehar alag: apne warmest/coolest/wettest + best months
     description: `${city.name === country.name ? city.name : `${city.name}, ${country.name}`} month by month: warmest in ${x.warmest?.month.name}, coolest in ${x.coolest?.month.name}, wettest in ${x.wettest?.month.name}. Best months to visit: ${best.join(', ')}. 20-year averages with charts.`,
-    path: cityPath(city.slug),
+    path: reg.cityPath(city.slug),
   });
 }
 
 export default async function CityByMonthPage({ params }) {
   const p = await params;
-  const { country, city } = resolveCity(p.slug, p.city);
+  const { country, city, reg } = await resolveCity(p.slug, p.city);
   const data = await requireHistory(city.slug);
   // Backend round A6: photo isi history jawab se (0 extra calls)
   const photo = await photoFromHistory(data, city.slug);
 
-  const others = (await onlyReady(citiesOfCountry(country.slug)))
+  // Registry: static + DB ke mukammal shehar (adhoore shamil hi nahi)
+  const others = reg.citiesOfCountry(country.slug)
     .filter((c) => c.slug !== city.slug)
-    .map((c) => ({ slug: c.slug, name: c.name, href: cityPath(c.slug) }));
+    .map((c) => ({ slug: c.slug, name: c.name, href: reg.cityPath(c.slug) }));
 
   const crumbs = [
     { name: 'Home', path: '/' },
     { name: 'Weather', path: '/weather' },
-    ...(hasCountryPage(country.slug) ? [{ name: country.name, path: countryPath(country.slug) }] : []),
-    { name: city.name, path: cityPath(city.slug) },
+    ...(reg.hasCountryPage(country.slug) ? [{ name: country.name, path: countryPath(country.slug) }] : []),
+    { name: city.name, path: reg.cityPath(city.slug) },
   ];
 
   return (
@@ -67,10 +67,10 @@ export default async function CityByMonthPage({ params }) {
       country={country}
       photo={photo}
       crumbs={crumbs}
-      monthHref={(m) => monthPath(city.slug, m)}
+      monthHref={(m) => reg.monthPath(city.slug, m)}
       others={others}
       years={yearsOf(data)}
-      geo={getCity(city.slug) || {}}
+      geo={city}
       tripHref={`/trip-planner?city=${city.slug}`}
       related={<RelatedArticles city={city.slug} limit={3} />}
     />

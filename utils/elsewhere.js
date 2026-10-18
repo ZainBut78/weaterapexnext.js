@@ -35,7 +35,7 @@ function km(a, b) {
  * @param {number} [o.max=5]
  * @returns {{slug,name,country,href,row,warmer,drier,km}[]}
  */
-export function pickElsewhere({ city, row, summary, hrefFor, max = 5 }) {
+export function pickElsewhere({ city, row, summary, hrefFor, max = 5, cities = CITIES }) {
   if (!city || !row || !summary || !isNum(row.avg_high)) return [];
   const hi = row.avg_high;
   const wantWarmer = hi < 26;
@@ -43,7 +43,7 @@ export function pickElsewhere({ city, row, summary, hrefFor, max = 5 }) {
   if (!wantWarmer && !wantDrier) return [];
 
   const cands = [];
-  for (const c of CITIES) {
+  for (const c of cities) {   // registry (static + DB ke mukammal shehar)
     if (c.slug === city.slug || typeof c.lat !== 'number') continue;
     const m = summary.get(c.slug)?.month_data;
     if (!m || !isNum(m.avg_high)) continue;
