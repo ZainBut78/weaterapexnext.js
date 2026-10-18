@@ -1232,3 +1232,26 @@ words, sticky toolbar. Backend 130 tests OK.
   It now waits for `networkidle` and allows one call per keystroke gap of 300 ms or more; with fast typing the limit is still ≤ 2. 5/5 passed.
 - Checks (live API, :3001): build OK · e2e 48 passed (1 flaky test fixed, then 5/5) · seo-check 361 / 9 — the 9 are all
   `/blog?page=2`, which does not exist on live yet (only 1 post), so it is data, not code (local with 10+ posts: 404 / 0).
+
+---
+
+## 2026-10-18 — SEO/performance round (Search Console + PageSpeed audit)
+Live already (pushed after review): robots `_rsc` block; Section 1 merged into `/weather/{country}/{city}` + 301 from
+`/weather/{city}`; real 404s (blog page HTML not ISR-cached, blog data tagged and cached for 5 min); `/api/revalidate`
+(Bearer `REVALIDATE_SECRET`); dynamic city registry (static 160 + complete DB cities, e.g. Gujranwala; aliases and
+review skips; `scripts/registry-report.mjs`).
+
+Branch `perf-a11y`:
+- **Homepage LCP:** the "Weather Map" heading (the LCP element) is now server HTML; Leaflet JS + CSS load lazily
+  (CSS removed from the root layout); framer-motion moved out of the shared chunk; nav/footer links don't prefetch;
+  home cards use 400/800 px Pexels; preconnect to Pexels and api. The observed LCP went from 6.6 s to first paint.
+- Initial JS (transfer): blog 321→185 KB, city 327→207 KB, home 382→289 KB. CSS 21→13–16 KB.
+- **Task 4:** `/sitemap.xml` = sitemap index → static / blog / places / months-1..2; every URL has a real lastmod
+  (blog updated_at, travel note "reviewed" date, page change dates — never build time).
+- **Task 5:** no geolocation on load; a "Use my location" button.
+- **Task 7:** one `<main>` per page; WCAG AA text contrast (globals.css); heading order fixed (footer h4→h2, cards
+  h3→h2); names for buttons/cards; Lighthouse a11y 100 on home/city/month/blog (local).
+- **Blog images:** srcset from the backend's 480/800/1200 WebP variants.
+- Not done: browserslist (the Next 16 default is already modern; the 17 KB "legacy JS" is inside Next's own
+  runtime); fonts (system fonts, nothing to preload); axios→fetch (~16 KB gz) left for later (auth refresh logic).
+- Checks: build OK · e2e 53/53 (new `tests/e2e/seo-perf.spec.mjs`) · seo-check 413/0 · backend 146 OK.
