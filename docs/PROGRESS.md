@@ -1255,3 +1255,13 @@ Branch `perf-a11y`:
 - Not done: browserslist (the Next 16 default is already modern; the 17 KB "legacy JS" is inside Next's own
   runtime); fonts (system fonts, nothing to preload); axios→fetch (~16 KB gz) left for later (auth refresh logic).
 - Checks: build OK · e2e 53/53 (new `tests/e2e/seo-perf.spec.mjs`) · seo-check 413/0 · backend 146 OK.
+
+## 2026-10-18 — Perf round 2 (homepage FCP/LCP, city hero, sitemap lastmod)
+- Homepage: London (DEFAULT_CITY, `config/defaults.js`) ka current weather server par (ISR 600s) → React Query `HydrationBoundary`. Weather card, forecast, map subtitle ab server HTML mein. Saved city doosri ho → `<head>` inline script `data-saved-city` lagata hai, `.ssr-default-city` `visibility:hidden` (no flash/CLS).
+- Bari weather icon: `MeteoconIcon priority` → lazy nahi, `fetchPriority="high"`, width/height 96.
+- City/month pages: hero photo `react-dom preload` (srcset/sizes, fetchPriority high).
+- `inlineCss` naapa aur BAND rakha (home 2.3→1.9s, city 3.0→3.6s kharab) — `next.config.mjs` comment.
+- Sitemap lastmod: city = backend `climate_updated_at` (fallback 2026-01-01), month = max(city, note reviewed), hub/`/weather` = newest of cities. Deploy/request date kabhi nahi.
+- Fix: 1-shehar mulk redirect page se wapas `proxy.js` mein (Next pehli MISS par `Location` header do dafa bhejta tha); proxy ab backend cities index 1 ghanta cache karta hai.
+- Tests: build OK · e2e 57/57 · seo-check 416/0 · backend 148 OK.
+- Local Lighthouse: home perf 67–74 / LCP 1.8–3.1s (LCP = "Weather Map" h2, observed 0.35s; baqi simulated render delay = main-thread JS); Brisbane 79–81 / 2.9–3.0s; a11y 100.
