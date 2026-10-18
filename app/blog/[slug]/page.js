@@ -7,13 +7,13 @@
 //   • Title/description `generateMetadata` se (purana Helmet).
 //   • Post na mile → notFound() = asli HTTP 404 (pehle 200 ke sath
 //     "Post not found" dikhta tha).
-//   • SEO fixes (Oct 2026): page DYNAMIC (ISR HTML cache nahi). Wajah: koi
-//     post publish se pehle link ho jati to us slug ka 404 ISR mein
-//     (s-maxage=600, SWR 1 saal) cache ho jata; publish ke baad bhi purana
-//     "not found" (200 STALE) dikhta — soft 404. Ab 404 kabhi cache nahi,
-//     aur post publish/schedule hote hi dikhti hai. Backend phir bhi kam:
-//     post ka data Next fetch cache mein 10 min (sirf 200 jawab cache hote
-//     hain), aur Django save par /api/revalidate path saaf karta hai.
+//   • SEO fixes (Oct 2026): page ka HTML ISR cache NAHI. Wajah: koi post
+//     publish se pehle link ho jati to us slug ka 404 ISR mein (SWR 1 saal)
+//     cache ho jata; publish ke baad bhi purana "not found" (soft 404).
+//     Ab: mili hui post ka DATA 5 min cache (fetch revalidate 300, tag
+//     `blog:<slug>` — Django publish par /api/revalidate yeh tag saaf
+//     karta hai). Next sirf 200 jawab cache karta hai → ghalat slug har
+//     dafa asli 404 + no-store; post publish/schedule hote hi dikhti hai.
 // ─────────────────────────────────────────────────────────────
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -33,13 +33,13 @@ import BlogFaq from '@/components/blog/BlogFaq';
 import { FurtherReading, Sources } from '@/components/blog/BlogLinks';
 import { prepareBlogHtml } from '@/utils/blogHtml';
 
-const BLOG_REVALIDATE = 600;   // sirf data (fetch) cache
+const BLOG_REVALIDATE = 300;   // sirf data (fetch) cache — 5 min
 export const dynamic = 'force-dynamic';
 
 // generateMetadata aur page dono yahi call karte hain — Next.js ek hi
 // URL ki fetch ko ek request mein mila deta hai (backend ko 1 call).
 const getPost = (slug) =>
-  serverGet(ENDPOINTS.blog.detail(slug), { revalidate: BLOG_REVALIDATE });
+  serverGet(ENDPOINTS.blog.detail(slug), { revalidate: BLOG_REVALIDATE, tags: [`blog:${slug}`, 'blog'] });
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;

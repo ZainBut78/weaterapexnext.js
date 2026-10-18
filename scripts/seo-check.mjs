@@ -310,7 +310,7 @@ async function restChecks() {
     results.push('skip  /weather/multan               backend-call check (set BACKEND_LOG)');
   }
 
-  for (const [from, to] of [['/weather/London', '/weather/london'], ['/weather/NEW-YORK', '/weather/new-york']]) {
+  for (const [from, to] of [['/weather/London', '/weather/united-kingdom/london'], ['/weather/NEW-YORK', '/weather/united-states/new-york']]) {
     const r = await get(from);
     ok(r.status === 308 || r.status === 301, from, 'uppercase city → permanent redirect', `got ${r.status}`);
     ok((r.location || '').endsWith(to), from, `redirects to ${to}`, r.location || 'none');

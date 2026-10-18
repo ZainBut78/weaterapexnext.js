@@ -17,7 +17,7 @@ import { citiesOfCountry, cityPath, countryPath, hasCountryPage, monthPath } fro
 import { getCity } from '@/data/cities';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
-import { getClimateSummary, getHistories, MAX_FANOUT, requireHistory, yearsOf } from '@/services/history';
+import { getClimateSummary, getHistories, MAX_FANOUT, onlyReady, requireHistory, yearsOf } from '@/services/history';
 import { rowFor, visitVerdict } from '@/utils/climateMath';
 import { pickElsewhere } from '@/utils/elsewhere';
 import { cityTags } from '@/data/cityTags';
@@ -63,7 +63,8 @@ export default async function MonthPage({ params }) {
 
   // Usi mulk ke doosre shehar — saare link (internal linking). Data:
   // summary se (koi cap nahi); summary na ho → purana rasta (≤ MAX_FANOUT calls)
-  const otherCities = citiesOfCountry(country.slug).filter((c) => c.slug !== city.slug);
+  // Sirf mukammal data wale shehar (adhoore ka link nahi — owner review)
+  const otherCities = await onlyReady(citiesOfCountry(country.slug).filter((c) => c.slug !== city.slug));
   let rowOf;
   if (summary) {
     rowOf = (slug) => summary.get(slug)?.month_data || null;

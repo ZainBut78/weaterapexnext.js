@@ -16,7 +16,7 @@ import RelatedArticles from '@/components/RelatedArticles';
 import { citiesOfCountry, cityPath, countryPath, hasCountryPage, monthPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
-import { requireHistory, yearsOf } from '@/services/history';
+import { onlyReady, requireHistory, yearsOf } from '@/services/history';
 import { bestMonths, yearExtremes } from '@/utils/climateMath';
 
 export const revalidate = 86400;
@@ -49,7 +49,7 @@ export default async function CityByMonthPage({ params }) {
   // Backend round A6: photo isi history jawab se (0 extra calls)
   const photo = await photoFromHistory(data, city.slug);
 
-  const others = citiesOfCountry(country.slug)
+  const others = (await onlyReady(citiesOfCountry(country.slug)))
     .filter((c) => c.slug !== city.slug)
     .map((c) => ({ slug: c.slug, name: c.name, href: cityPath(c.slug) }));
 

@@ -16,7 +16,7 @@ import { isKnownCity } from '@/data/cities';
 import { getCountry, hasCountryPage, citiesOfCountry, cityPath, countryPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 import { getCityPhoto } from '@/services/cityPhoto';
-import { getClimateSummary, getHistories } from '@/services/history';
+import { getClimateSummary, getHistories, onlyReady } from '@/services/history';
 
 export const revalidate = 86400;
 
@@ -54,7 +54,8 @@ export default async function WeatherSlugPage({ params }) {
 
   // ── MULK (preview) ──────────────────────────────────────────
   if (r.kind === 'country') {
-    const list = citiesOfCountry(r.country.slug);
+    // Sirf mukammal data wale shehar (adhoore ka card/link nahi)
+    const list = await onlyReady(citiesOfCountry(r.country.slug));
     // Backend round C2: saare shehar EK climate-summary call mein (koi 6 wali
     // hadd nahi). Summary na mile (purana backend) → purana rasta (≤ 6 calls).
     const summary = await getClimateSummary({ cities: list.map((c) => c.slug) });

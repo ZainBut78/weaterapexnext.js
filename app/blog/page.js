@@ -109,6 +109,7 @@ export default async function BlogPage({ searchParams }) {
   const data = await serverGet(ENDPOINTS.blog.list, {
     params: { page },
     revalidate: BLOG_REVALIDATE,
+    tags: ['blog'],   // /api/revalidate (Django publish) se saaf
   });
   // /blog?page=99 jaisa page jo hai hi nahi → asli 404. Backend aise
   // page par chup-chaap AAKHRI page bhej deta hai (current_page badal

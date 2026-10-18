@@ -7,6 +7,7 @@
 //  ClimateGuidesClient.jsx ('use client').
 // ─────────────────────────────────────────────────────────────
 import Navbar from '@/components/Navbar';
+import { onlyReady } from '@/services/history';
 import Footer from '@/components/Footer';
 import { CitySearchForm, CityGrid, PlanTripButton } from './ClimateGuidesClient';
 import { pageMetadata } from '@/utils/seo';
@@ -64,7 +65,8 @@ export default async function ClimateGuidesPage() {
   // Build ke waqt 24 shehron ka loop NA chale (API quota) — page request
   // par banta hai; photos upar wale cache se aati hain.
   await connection();
-  const cities = await withPhotos(FEATURED_CITIES);
+  // Sirf jin ka 20-saal data mukammal (adhoore shehar ka link nahi)
+  const cities = await withPhotos(await onlyReady(FEATURED_CITIES));
 
   return (
     <div className="min-h-screen bg-[#f3f7ff]">

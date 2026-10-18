@@ -16,6 +16,7 @@
 import { serverGet } from '@/services/serverApi';
 import { ENDPOINTS } from '@/config/endpoints';
 import { CITIES } from '@/data/cities';
+import { onlyReady } from '@/services/history';
 import { SITE_URL } from '@/utils/seo';
 import { COUNTRIES, hasCountryPage, countryPath, cityPath, monthPath } from '@/data/countries';
 import { MONTHS } from '@/utils/climateMath';
@@ -30,7 +31,7 @@ async function allPosts() {
   const posts = [];
   try {
     for (let page = 1; page <= 50; page++) {
-      const data = await serverGet(ENDPOINTS.blog.list, { params: { page }, revalidate });
+      const data = await serverGet(ENDPOINTS.blog.list, { params: { page }, revalidate, tags: ['blog'] });
       if (!data?.posts?.length) break;
       posts.push(...data.posts);
       if (!data.has_next || data.current_page !== page) break;
@@ -43,6 +44,8 @@ async function allPosts() {
 
 export default async function sitemap() {
   const posts = await allPosts();
+  // Sirf mukammal data wale shehar (adhoore = 404, sitemap mein nahi)
+  const cities = await onlyReady(CITIES);
   const url = (p) => `${SITE_URL}${p === '/' ? '' : p}`;
 
   return [
@@ -55,7 +58,7 @@ export default async function sitemap() {
     // Section 2
     { url: url('/weather') },
     ...COUNTRIES.filter((c) => hasCountryPage(c.slug)).map((c) => ({ url: url(countryPath(c.slug)) })),
-    ...CITIES.map((c) => ({ url: url(cityPath(c.slug)) })),
-    ...CITIES.flatMap((c) => MONTHS.map((m) => ({ url: url(monthPath(c.slug, m.slug)) }))),
+    ...cities.map((c) => ({ url: url(cityPath(c.slug)) })),
+    ...cities.flatMap((c) => MONTHS.map((m) => ({ url: url(monthPath(c.slug, m.slug)) }))),
   ];
 }
