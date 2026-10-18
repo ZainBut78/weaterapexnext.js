@@ -41,9 +41,11 @@ export async function photoFromHistory(data, slug) {
 }
 
 export async function getCityPhoto(slug) {
-  if (!slug || !isKnownCity(slug)) return null;
+  if (!slug) return null;
+  // Index (DB) mein har shehar ki photo — naye (registry) shehar bhi
   const fromIndex = (await getCitiesIndex()).get(slug)?.image_url;
   if (fromIndex) return fromIndex;
+  if (!isKnownCity(slug)) return null;
   // Fallback (sirf jin ki photo DB mein abhi nahi): purana rasta
   try {
     const data = await serverGet(ENDPOINTS.weather.current, {

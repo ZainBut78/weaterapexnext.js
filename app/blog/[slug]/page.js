@@ -23,8 +23,7 @@ import Footer from '@/components/Footer';
 import RelatedArticles from '@/components/RelatedArticles';
 import { serverGet } from '@/services/serverApi';
 import { ENDPOINTS } from '@/config/endpoints';
-import { isKnownCity } from '@/data/cities';
-import { cityPath } from '@/data/countries';
+import { getCityRegistry } from '@/services/cityRegistry';
 import ProductImage from './ProductImage';
 import { pageMetadata, ogImageUrl, SITE_URL } from '@/utils/seo';
 import JsonLd, { AUTHOR, ORGANIZATION, breadcrumbs } from '@/components/JsonLd';
@@ -87,7 +86,9 @@ export default async function BlogPostPage({ params }) {
   const { html: contentHtml, toc } = prepareBlogHtml(content);
   // Backend round B4: article ke linked shehar — sirf whitelist wale (unke
   // apne pages hain). Purana backend `cities` na bheje → [] (box nahi).
-  const weatherCities = (data.cities || []).filter((c) => isKnownCity(c.slug));
+  // Registry (static + DB ke mukammal shehar) — jin ka page hai
+  const reg = await getCityRegistry();
+  const weatherCities = (data.cities || []).filter((c) => reg.has(c.slug));
 
   // Article + Breadcrumb structured data (audit 2.4). Author = Person
   // "Zain Butt" (owner, Oct 2026 — backend abhi author nahi bhejta);
@@ -242,7 +243,7 @@ export default async function BlogPostPage({ params }) {
                   <p className="font-bold text-[#002244] mb-2">{c.name}</p>
                   {/* SEO fixes (Oct 2026): ek hi page — purana /weather/<city>
                       climate guide /weather/<country>/<city> mein merge (301) */}
-                  <Link href={cityPath(c.slug)} className="flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:underline">
+                  <Link href={reg.cityPath(c.slug)} className="flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:underline">
                     {c.name} weather by month &amp; climate <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </li>

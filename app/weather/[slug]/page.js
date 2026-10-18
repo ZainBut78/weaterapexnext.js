@@ -13,10 +13,11 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import CountryClimate from '@/components/climate/CountryClimate';
 import { isKnownCity } from '@/data/cities';
-import { getCountry, hasCountryPage, citiesOfCountry, cityPath, countryPath } from '@/data/countries';
+import { getCountry, cityPath, countryPath } from '@/data/countries';
+import { getCityRegistry } from '@/services/cityRegistry';
 import { pageMetadata } from '@/utils/seo';
 import { getCityPhoto } from '@/services/cityPhoto';
-import { getClimateSummary, getHistories, onlyReady } from '@/services/history';
+import { getClimateSummary, getHistories } from '@/services/history';
 
 export const revalidate = 86400;
 
@@ -24,20 +25,27 @@ export async function generateStaticParams() {
   return [];
 }
 
-function resolve(rawSlug) {
+// Shehar registry se (static + DB ke mukammal shehar). 2+ → hub; 1 → us
+// shehar par 308 (proxy static list se pehle hi karta hai; yeh DB ke naye
+// shehron ke liye); 0 → 404.
+async function resolve(rawSlug) {
   const slug = decodeURIComponent(rawSlug).toLowerCase();
-  // Purana city URL → merged page (proxy.js 301 pehle hi kar deta hai)
+  // Purana city URL (original 160) → merged page (proxy.js 301 pehle hi kar deta hai)
   if (isKnownCity(slug)) permanentRedirect(cityPath(slug));
   const country = getCountry(slug);
-  if (country && hasCountryPage(slug)) return { kind: 'country', country };
-  notFound();
+  if (!country) notFound();
+  const reg = await getCityRegistry();
+  const list = reg.citiesOfCountry(country.slug);
+  if (list.length === 1) permanentRedirect(reg.cityPath(list[0].slug));
+  if (list.length === 0) notFound();
+  return { kind: 'country', country, list, reg };
 }
 
 export async function generateMetadata({ params }) {
-  const r = resolve((await params).slug);
+  const r = await resolve((await params).slug);
 
   if (r.kind === 'country') {
-    const n = citiesOfCountry(r.country.slug).length;
+    const n = r.list.length;
     return pageMetadata({
       title: `${r.country.name} Weather by Month & City`,
       description: `Month-by-month climate for ${n} cities in ${r.country.name}: average highs and lows, rainfall and the best months to visit, from 20 years of weather data.`,
@@ -50,19 +58,19 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function WeatherSlugPage({ params }) {
-  const r = resolve((await params).slug);
+  const r = await resolve((await params).slug);
 
   // ── MULK (preview) ──────────────────────────────────────────
   if (r.kind === 'country') {
-    // Sirf mukammal data wale shehar (adhoore ka card/link nahi)
-    const list = await onlyReady(citiesOfCountry(r.country.slug));
+    // Registry: sirf mukammal data wale shehar (static + DB)
+    const list = r.list;
     // Backend round C2: saare shehar EK climate-summary call mein (koi 6 wali
     // hadd nahi). Summary na mile (purana backend) → purana rasta (≤ 6 calls).
     const summary = await getClimateSummary({ cities: list.map((c) => c.slug) });
     const histories = summary || (await getHistories(list.map((c) => c.slug))).data;
     // Photos: cities index (1 call, 1 h cache) — sirf jin ka data aaya
     const photos = new Map(await Promise.all([...histories.keys()].map(async (s) => [s, await getCityPhoto(s)])));
-    const cities = list.map((c) => ({ slug: c.slug, name: c.name, href: cityPath(c.slug), photo: photos.get(c.slug) || null }));
+    const cities = list.map((c) => ({ slug: c.slug, name: c.name, href: r.reg.cityPath(c.slug), photo: photos.get(c.slug) || null }));
     return (
       <CountryClimate
         country={r.country}

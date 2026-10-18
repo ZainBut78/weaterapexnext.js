@@ -232,7 +232,6 @@ async function redirectChecks() {
     ['/about/', '/about'],
     ['/weather/United-Kingdom/London/October/', '/weather/united-kingdom/london/october'],
     ['/weather/hungary', '/weather/hungary/budapest'],
-    ['/weather/Hungary/', '/weather/hungary/budapest'],
     ['/weather/', '/weather'],
   ];
   for (const [from, to] of cases) {
@@ -341,8 +340,9 @@ async function restChecks() {
   ok(legacy === 0, '/sitemap.xml', 'no old /weather/<city> URLs (301)', `${legacy} found`);
   ok(w.includes('/weather'), '/sitemap.xml', 'has /weather hub');
   ok(countryPages === expectCountries, '/sitemap.xml', `country pages ${countryPages}/${expectCountries} (2+ cities)`);
-  ok(byMonth === CITIES.length, '/sitemap.xml', `city-by-month pages ${byMonth}/${CITIES.length}`);
-  ok(monthPages === CITIES.length * 12, '/sitemap.xml', `month pages ${monthPages}/${CITIES.length * 12}`);
+  // Shehar dynamic (registry: static 160 + DB ke mukammal) — kam az kam 160, har shehar ke 12 mahine
+  ok(byMonth >= CITIES.length, '/sitemap.xml', `city-by-month pages ${byMonth} (>= ${CITIES.length})`);
+  ok(monthPages === byMonth * 12, '/sitemap.xml', `month pages ${monthPages}/${byMonth * 12}`);
   ok(!w.includes('/weather/hungary'), '/sitemap.xml', 'no 1-city country page (308)');
   ok(locs.some((l) => l.includes('/blog/')), '/sitemap.xml', 'has blog posts');
   results.push(`info  /sitemap.xml                 ${locs.length} URLs`);

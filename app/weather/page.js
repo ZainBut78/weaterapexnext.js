@@ -1,7 +1,8 @@
 // ─────────────────────────────────────────────────────────────
 //  /weather — hub: saare mulk, regions mein (Phase C)
 //
-//  LIVE (Phase C2): indexable, sitemap mein. Backend call: 0 (sirf data/cities.js + data/countries.js).
+//  LIVE (Phase C2): indexable, sitemap mein. Shehar registry se (static 160 +
+//  DB ke mukammal shehar — services/cityRegistry.js; 1 cached index call).
 //  1.3 option A: 2+ shehar → country page; 1 shehar → seedha shehar page.
 // ─────────────────────────────────────────────────────────────
 import Link from 'next/link';
@@ -9,28 +10,32 @@ import { Globe2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import JsonLd, { breadcrumbs } from '@/components/JsonLd';
-import { CITIES } from '@/data/cities';
-import { readyCitySlugs } from '@/services/history';
-import { REGIONS, COUNTRIES, citiesOfCountry, hasCountryPage, countryPath, cityPath } from '@/data/countries';
+import { getCityRegistry } from '@/services/cityRegistry';
+import { REGIONS, COUNTRIES, countryPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 
-export const metadata = pageMetadata({
-  absoluteTitle: 'Weather by Country & Month — WeatherApex',
-  imageTitle: 'Weather by Country & Month',
-  description: `Climate guides for ${CITIES.length} cities in ${COUNTRIES.length} countries and territories — month-by-month temperatures, rainfall and the best time to visit.`,
-  path: '/weather',
-});
+export async function generateMetadata() {
+  const reg = await getCityRegistry();
+  const nCountries = new Set(reg.cities.map((c) => c.countrySlug)).size;
+  return pageMetadata({
+    absoluteTitle: 'Weather by Country & Month — WeatherApex',
+    imageTitle: 'Weather by Country & Month',
+    description: `Climate guides for ${reg.cities.length} cities in ${nCountries} countries and territories — month-by-month temperatures, rainfall and the best time to visit.`,
+    path: '/weather',
+  });
+}
 
 export default async function WeatherHub() {
-  // Sirf mukammal data wale shehar; jis mulk ka koi shehar tayyar nahi woh chhup jaye
-  const ready = await readyCitySlugs();
-  const isReady = (s) => !ready || ready.has(s);
+  // Registry: sirf mukammal data wale shehar (static + DB); jis mulk ka koi
+  // shehar tayyar nahi woh chhup jaye
+  const reg = await getCityRegistry();
+  const nCountries = new Set(reg.cities.map((c) => c.countrySlug)).size;
   const groups = REGIONS.map((r) => ({
     ...r,
-    countries: COUNTRIES.filter((c) => c.region === r.key && citiesOfCountry(c.slug).some((x) => isReady(x.slug)))
+    countries: COUNTRIES.filter((c) => c.region === r.key && reg.citiesOfCountry(c.slug).length > 0)
       .map((c) => {
-        const list = citiesOfCountry(c.slug).filter((x) => isReady(x.slug));
-        return { ...c, count: list.length, href: hasCountryPage(c.slug) ? countryPath(c.slug) : cityPath(list[0].slug), only: list.length === 1 ? list[0].name : null };
+        const list = reg.citiesOfCountry(c.slug);
+        return { ...c, count: list.length, href: reg.hasCountryPage(c.slug) ? countryPath(c.slug) : reg.cityPath(list[0].slug), only: list.length === 1 ? list[0].name : null };
       })
       .sort((a, b) => a.name.localeCompare(b.name)),
   }));
@@ -44,7 +49,7 @@ export default async function WeatherHub() {
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-3">Weather by Country</h1>
           <p className="text-slate-500 text-lg">
-            Month-by-month weather for {CITIES.length} cities in {COUNTRIES.length} countries and territories, built on 20 years of historical weather data.
+            Month-by-month weather for {reg.cities.length} cities in {nCountries} countries and territories, built on 20 years of historical weather data.
           </p>
         </div>
       </div>
