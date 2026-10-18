@@ -64,9 +64,9 @@ function BlogCard({ post }) {
               {post.category}
             </span>
           )}
-          <h3 className="text-xl font-bold text-[#002244] leading-snug mb-3 group-hover:text-[#0077b6] transition-colors">
+          <h2 className="text-xl font-bold text-[#002244] leading-snug mb-3 group-hover:text-[#0077b6] transition-colors">
             {post.title}
-          </h3>
+          </h2>
           <p className="text-sm text-gray-600 leading-relaxed mb-6 line-clamp-3">
             {post.excerpt}
           </p>
@@ -119,6 +119,8 @@ export default async function BlogPage({ searchParams }) {
   return (
     <div className="min-h-screen bg-[#f3f7ff]">
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
 
       <div className="bg-gradient-to-b from-white to-blue-50 py-12 px-4">
         <div className="max-w-3xl mx-auto text-center">
@@ -164,6 +166,7 @@ export default async function BlogPage({ searchParams }) {
         )}
       </div>
 
+      </main>
       <Footer />
     </div>
   );

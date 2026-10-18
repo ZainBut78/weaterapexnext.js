@@ -62,6 +62,8 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
     <div className="min-h-screen bg-[#f3f7ff]">
       <JsonLd data={breadcrumbs(crumbs)} />
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
 
       <div className="bg-gradient-to-br from-[#002244] via-[#0077b6] to-[#00a8e8] text-white">
         <div className="max-w-6xl mx-auto px-4 py-14 text-center">
@@ -198,6 +200,7 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
         )}
       </div>
 
+      </main>
       <Footer />
     </div>
   );

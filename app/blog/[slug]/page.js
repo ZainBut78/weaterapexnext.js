@@ -135,6 +135,8 @@ export default async function BlogPostPage({ params }) {
         ])}
       />
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
 
       <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
         <Link
@@ -258,6 +260,7 @@ export default async function BlogPostPage({ params }) {
         <RelatedArticles post={slug} limit={3} title="You may also like" />
       </div>
 
+      </main>
       <Footer />
     </div>
   );

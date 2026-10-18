@@ -21,6 +21,8 @@ export default function TripPlannerPage() {
   return (
     <div className="min-h-screen bg-[#f3f7ff] font-sans">
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
       <TripPlannerTool
         intro={
           <div className="text-center mb-8">
@@ -29,6 +31,7 @@ export default function TripPlannerPage() {
           </div>
         }
       />
+      </main>
       <Footer />
     </div>
   );

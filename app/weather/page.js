@@ -44,6 +44,8 @@ export default async function WeatherHub() {
     <div className="min-h-screen bg-[#f3f7ff]">
       <JsonLd data={breadcrumbs([{ name: 'Home', path: '/' }, { name: 'Weather', path: '/weather' }])} />
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
 
       <div className="bg-gradient-to-b from-white to-blue-50 py-12 px-4">
         <div className="max-w-3xl mx-auto text-center">
@@ -75,6 +77,7 @@ export default async function WeatherHub() {
         ))}
       </div>
 
+      </main>
       <Footer />
     </div>
   );

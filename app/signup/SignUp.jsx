@@ -119,7 +119,7 @@ export default function SignUp() {
 
   if (step === 'register') {
     return (
-      <div className="min-h-screen bg-[#f3f7ff] flex items-center justify-center px-4 py-12">
+      <main className="min-h-screen bg-[#f3f7ff] flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10">
             <div className="text-center mb-8">
@@ -232,12 +232,12 @@ export default function SignUp() {
             </p>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f7ff] flex items-center justify-center px-4 py-12">
+    <main className="min-h-screen bg-[#f3f7ff] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10">
           <div className="text-center mb-8">
@@ -304,6 +304,6 @@ export default function SignUp() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

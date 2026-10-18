@@ -580,7 +580,7 @@ function TripPlannerTool({ intro }) {
         {!data && !isLoading && !error && !needsCity && !freeLimit && (
           <div className="text-center py-20">
             <Sun className="w-16 h-16 text-blue-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-400">Plan Your Trip</h3>
+            <h2 className="text-xl font-semibold text-gray-400">Plan Your Trip</h2>
             <p className="text-gray-400 mt-1">Search by city to get per-day scores, or by country to compare cities</p>
           </div>
         )}

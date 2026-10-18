@@ -122,6 +122,7 @@ const PopularDestinations = () => {
             {showLeft && (
               <button
                 onClick={() => scroll('left')}
+                aria-label="Scroll destinations left"
                 className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-white hover:border-gray-400 transition-all"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -130,6 +131,7 @@ const PopularDestinations = () => {
             {showRight && (
               <button
                 onClick={() => scroll('right')}
+                aria-label="Scroll destinations right"
                 className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-white hover:border-gray-400 transition-all"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -176,7 +178,6 @@ const PopularDestinations = () => {
                 // bhi button ki tarah kaam karta hai.
                 role="button"
                 tabIndex={0}
-                aria-label={`Show weather for ${item.city}, ${item.country}`}
                 onClick={() => openCity(item.city)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -208,6 +209,8 @@ const PopularDestinations = () => {
 
                 <div className="flex justify-between items-start z-10">
                   <div>
+                    {/* Card ka naam content se (a11y: dikhne wala text naam mein ho) */}
+                    <span className="sr-only">Show weather for </span>
                     <h3 className={`text-xl font-bold leading-tight ${imageUrl ? 'text-white' : 'text-[#002244]'}`}>
                       {item.city}
                     </h3>
@@ -232,7 +235,7 @@ const PopularDestinations = () => {
                     href={cityHref(item.city)}
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.stopPropagation()}
-                    className={`text-xs font-semibold mb-1 hover:underline focus:outline-none focus-visible:underline ${imageUrl ? 'text-white/90' : 'text-[#0077b6]'}`}
+                    className={`inline-block py-1 text-xs font-semibold mb-1 hover:underline focus:outline-none focus-visible:underline ${imageUrl ? 'text-white/90' : 'text-[#0077b6]'}`}
                   >
                     Climate guide →
                   </Link>

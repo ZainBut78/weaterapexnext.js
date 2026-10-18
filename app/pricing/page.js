@@ -20,9 +20,9 @@ export default function PricingPage() {
     // Navbar + Footer (audit 2.6-c). "Coming Soon" beech mein wahi rehta hai.
     <div className="min-h-screen flex flex-col bg-[#f3f7ff]">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center py-32">
+      <main className="flex-1 flex items-center justify-center py-32">
         <h1 className="text-2xl font-bold text-[#002244]">Pricing — Coming Soon</h1>
-      </div>
+      </main>
       <Footer />
     </div>
   );

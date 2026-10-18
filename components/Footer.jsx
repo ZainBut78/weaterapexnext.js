@@ -67,7 +67,7 @@ const Footer = () => {
 
           {/* Product Links */}
           <div className="md:col-span-2">
-            <h4 className="font-extrabold text-sm text-[#002244] mb-4">Product</h4>
+            <h2 className="font-extrabold text-sm text-[#002244] mb-4">Product</h2>
             <ul className="space-y-3 text-sm text-gray-600">
               <li><Link prefetch={false} href="/" className="hover:text-[#0077b6] transition-colors">Local Forecasts</Link></li>
               <li><Link prefetch={false} href="/climate-guides" className="hover:text-[#0077b6] transition-colors">Historical Data</Link></li>
@@ -78,7 +78,7 @@ const Footer = () => {
 
           {/* Company Links */}
           <div className="md:col-span-2">
-            <h4 className="font-extrabold text-sm text-[#002244] mb-4">Company</h4>
+            <h2 className="font-extrabold text-sm text-[#002244] mb-4">Company</h2>
             <ul className="space-y-3 text-sm text-gray-600">
               <li><Link prefetch={false} href="/about" className="hover:text-[#0077b6] transition-colors">About Us</Link></li>
               <li><a href="#" className="hover:text-[#0077b6] transition-colors">Careers</a></li>
@@ -89,7 +89,7 @@ const Footer = () => {
 
           {/* Stay Informed Newsletter Column */}
           <div className="md:col-span-4">
-            <h4 className="font-extrabold text-sm text-[#002244] mb-4">Stay Informed</h4>
+            <h2 className="font-extrabold text-sm text-[#002244] mb-4">Stay Informed</h2>
             <p className="text-gray-600 text-sm mb-4 leading-relaxed">
               Get localized severe weather alerts directly to your inbox.
             </p>

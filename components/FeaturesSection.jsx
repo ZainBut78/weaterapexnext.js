@@ -61,9 +61,9 @@ const FeaturesSection = () => {
                 </div>
                 
                 {/* Feature Title */}
-                <h3 className="text-xl font-extrabold text-[#002244] mb-3">
+                <h2 className="text-xl font-extrabold text-[#002244] mb-3">
                   {feature.title}
-                </h3>
+                </h2>
                 
                 {/* Feature Description */}
                 <p className="text-sm text-gray-600 leading-relaxed mb-6 flex-grow">

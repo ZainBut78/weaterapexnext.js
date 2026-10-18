@@ -112,3 +112,24 @@
 /* <details> accordion (blog TOC / FAQ) — Safari ka default ▶ marker band */
 .blog-details > summary::-webkit-details-marker { display: none; }
 .blog-details > summary { list-style: none; }
+
+/* ─────────────────────────────────────────────────────────────
+   WCAG AA contrast (a11y Task 7, Oct 2026) — sirf TEXT rang, border /
+   background wahi. Har light background (#fff, #f3f7ff, #eff6ff, #f0f5ff)
+   par ≥ 4.5:1 (scripts se naapa). Classes wahi rakhi (100+ jagah), rang
+   yahan ek dafa thoda gehra:
+     gray-400 2.6 → 4.9 · gray-500 4.4 → 5.1 · slate-400 2.6 → 5.0
+     slate-500 4.4 → 5.0 · orange/amber/emerald/blue 500-600 → 700 shade
+     brand text #0077b6 4.45 (light-blue par) → #006aa3 5.35
+   ───────────────────────────────────────────────────────────── */
+@layer utilities {
+  .text-gray-400 { color: #646d7c; }
+  .text-gray-500 { color: #5b6474; }
+  .text-slate-400 { color: #5b6b84; }
+  .text-slate-500 { color: #56657d; }
+  .text-orange-500, .text-orange-600 { color: #ca3500; }
+  .text-amber-500, .text-amber-600 { color: #bb4d00; }
+  .text-emerald-600 { color: #007a55; }
+  .text-blue-500 { color: #1447e6; }
+  .text-\[\#0077b6\] { color: #006aa3; }
+}

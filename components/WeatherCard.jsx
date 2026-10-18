@@ -227,8 +227,8 @@ const WeatherCard = () => {
                       type="button"
                       onClick={() => units.setUnit(u)}
                       aria-pressed={units.unit === u}
-                      aria-label={u === 'C' ? 'Show Celsius' : 'Show Fahrenheit'}
-                      className={`text-left leading-[inherit] cursor-pointer transition-colors ${units.unit === u ? 'text-[#0077b6]' : 'text-[#4a607a]/45 hover:text-[#4a607a]'}`}
+                      aria-label={u === 'C' ? '°C — show Celsius' : '°F — show Fahrenheit'}
+                      className={`text-left leading-[inherit] cursor-pointer transition-colors ${units.unit === u ? 'text-[#0077b6]' : 'text-[#5f6878] hover:text-[#4a607a]'}`}
                     >
                       °{u}
                     </button>
