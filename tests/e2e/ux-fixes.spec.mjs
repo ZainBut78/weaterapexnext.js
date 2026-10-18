@@ -172,7 +172,7 @@ test('search from another page: known city → its city page', async ({ page }) 
   const input = page.locator('header input[role="combobox"]').first();
   await input.fill('barcelona');
   await input.press('Enter');
-  await expect(page).toHaveURL(/\/weather\/barcelona$/);
+  await expect(page).toHaveURL(/\/weather\/spain\/barcelona$/);   // merged city page (SEO fixes Oct 2026)
 });
 
 test('search from another page: other place → home with that city', async ({ page }) => {

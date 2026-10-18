@@ -10,6 +10,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import JsonLd, { breadcrumbs } from '@/components/JsonLd';
 import { CITIES } from '@/data/cities';
+import { readyCitySlugs } from '@/services/history';
 import { REGIONS, COUNTRIES, citiesOfCountry, hasCountryPage, countryPath, cityPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 
@@ -20,12 +21,15 @@ export const metadata = pageMetadata({
   path: '/weather',
 });
 
-export default function WeatherHub() {
+export default async function WeatherHub() {
+  // Sirf mukammal data wale shehar; jis mulk ka koi shehar tayyar nahi woh chhup jaye
+  const ready = await readyCitySlugs();
+  const isReady = (s) => !ready || ready.has(s);
   const groups = REGIONS.map((r) => ({
     ...r,
-    countries: COUNTRIES.filter((c) => c.region === r.key)
+    countries: COUNTRIES.filter((c) => c.region === r.key && citiesOfCountry(c.slug).some((x) => isReady(x.slug)))
       .map((c) => {
-        const list = citiesOfCountry(c.slug);
+        const list = citiesOfCountry(c.slug).filter((x) => isReady(x.slug));
         return { ...c, count: list.length, href: hasCountryPage(c.slug) ? countryPath(c.slug) : cityPath(list[0].slug), only: list.length === 1 ? list[0].name : null };
       })
       .sort((a, b) => a.name.localeCompare(b.name)),

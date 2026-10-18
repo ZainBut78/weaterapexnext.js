@@ -10,7 +10,6 @@
 //     Summary na mile (purana backend) → purana rasta (≤ 6 history calls).
 //   • related articles: backend recommendation (RelatedArticles)
 // ─────────────────────────────────────────────────────────────
-import { notFound } from 'next/navigation';
 import { resolveCity, resolveMonth } from '../../resolve';
 import MonthGuide from '@/components/climate/MonthGuide';
 import RelatedArticles from '@/components/RelatedArticles';
@@ -18,7 +17,7 @@ import { citiesOfCountry, cityPath, countryPath, hasCountryPage, monthPath } fro
 import { getCity } from '@/data/cities';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
-import { getClimateSummary, getHistory, getHistories, MAX_FANOUT, yearsOf } from '@/services/history';
+import { getClimateSummary, getHistories, MAX_FANOUT, onlyReady, requireHistory, yearsOf } from '@/services/history';
 import { rowFor, visitVerdict } from '@/utils/climateMath';
 import { pickElsewhere } from '@/utils/elsewhere';
 import { cityTags } from '@/data/cityTags';
@@ -34,8 +33,7 @@ async function load(params) {
   const p = await params;
   const { country, city } = resolveCity(p.slug, p.city);
   const month = resolveMonth(p.month);
-  const data = await getHistory(city.slug);
-  if (!data) notFound();
+  const data = await requireHistory(city.slug);   // data na ho → 503 (cache nahi), 404 nahi
   return { country, city, month, data };
 }
 
@@ -65,7 +63,8 @@ export default async function MonthPage({ params }) {
 
   // Usi mulk ke doosre shehar — saare link (internal linking). Data:
   // summary se (koi cap nahi); summary na ho → purana rasta (≤ MAX_FANOUT calls)
-  const otherCities = citiesOfCountry(country.slug).filter((c) => c.slug !== city.slug);
+  // Sirf mukammal data wale shehar (adhoore ka link nahi — owner review)
+  const otherCities = await onlyReady(citiesOfCountry(country.slug).filter((c) => c.slug !== city.slug));
   let rowOf;
   if (summary) {
     rowOf = (slug) => summary.get(slug)?.month_data || null;

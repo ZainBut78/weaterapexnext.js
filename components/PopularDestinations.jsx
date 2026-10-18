@@ -9,6 +9,15 @@ import { getMeteoconIcon } from '../utils/meteoconsMap';
 import { isNightHour } from '../utils/isNightHour';
 import { useCity } from '../context/CityContext';
 import { useUnits } from '../context/UnitsContext';
+import { isKnownCity } from '../data/cities';
+import { cityPath } from '../data/countries';
+
+// Shehar ka page: /weather/<country>/<city> (SEO fixes Oct 2026 — purana
+// /weather/<city> ab 301 hai, internal link seedha naye URL par)
+const cityHref = (name) => {
+  const slug = name.toLowerCase().replace(/ /g, '-');
+  return isKnownCity(slug) ? cityPath(slug) : `/weather/${slug}`;
+};
 
 const cities = [
   { city: 'Paris', country: 'France' },
@@ -211,7 +220,7 @@ const PopularDestinations = () => {
                       badalta hai; is link par click/Enter card tak nahi
                       jata (stopPropagation), seedha climate page khulta hai. */}
                   <Link
-                    href={`/weather/${item.city.toLowerCase().replace(/ /g, '-')}`}
+                    href={cityHref(item.city)}
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.stopPropagation()}
                     className={`text-xs font-semibold mb-1 hover:underline focus:outline-none focus-visible:underline ${imageUrl ? 'text-white/90' : 'text-[#0077b6]'}`}

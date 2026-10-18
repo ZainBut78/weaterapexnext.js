@@ -7,8 +7,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, MapPin, ArrowRight } from 'lucide-react';
 import { pexelsSized, pexelsSrcSet } from '@/utils/pexels';
+import { isKnownCity } from '@/data/cities';
+import { cityPath } from '@/data/countries';
 
-// "Search any city..." — shehar ka naam likh kar /weather/<slug> par jana.
+// "Search any city..." — shehar ka naam likh kar us ke page par jana
+// (whitelist shehar → /weather/<country>/<city>; baqi /weather/<slug> → mulk ya 404).
 export function CitySearchForm() {
   const [customCity, setCustomCity] = useState('');
   const router = useRouter();
@@ -17,7 +20,7 @@ export function CitySearchForm() {
     e.preventDefault();
     if (customCity.trim()) {
       const slug = customCity.trim().toLowerCase().replace(/\s+/g, '-');
-      router.push(`/weather/${slug}`);
+      router.push(isKnownCity(slug) ? cityPath(slug) : `/weather/${slug}`);
     }
   };
 
@@ -102,7 +105,7 @@ function CityCard({ city, index }) {
   if (!photo) {
     return (
       <Link
-        href={`/weather/${city.slug}`}
+        href={cityPath(city.slug)}
         className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-blue-300 transition-all"
       >
         <p className="font-semibold text-slate-900">{city.name}</p>
@@ -113,7 +116,7 @@ function CityCard({ city, index }) {
 
   return (
     <Link
-      href={`/weather/${city.slug}`}
+      href={cityPath(city.slug)}
       className="group relative block h-32 sm:h-36 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition-all"
     >
       <img

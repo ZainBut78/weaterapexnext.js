@@ -6,9 +6,14 @@
 //      /api ko matcher chhoo hi nahi sakta; Django ke URLs "/" par khatam hote hain)
 //   2) /weather/* chhote harf:  /weather/London → /weather/london
 //   3) 1-shehar wala mulk:  /weather/hungary → /weather/hungary/budapest
-//      Istisna: singapore / hong-kong — yeh Section 1 ke SHEHAR pages hain
-//      (/weather/singapore 200 rehta hai, redirect nahi → koi loop nahi).
+//   4) Purana city URL (Section 1) → merged page, **301** (SEO fixes, Oct
+//      2026, owner): /weather/brisbane → /weather/australia/brisbane.
+//      Sab 160 whitelist shehar ka naya page hai (data/countries cityPath).
+//      singapore / hong-kong bhi: /weather/singapore → /weather/singapore/singapore
+//      (4 hisse — wapas yahan nahi aata, loop nahi). Country hubs
+//      (/weather/australia) shehar nahi → 200, bilkul waise.
 //  Misal: /weather/Hungary/ → ek hi hop → /weather/hungary/budapest
+//         /weather/Brisbane/ → ek hi hop (301) → /weather/australia/brisbane
 //
 //  Lowercase redirect page.js mein kyun nahi: city pages ISR hain; page se
 //  redirect karne par "London" ka redirect cache hota aur Windows ki disk par
@@ -22,6 +27,7 @@ import { getCountry, hasCountryPage, citiesOfCountry, cityPath } from './data/co
 export function proxy(request) {
   const original = request.nextUrl.pathname;
   let path = original;
+  let status = 308;
 
   // 1) trailing slash
   if (path.length > 1 && path.endsWith('/')) path = path.replace(/\/+$/, '') || '/';
@@ -35,7 +41,11 @@ export function proxy(request) {
     if (parts.length === 3 && parts[2]) {
       const slug = parts[2];
       const country = getCountry(slug);
-      if (country && !isKnownCity(slug) && !hasCountryPage(slug)) {
+      if (isKnownCity(slug)) {
+        // 4) purana Section 1 city URL → merged page (301, owner ki farmaish)
+        path = cityPath(slug);
+        status = 301;
+      } else if (country && !hasCountryPage(slug)) {
         const only = citiesOfCountry(slug)[0];
         if (only) path = cityPath(only.slug);
       }
@@ -47,7 +57,7 @@ export function proxy(request) {
     // karte waqt wapas jod deta tha (/about/ → /about/ loop, test mein pakda).
     const url = new URL(request.url);
     url.pathname = path;
-    return NextResponse.redirect(url, 308);
+    return NextResponse.redirect(url, status);
   }
   return NextResponse.next();
 }

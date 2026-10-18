@@ -12,6 +12,7 @@
 //  Baqi shehar `skipped` mein wapas aate hain (page un ka "—" dikhata hai).
 //  Build ke waqt kabhi nahi chalta (pages on-demand ISR).
 // ─────────────────────────────────────────────────────────────
+import { notFound } from 'next/navigation';
 import { serverGet } from './serverApi';
 import { ENDPOINTS } from '../config/endpoints';
 import { HISTORY_READY } from '../data/historyReady';
@@ -58,6 +59,54 @@ export const getHistory = (citySlug) =>
     params: { city: citySlug },
     revalidate: HISTORY_REVALIDATE,
   });
+
+// ── Kis shehar ka 20-saal data mukammal hai (owner review, Oct 2026) ──
+// Backend /weather/cities/ (sirf DB, Open-Meteo nahi) har shehar ke saath
+// `history_complete` deta hai. Wahi ek call (1 ghanta cache) cityPhoto bhi
+// karta hai — same URL, isliye backend ko izafi call nahi.
+const CITIES_INDEX_REVALIDATE = 60 * 60;
+
+/** slug → index row. Backend down → THROW (caller 5xx deta hai). */
+async function citiesIndexStrict() {
+  const data = await serverGet(ENDPOINTS.weather.cities, { revalidate: CITIES_INDEX_REVALIDATE, tags: ['cities'] });
+  return new Map((data?.cities || []).map((c) => [c.slug, c]));
+}
+
+/**
+ * Jin whitelist shehron ka data mukammal hai — Set(slug). Sitemap aur
+ * internal links isi se filter hote hain (adhoore shehar ka link/URL nahi).
+ * Backend down ho to `null` (caller sab shehar rakhe — poori site gayab na ho).
+ */
+export async function readyCitySlugs() {
+  try {
+    const idx = await citiesIndexStrict();
+    return new Set([...idx.values()].filter((c) => c.history_complete !== false).map((c) => c.slug));
+  } catch {
+    return null;
+  }
+}
+
+/** list ko ready shehron tak mehdood karo (index na mile → list waisi hi) */
+export async function onlyReady(list, slugOf = (c) => c.slug) {
+  const ready = await readyCitySlugs();
+  return ready ? list.filter((c) => ready.has(slugOf(c))) : list;
+}
+
+// City / month page ka data (owner review, Oct 2026):
+//  • Backend jawab na de / timeout / 5xx → THROW → 5xx, Next cache NAHI
+//    karta (pehle se bana achha page ISR mein rehta hai).
+//  • Backend ne jawab diya magar shehar ka data mukammal nahi (index mein
+//    nahi, ya history_complete false) → notFound() = asli 404. History
+//    endpoint call hi nahi hota (warna backend Open-Meteo se 20 saal mangwata).
+//  • Ghalat URL (whitelist se bahar) pehle hi resolveCity() mein 404.
+export async function requireHistory(citySlug) {
+  const idx = await citiesIndexStrict();
+  const info = idx.get(citySlug);
+  if (!info || info.history_complete === false) notFound();
+  const data = await getHistory(citySlug);
+  if (!data) notFound();
+  return data;
+}
 
 /**
  * @param {string[]} slugs    — tarteeb ahem: pehle wale pehle

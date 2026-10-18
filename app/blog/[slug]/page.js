@@ -7,7 +7,13 @@
 //   • Title/description `generateMetadata` se (purana Helmet).
 //   • Post na mile → notFound() = asli HTTP 404 (pehle 200 ke sath
 //     "Post not found" dikhta tha).
-//   • Pehli dafa khulne par page banta hai, phir 10 min cache (ISR).
+//   • SEO fixes (Oct 2026): page ka HTML ISR cache NAHI. Wajah: koi post
+//     publish se pehle link ho jati to us slug ka 404 ISR mein (SWR 1 saal)
+//     cache ho jata; publish ke baad bhi purana "not found" (soft 404).
+//     Ab: mili hui post ka DATA 5 min cache (fetch revalidate 300, tag
+//     `blog:<slug>` — Django publish par /api/revalidate yeh tag saaf
+//     karta hai). Next sirf 200 jawab cache karta hai → ghalat slug har
+//     dafa asli 404 + no-store; post publish/schedule hote hi dikhti hai.
 // ─────────────────────────────────────────────────────────────
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -27,19 +33,13 @@ import BlogFaq from '@/components/blog/BlogFaq';
 import { FurtherReading, Sources } from '@/components/blog/BlogLinks';
 import { prepareBlogHtml } from '@/utils/blogHtml';
 
-const BLOG_REVALIDATE = 600;
-export const revalidate = 600;
-
-// Build ke waqt koi post pehle se nahi banti — har post pehli visit par
-// banti hai aur cache hoti hai (on-demand ISR).
-export async function generateStaticParams() {
-  return [];
-}
+const BLOG_REVALIDATE = 300;   // sirf data (fetch) cache — 5 min
+export const dynamic = 'force-dynamic';
 
 // generateMetadata aur page dono yahi call karte hain — Next.js ek hi
 // URL ki fetch ko ek request mein mila deta hai (backend ko 1 call).
 const getPost = (slug) =>
-  serverGet(ENDPOINTS.blog.detail(slug), { revalidate: BLOG_REVALIDATE });
+  serverGet(ENDPOINTS.blog.detail(slug), { revalidate: BLOG_REVALIDATE, tags: [`blog:${slug}`, 'blog'] });
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -240,11 +240,10 @@ export default async function BlogPostPage({ params }) {
               {weatherCities.map((c) => (
                 <li key={c.slug} className="rounded-2xl bg-[#f3f7ff] p-4">
                   <p className="font-bold text-[#002244] mb-2">{c.name}</p>
-                  <Link href={`/weather/${c.slug}`} className="flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:underline">
-                    {c.name} climate & 20-year averages <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                  <Link href={cityPath(c.slug)} className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:underline">
-                    {c.name} weather by month <ArrowRight className="w-3.5 h-3.5" />
+                  {/* SEO fixes (Oct 2026): ek hi page — purana /weather/<city>
+                      climate guide /weather/<country>/<city> mein merge (301) */}
+                  <Link href={cityPath(c.slug)} className="flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:underline">
+                    {c.name} weather by month &amp; climate <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </li>
               ))}
