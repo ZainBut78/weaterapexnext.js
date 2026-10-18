@@ -17,7 +17,7 @@ export default function UnitTempShort({ c, dual = false }) {
   return (
     <>
       <span className="block">{first}</span>
-      <span className="block text-[10px] opacity-70">{second}</span>
+      <span className="block text-[10px] font-normal">{second}</span>
     </>
   );
 }
