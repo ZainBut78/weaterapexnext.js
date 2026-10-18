@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useCity } from '../context/CityContext';
-import { useCurrentWeather } from '../hooks/useWeather';
+import { useCurrentWeather, DEFAULT_CITY } from '../hooks/useWeather';
 import { isNightHour } from '../utils/isNightHour';
 import { getWeatherDescription } from '../utils/weatherDescriptions';
 import MeteoconIcon from './MeteoconIcon';
@@ -114,7 +114,12 @@ function CityNotFoundMessage({ query, onPick }) {
 }
 
 const WeatherCard = () => {
-  const { city, setCity, locate, geoStatus } = useCity();
+  const { city: savedCity, setCity, locate, geoStatus } = useCity();
+  // Pehle render (server + hydration) par saved city abhi maloom nahi → default
+  // shehar ka server data (app/page.js) — card foran HTML mein. `ssr-default-city`
+  // class: layout.js script ne bataya ke saved shehar koi aur hai → CSS chhupata hai.
+  const city = savedCity ?? DEFAULT_CITY;
+  const ssrDefault = savedCity === null ? ' ssr-default-city' : '';
   const { data, isLoading, isError, error } = useCurrentWeather(city);
   const [activeTab, setActiveTab] = useState('Temperature');
   // °C/°F + km/h/mph (audit 3.2) — hook early return se PEHLE
@@ -125,7 +130,7 @@ const WeatherCard = () => {
   // ki saved city useEffect mein aati hai). Tab bhi "Loading" hi
   // dikhe — warna ek pal ke liye "Could not load" chamak jata.
   // Loading ke waqt asli card jitna bara skeleton (CLS fix — HomeSkeletons.jsx)
-  if (isLoading || !city) {
+  if (isLoading) {
     return <WeatherCardSkeleton />;
   }
 
@@ -200,7 +205,7 @@ const WeatherCard = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <div className="relative bg-white rounded-3xl shadow-xl p-5 sm:p-7 lg:p-10 max-w-[900px] mx-auto overflow-hidden">
+      <div className={`relative bg-white rounded-3xl shadow-xl p-5 sm:p-7 lg:p-10 max-w-[900px] mx-auto overflow-hidden${ssrDefault}`}>
         
         <WeatherBackground weatherCode={weatherCode} />
 
@@ -210,7 +215,7 @@ const WeatherCard = () => {
             bilkul pehle jaisa row. */}
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 lg:gap-12 mb-6 lg:mb-10">
           <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-            <MeteoconIcon weatherCode={weatherCode} isNight={isCurrentlyNight} sizeClass="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 shrink-0" />
+            <MeteoconIcon weatherCode={weatherCode} isNight={isCurrentlyNight} sizeClass="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 shrink-0" priority />
             <div className="min-w-0">
               {/* Pehle <h1> tha — home par do <h1> ban jate (FeaturesSection
                   ka bhi). Ab <div>, same classes (andar <div> hai, is liye

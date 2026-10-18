@@ -7,10 +7,13 @@
 //   /sitemap/places.xml         → /weather, country hubs, city pages
 //   /sitemap/months-<n>.xml     → month pages, 1,000 per file
 //
-//  lastmod sach: blog = post ka updated_at; month page jis ka travel note
-//  ho = note ki "facts reviewed YYYY-MM-DD"; baqi = us page ke template /
-//  content ki aakhri asal tabdeeli (neeche constants — page badlein to
-//  tareekh bhi). Build ka waqt KABHI nahi.
+//  lastmod sach (owner review, Oct 2026 — deploy par KABHI nahi badalta):
+//   • blog = post ka updated_at
+//   • city page = us shehar ke climate data ki aakhri tabdeeli (backend
+//     cities index `climate_updated_at`; purana backend → DATA_PERIOD_DATE)
+//   • month page = wahi, ya travel note ki "facts reviewed" (jo nayi ho)
+//   • country hub = us ke shehron mein sab se nayi; /weather = sab mein nayi
+//   • static pages = neeche constants (page ka content badle to tareekh bhi)
 //  Sirf canonical + indexable + 200 URLs: login/signup/pricing (noindex),
 //  api-docs, purane /weather/<city> (301), ?param URLs — kuch nahi.
 //  Shehar: registry (static + DB ke mukammal) — adhoore shamil nahi.
@@ -34,8 +37,10 @@ const STATIC_PAGES = [
   ['/terms', '2026-10-03'],
   ['/privacy', '2026-10-03'],
 ];
-// /weather hub, country hubs, city pages, month pages ka template (merge: Oct 18)
-export const WEATHER_LASTMOD = '2026-10-18';
+// Climate data ka daur 2006–2025 band hua → shehar ki apni tareekh na mile to yeh
+// (pakki — har deploy par wahi)
+export const DATA_PERIOD_DATE = '2026-01-01';
+const cityDate = (c) => c.dataDate || DATA_PERIOD_DATE;
 const MONTH_CHUNK = 1000;
 
 const BLOG_REVALIDATE = 600;
@@ -100,10 +105,12 @@ export async function blogEntries() {
 
 export async function placeEntries() {
   const reg = await getCityRegistry();
+  const newestOf = (list) => list.reduce((a, c) => max(a, isoDay(cityDate(c))), null);
   return [
-    { path: '/weather', lastmod: WEATHER_LASTMOD },
-    ...COUNTRIES.filter((c) => reg.hasCountryPage(c.slug)).map((c) => ({ path: countryPath(c.slug), lastmod: WEATHER_LASTMOD })),
-    ...reg.cities.map((c) => ({ path: reg.cityPath(c.slug), lastmod: WEATHER_LASTMOD })),
+    { path: '/weather', lastmod: newestOf(reg.cities) },
+    ...COUNTRIES.filter((c) => reg.hasCountryPage(c.slug))
+      .map((c) => ({ path: countryPath(c.slug), lastmod: newestOf(reg.citiesOfCountry(c.slug)) })),
+    ...reg.cities.map((c) => ({ path: reg.cityPath(c.slug), lastmod: cityDate(c) })),
   ];
 }
 
@@ -113,7 +120,7 @@ export async function monthEntries() {
   for (const c of reg.cities) {
     for (const m of MONTHS) {
       const note = await noteDate(c.slug, m.slug);
-      out.push({ path: reg.monthPath(c.slug, m.slug), lastmod: max(WEATHER_LASTMOD, note) });
+      out.push({ path: reg.monthPath(c.slug, m.slug), lastmod: max(isoDay(cityDate(c)), note && isoDay(note)) });
     }
   }
   return out;

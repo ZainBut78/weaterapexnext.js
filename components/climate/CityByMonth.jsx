@@ -23,6 +23,7 @@ import { UnitTemp } from './UnitText';
 import MonthlyTable from './MonthlyTable';
 import LazyClimateChart from './LazyClimateChart';
 import { pexelsSized, pexelsSrcSet } from '@/services/cityPhoto';
+import { preload } from 'react-dom';
 import { MONTHS, rowFor, visitVerdict, yearExtremes, bestMonths, mmToIn } from '@/utils/climateMath';
 import { MONTH_SHORT } from '@/utils/climateNarrative';
 import { SITE_URL } from '@/utils/seo';
@@ -87,6 +88,16 @@ export default function CityByMonth({ data, city, country, photo, crumbs, monthH
   }));
   const withRain = monthly.filter((m) => typeof m.avg_rainfall === 'number');
 
+  // Hero (LCP) tasveer <head> mein preload — HTML parse hone se pehle request
+  // shuru; wahi srcset/sizes jo <img> par (perf, Oct 2026)
+  if (photo) {
+    preload(pexelsSized(photo, 1280), {
+      as: 'image',
+      imageSrcSet: pexelsSrcSet(photo),
+      imageSizes: '(max-width: 640px) 60vw, 100vw',
+      fetchPriority: 'high',
+    });
+  }
   return (
     <div className="min-h-screen bg-[#f3f7ff]">
       <JsonLd data={breadcrumbs(crumbs)} />

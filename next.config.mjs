@@ -20,6 +20,10 @@ const nextConfig = {
   // ISR pages ki stale-while-revalidate 1 saal ki jagah zyada se zyada 2 din
   // (sab se lamba page revalidate 1 din). SEO fixes Oct 2026.
   expireTime: 172800,
+  // inlineCss NAAPA aur BAND rakha (Oct 2026): CSS <style> mein HTML + RSC
+  // payload dono mein aati hai (+13 KB gz har page). Lighthouse (local, 2 runs):
+  // home LCP 2.3 → 1.9 s behtar, magar city/month 3.0 → 3.6 s KHARAB (bara RSC
+  // payload). Site ke zyada pages city/month hain → band.
   // ── Standalone (Hostinger khud `output: 'standalone'` lagata hai) ──
   // Local test ke liye sirf env switch: NEXT_OUTPUT=standalone npm run build.
   // Hamesha nahi — standalone ke saath local `next start` (aur hamare

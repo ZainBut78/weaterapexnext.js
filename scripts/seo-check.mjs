@@ -250,6 +250,7 @@ async function redirectChecks() {
     ['/about/', '/about'],
     ['/weather/United-Kingdom/London/October/', '/weather/united-kingdom/london/october'],
     ['/weather/hungary', '/weather/hungary/budapest'],
+    ['/weather/Hungary/', '/weather/hungary/budapest'],   // proxy: lowercase + 1-shehar mulk ek hi hop
     ['/weather/', '/weather'],
   ];
   for (const [from, to] of cases) {

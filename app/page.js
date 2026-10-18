@@ -21,6 +21,22 @@ import Article from '@/components/Article';
 import Footer from '@/components/Footer';
 import { pageMetadata, SITE_NAME, SITE_URL } from '@/utils/seo';
 import JsonLd, { ORGANIZATION } from '@/components/JsonLd';
+import { QueryClient, dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { serverGet } from '@/services/serverApi';
+import { ENDPOINTS } from '@/config/endpoints';
+import { DEFAULT_CITY } from '@/config/defaults';
+
+// Perf (Oct 2026): pehli screen (weather card, forecast, map heading) server
+// HTML mein — default shehar ka data yahin. 10 min ISR (current weather).
+export const revalidate = 600;
+
+async function defaultCityWeather() {
+  try {
+    return await serverGet(ENDPOINTS.weather.current, { params: { city: DEFAULT_CITY }, revalidate: 600 });
+  } catch {
+    return null;   // backend band → pehle jaisa: browser khud mangwaye
+  }
+}
 
 // Home ka structured data: Organization + WebSite (audit 2.4)
 const HOME_JSON_LD = {
@@ -45,15 +61,22 @@ export const metadata = pageMetadata({
   path: '/',
 });
 
-export default function HomePage() {
+export default async function HomePage() {
+  // React Query cache mein default shehar ka data — WeatherCard / ForecastTable /
+  // map wahi key (['currentWeather', 'london']) parhte hain, koi browser call nahi
+  const qc = new QueryClient();
+  const weather = await defaultCityWeather();
+  if (weather) qc.setQueryData(['currentWeather', DEFAULT_CITY], weather);
   return (
     <div className="min-h-screen bg-[#f3f7ff]">
       <JsonLd data={HOME_JSON_LD} />
       <Navbar />
       <main className="space-y-0">
-        <WeatherCard />
-        <LiveSatelliteRadar />
-        <ForecastTable />
+        <HydrationBoundary state={dehydrate(qc)}>
+          <WeatherCard />
+          <LiveSatelliteRadar />
+          <ForecastTable />
+        </HydrationBoundary>
         <PopularDestinations />
         <FeaturesSection />
         <ApexWorkflow />
