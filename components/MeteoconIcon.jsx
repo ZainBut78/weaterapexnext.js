@@ -6,7 +6,8 @@ import { getMeteoconIcon } from '../utils/meteoconsMap';
 
 // Meteocons CDN icon render karta hai; load fail hone par
 // lucide-react ke getWeatherIcon fallback par degrade (graceful).
-export default function MeteoconIcon({ weatherCode, isNight, sizeClass }) {
+// priority: above-the-fold (homepage ki badi icon) → lazy nahi, fetchpriority high
+export default function MeteoconIcon({ weatherCode, isNight, sizeClass, priority = false }) {
   const [failed, setFailed] = useState(false);
 
   if (failed) {
@@ -18,7 +19,10 @@ export default function MeteoconIcon({ weatherCode, isNight, sizeClass }) {
     <img
       src={getMeteoconIcon(weatherCode, isNight)}
       alt="weather icon"
-      loading="lazy"
+      loading={priority ? undefined : 'lazy'}
+      fetchPriority={priority ? 'high' : undefined}
+      width={96}
+      height={96}
       decoding="async"
       className={sizeClass}
       onError={() => setFailed(true)}

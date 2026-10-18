@@ -15,7 +15,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { useCity } from '../context/CityContext';
-import { useCurrentWeather } from '../hooks/useWeather';
+import { useCurrentWeather, DEFAULT_CITY } from '../hooks/useWeather';
 import { useUnits } from '../context/UnitsContext';
 
 const LeafletMap = dynamic(() => import('./LiveSatelliteRadar'), {
@@ -24,8 +24,9 @@ const LeafletMap = dynamic(() => import('./LiveSatelliteRadar'), {
 });
 
 export default function LiveSatelliteRadar() {
-  const { city } = useCity();
-  const { data } = useCurrentWeather(city);
+  const { city: savedCity } = useCity();
+  const { data } = useCurrentWeather(savedCity ?? DEFAULT_CITY);
+  const ssrDefault = savedCity === null ? ' ssr-default-city' : '';
   const units = useUnits();
   const boxRef = useRef(null);
   const [near, setNear] = useState(false);
@@ -55,7 +56,7 @@ export default function LiveSatelliteRadar() {
             Weather Map
           </h2>
           {data ? (
-            <p className="text-sm text-slate-300 font-medium mt-1">
+            <p className={`text-sm text-slate-300 font-medium mt-1${ssrDefault}`}>
               {data.city}, {data.country} &mdash; {units.temp1(data.current.temperature_2m)}{units.tempSymbol} &bull; Precipitation Radar
             </p>
           ) : (

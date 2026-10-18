@@ -37,6 +37,36 @@ test('"Weather Map" heading is in the server HTML (no JS needed)', async ({ requ
   expect(html).toContain('Weather Map</h2>');
 });
 
+test('homepage weather card is server-rendered for the default city (London)', async ({ request }) => {
+  const html = await (await request.get('/')).text();
+  expect(html).toContain('ssr-default-city');
+  expect(html).toMatch(/London(<!-- -->)?, (<!-- -->)?United Kingdom/);
+  // Badi icon above the fold: lazy nahi, high priority
+  expect(html).toMatch(/<img[^>]*fetchPriority="high"[^>]*\/icons\/meteocons\/|<img[^>]*\/icons\/meteocons\/[^>]*fetchPriority="high"/);
+});
+
+for (const [saved, hidden] of [['paris', true], ['london', false]]) {
+  test(`saved city "${saved}": server London content ${hidden ? 'hidden' : 'visible'} before JS`, async ({ page }) => {
+    await blockThirdParty(page);
+    // JS chunks rok do — sirf server HTML + inline script (hydration nahi)
+    await page.route('**/_next/static/chunks/**', (r) => r.abort());
+    await page.addInitScript((c) => localStorage.setItem('weatherApex_city', c), saved);
+    await page.goto('/');
+    const vis = await page.locator('.ssr-default-city').first().evaluate((el) => getComputedStyle(el).visibility);
+    expect(vis).toBe(hidden ? 'hidden' : 'visible');
+  });
+}
+
+test('sitemap lastmod is stable between requests (not request time)', async ({ request }) => {
+  const a = await (await request.get('/sitemap/places.xml')).text();
+  await new Promise((r) => setTimeout(r, 1500));
+  const b = await (await request.get('/sitemap/places.xml')).text();
+  const dates = (x) => [...x.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]);
+  expect(dates(a)).toEqual(dates(b));
+  const today = new Date().toISOString().slice(0, 10);
+  expect(dates(a).filter((d) => !d.startsWith(today)).length).toBeGreaterThan(dates(a).length / 2);
+});
+
 test('sitemap index lists child sitemaps; children are valid with lastmod and no legacy URLs', async ({ request }) => {
   const idx = await request.get('/sitemap.xml');
   expect(idx.status()).toBe(200);

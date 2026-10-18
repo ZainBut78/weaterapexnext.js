@@ -25,6 +25,7 @@ import { monthFacts } from '@/utils/monthNarrative';
 import UnitTempShort from './UnitTempShort';
 import { VERDICT_STYLE } from './CityByMonth';
 import { pexelsSized, pexelsSrcSet } from '@/services/cityPhoto';
+import { preload } from 'react-dom';
 import { renderMarkdown } from '@/utils/markdown';
 import {
   MONTHS, rowFor, monthPacking, mmToIn, warmerThanCount, monthSuits,
@@ -65,6 +66,16 @@ export default function MonthGuide({ data, city, country, month, photo, crumbs, 
     { icon: Waves, label: 'Humidity', value: row?.humidity != null ? `${row.humidity}%` : '—', tone: 'bg-emerald-50 border-emerald-200 text-emerald-600' },
   ];
 
+  // Hero (LCP) tasveer <head> mein preload — HTML parse hone se pehle request
+  // shuru; wahi srcset/sizes jo <img> par (perf, Oct 2026)
+  if (photo) {
+    preload(pexelsSized(photo, 1280), {
+      as: 'image',
+      imageSrcSet: pexelsSrcSet(photo),
+      imageSizes: '(max-width: 640px) 60vw, 100vw',
+      fetchPriority: 'high',
+    });
+  }
   return (
     <div className="min-h-screen bg-[#f3f7ff]">
       <JsonLd data={breadcrumbs(crumbs)} />

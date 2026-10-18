@@ -43,6 +43,9 @@ export function buildRegistry(rows) {
 
   // Static: backend index mil gaya → sirf jin ka data mukammal; warna sab
   const cities = idx ? statics.filter((c) => idx.get(c.slug) && idx.get(c.slug).history_complete !== false) : statics;
+  // Shehar ke climate data ki aakhri asal tabdeeli (backend climate_updated_at) —
+  // sitemap lastmod (deploy par nahi badalta). Purana backend → null.
+  if (idx) for (const c of cities) c.dataDate = idx.get(c.slug)?.climate_updated_at || null;
   const aliases = new Map();   // duplicate slug → canonical slug
   const skipped = [];
 
@@ -72,6 +75,7 @@ export function buildRegistry(rows) {
         slug: r.slug, name: r.name, country: country.name, countrySlug: country.slug,
         lat: r.lat, lon: r.lon, tz: null,
         tags: { coastal: !!r.is_coastal, hiking: !!r.has_hiking_trails }, isStatic: false,
+        dataDate: r.climate_updated_at || null,
       });
     }
   }

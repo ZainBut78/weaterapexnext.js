@@ -3,14 +3,16 @@
 import React from 'react';
 import { Droplets } from 'lucide-react';
 import { useCity } from '../context/CityContext';
-import { useCurrentWeather } from '../hooks/useWeather';
+import { useCurrentWeather, DEFAULT_CITY } from '../hooks/useWeather';
 import { getMeteoconIcon } from '../utils/meteoconsMap';
 import { getWeatherDescription, getNightDescription } from '../utils/weatherDescriptions';
 import { ForecastSkeleton } from './HomeSkeletons';
 import { useUnits } from '../context/UnitsContext';
 
 const ForecastTable = () => {
-  const { city } = useCity();
+  const { city: savedCity } = useCity();
+  const city = savedCity ?? DEFAULT_CITY;   // server HTML: default shehar (WeatherCard dekhein)
+  const ssrDefault = savedCity === null ? ' ssr-default-city' : '';
   const { data, isLoading, isError } = useCurrentWeather(city);
   const units = useUnits(); // °C/°F (audit 3.2)
 
@@ -18,7 +20,7 @@ const ForecastTable = () => {
   // ki saved city useEffect mein aati hai). Tab bhi "Loading" hi
   // dikhe — warna ek pal ke liye "Could not load" chamak jata.
   // Loading ke waqt asli table jitna bara skeleton (CLS fix — HomeSkeletons.jsx)
-  if (isLoading || !city) {
+  if (isLoading) {
     return <ForecastSkeleton />;
   }
 
@@ -83,7 +85,7 @@ const ForecastTable = () => {
 
   return (
     <div className="w-full bg-white py-8 border-t border-gray-100">
-      <div className="max-w-[1000px] mx-auto px-4 font-sans">
+      <div className={`max-w-[1000px] mx-auto px-4 font-sans${ssrDefault}`}>
         <h2 className="text-3xl font-extrabold text-[#002244] mb-6 tracking-tight">
           Long-range Forecast
         </h2>

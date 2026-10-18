@@ -133,3 +133,8 @@
   .text-blue-500 { color: #1447e6; }
   .text-\[\#0077b6\] { color: #006aa3; }
 }
+
+/* Homepage: saved shehar London nahi → server HTML ka London content chhupa
+   (jagah wahi rehti hai), client par apne shehar ka data aate hi class hat
+   jati hai. app/layout.js script + hooks/useWeather DEFAULT_CITY. */
+html[data-saved-city]:not([data-saved-city="london"]) .ssr-default-city { visibility: hidden; }

@@ -45,7 +45,21 @@ export default function RootLayout({ children }) {
   preconnect('https://images.pexels.com');
   preconnect('https://api.weatherapex.com');
   return (
-    <html lang="en">
+    // suppressHydrationWarning <html> par: neeche wala script React se pehle
+    // `data-saved-city` lagata hai (sirf yahi attribute ka farq)
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Homepage server HTML default shehar (London) ka card dikhata hai.
+            User ka saved shehar koi aur ho to yeh 1-line script pehle paint
+            se pehle bata deta hai, aur CSS (globals.css .ssr-default-city)
+            London wala content chhupa deti hai — jagah wahi (CLS nahi), apne
+            shehar ka data aate hi dikh jata hai. Perf fixes, Oct 2026. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "try{var c=localStorage.getItem('weatherApex_city');if(c)document.documentElement.setAttribute('data-saved-city',c)}catch(e){}",
+          }}
+        />
+      </head>
       {/* suppressHydrationWarning: browser extensions (jaise ColorZilla ka
           `cz-shortcut-listen`) React se pehle <body> par attribute laga
           dete hain → dev mein laal "Issue". Yeh SIRF <body> ke apne
