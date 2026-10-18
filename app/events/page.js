@@ -20,6 +20,8 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
 
       <EventRiskTool
         intro={
@@ -36,6 +38,7 @@ export default function EventsPage() {
         }
       />
 
+      </main>
       <Footer />
     </div>
   );

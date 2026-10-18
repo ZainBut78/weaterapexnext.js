@@ -32,6 +32,8 @@ export default function TermsOfService() {
     <div className="min-h-screen bg-[#f3f7ff] font-sans">
       {/* Navbar + Footer: pehle yeh page "band gali" tha — koi link nahi (audit 2.6-c) */}
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
       <div className="bg-[#002244] text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <FileText className="w-12 h-12 text-blue-300 mx-auto mb-4" />
@@ -50,6 +52,7 @@ export default function TermsOfService() {
           ))}
         </div>
       </div>
+      </main>
       <Footer />
     </div>
   );

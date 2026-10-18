@@ -67,20 +67,20 @@ const Footer = () => {
 
           {/* Product Links */}
           <div className="md:col-span-2">
-            <h4 className="font-extrabold text-sm text-[#002244] mb-4">Product</h4>
+            <h2 className="font-extrabold text-sm text-[#002244] mb-4">Product</h2>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><Link href="/" className="hover:text-[#0077b6] transition-colors">Local Forecasts</Link></li>
-              <li><Link href="/climate-guides" className="hover:text-[#0077b6] transition-colors">Historical Data</Link></li>
-              <li><Link href="/api-docs" className="hover:text-[#0077b6] transition-colors">API for Developers</Link></li>
-              <li><Link href="/" className="hover:text-[#0077b6] transition-colors">Radar Visualization</Link></li>
+              <li><Link prefetch={false} href="/" className="hover:text-[#0077b6] transition-colors">Local Forecasts</Link></li>
+              <li><Link prefetch={false} href="/climate-guides" className="hover:text-[#0077b6] transition-colors">Historical Data</Link></li>
+              <li><Link prefetch={false} href="/api-docs" className="hover:text-[#0077b6] transition-colors">API for Developers</Link></li>
+              <li><Link prefetch={false} href="/" className="hover:text-[#0077b6] transition-colors">Radar Visualization</Link></li>
             </ul>
           </div>
 
           {/* Company Links */}
           <div className="md:col-span-2">
-            <h4 className="font-extrabold text-sm text-[#002244] mb-4">Company</h4>
+            <h2 className="font-extrabold text-sm text-[#002244] mb-4">Company</h2>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><Link href="/about" className="hover:text-[#0077b6] transition-colors">About Us</Link></li>
+              <li><Link prefetch={false} href="/about" className="hover:text-[#0077b6] transition-colors">About Us</Link></li>
               <li><a href="#" className="hover:text-[#0077b6] transition-colors">Careers</a></li>
               <li><a href="#" className="hover:text-[#0077b6] transition-colors">Scientific Board</a></li>
               <li><a href="#" className="hover:text-[#0077b6] transition-colors">Press Room</a></li>
@@ -89,7 +89,7 @@ const Footer = () => {
 
           {/* Stay Informed Newsletter Column */}
           <div className="md:col-span-4">
-            <h4 className="font-extrabold text-sm text-[#002244] mb-4">Stay Informed</h4>
+            <h2 className="font-extrabold text-sm text-[#002244] mb-4">Stay Informed</h2>
             <p className="text-gray-600 text-sm mb-4 leading-relaxed">
               Get localized severe weather alerts directly to your inbox.
             </p>
@@ -120,8 +120,8 @@ const Footer = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <p>© 2024 WeatherApex. Precision data for the modern traveler.</p>
           <div className="flex items-center gap-6 font-medium">
-            <Link href="/privacy" className="hover:text-[#002244] transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-[#002244] transition-colors">Terms of Service</Link>
+            <Link prefetch={false} href="/privacy" className="hover:text-[#002244] transition-colors">Privacy Policy</Link>
+            <Link prefetch={false} href="/terms" className="hover:text-[#002244] transition-colors">Terms of Service</Link>
             <a href="#" className="hover:text-[#002244] transition-colors">Cookie Settings</a>
           </div>
         </div>

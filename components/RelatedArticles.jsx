@@ -25,6 +25,7 @@ function Card({ post }) {
         {post.featured_image ? (
           <img
             loading="lazy" decoding="async" src={post.featured_image} alt={post.featured_image_alt || post.title}
+            {...(post.featured_image_srcset?.length > 1 ? { srcSet: post.featured_image_srcset.map((s) => `${s.url} ${s.width}w`).join(', '), sizes: '(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw' } : {})}
             width={400} height={144}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />

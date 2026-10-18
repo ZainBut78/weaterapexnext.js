@@ -135,6 +135,8 @@ export default async function BlogPostPage({ params }) {
         ])}
       />
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
 
       <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
         <Link
@@ -150,6 +152,14 @@ export default async function BlogPostPage({ params }) {
           <div className="rounded-3xl overflow-hidden mb-8 shadow-sm">
             <img
               src={featured_image}
+              // Perf (Oct 2026): backend 480/800/1200 WebP versions — mobile ko
+              // chhoti file (article ki chaurai max 768px)
+              {...(data.featured_image_srcset?.length > 1
+                ? {
+                  srcSet: data.featured_image_srcset.map((s) => `${s.url} ${s.width}w`).join(', '),
+                  sizes: '(min-width: 800px) 768px, 100vw',
+                }
+                : {})}
               alt={featuredAlt}
               {...(data.featured_image_width && data.featured_image_height
                 ? { width: data.featured_image_width, height: data.featured_image_height }
@@ -258,6 +268,7 @@ export default async function BlogPostPage({ params }) {
         <RelatedArticles post={slug} limit={3} title="You may also like" />
       </div>
 
+      </main>
       <Footer />
     </div>
   );

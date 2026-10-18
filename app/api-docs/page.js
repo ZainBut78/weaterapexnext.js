@@ -25,7 +25,10 @@ export default function ApiDocsPage() {
   return (
     <>
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
       <ApiDocs />
+      </main>
       <Footer />
     </>
   );

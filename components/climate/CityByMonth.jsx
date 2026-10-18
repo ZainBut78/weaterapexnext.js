@@ -111,12 +111,14 @@ export default function CityByMonth({ data, city, country, photo, crumbs, monthH
         license: 'https://creativecommons.org/licenses/by/4.0/',
       }} />
       <Navbar />
+      {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
+      <main>
 
       {/* 1. Hero */}
       <div className="relative bg-gradient-to-br from-[#002244] via-[#0077b6] to-[#00a8e8] text-white overflow-hidden">
         {photo && (
           <>
-            <img src={pexelsSized(photo, 1280)} srcSet={pexelsSrcSet(photo)} sizes="100vw" alt={`${place} skyline`} width={1280} height={720} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={pexelsSized(photo, 1280)} srcSet={pexelsSrcSet(photo)} sizes="(max-width: 640px) 60vw, 100vw" alt={`${place} skyline`} width={1280} height={720} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#001528]/85 via-[#001528]/70 to-[#001528]/70" />
           </>
         )}
@@ -359,6 +361,7 @@ export default function CityByMonth({ data, city, country, photo, crumbs, monthH
         </p>
       </div>
 
+      </main>
       <Footer />
     </div>
   );

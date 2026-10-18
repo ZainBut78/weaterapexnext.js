@@ -81,12 +81,12 @@ test.describe('°C / °F', () => {
     await mockCurrentWeather(page);
     await page.goto('/');
     const group = page.getByRole('group', { name: 'Temperature unit' });
-    await expect(group.getByRole('button', { name: 'Show Fahrenheit' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(group.getByRole('button', { name: /show Fahrenheit/i })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByText(/\d+mph/).first()).toBeVisible();
-    await group.getByRole('button', { name: 'Show Celsius' }).click();
+    await group.getByRole('button', { name: /show Celsius/i }).click();
     await expect(page.getByText(/\d+km\/h/).first()).toBeVisible();
     await page.reload();
-    await expect(page.getByRole('button', { name: 'Show Celsius' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /show Celsius/i })).toHaveAttribute('aria-pressed', 'true');
   });
 });
 
