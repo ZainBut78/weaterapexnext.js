@@ -45,6 +45,7 @@ function BlogCard({ post }) {
         {post.featured_image ? (
           <img
             loading="lazy" decoding="async" src={post.featured_image}
+            {...(post.featured_image_srcset?.length > 1 ? { srcSet: post.featured_image_srcset.map((s) => `${s.url} ${s.width}w`).join(', '), sizes: '(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw' } : {})}
             alt={post.featured_image_alt || post.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
