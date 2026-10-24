@@ -1265,3 +1265,14 @@ Branch `perf-a11y`:
 - Fix: 1-shehar mulk redirect page se wapas `proxy.js` mein (Next pehli MISS par `Location` header do dafa bhejta tha); proxy ab backend cities index 1 ghanta cache karta hai.
 - Tests: build OK · e2e 57/57 · seo-check 416/0 · backend 148 OK.
 - Local Lighthouse: home perf 67–74 / LCP 1.8–3.1s (LCP = "Weather Map" h2, observed 0.35s; baqi simulated render delay = main-thread JS); Brisbane 79–81 / 2.9–3.0s; a11y 100.
+
+## 2026-10-25 — Search se naya shehar + mahina-war data + har mahine ka naya data (owner)
+Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mein 56 mulk hi the).
+- **Mulk list 56 → 240** (`data/countries.js`, Intl.DisplayNames se generate — `scripts/gen-countries.mjs`; backend `weather/countries.py` isi se). Hub page ab bhi sirf 2+ mukammal shehar par.
+- **Search** (Climate Guides box) → `POST /api/places/open` (Next route, per-IP 20/10 min) → Django `places/open` (internal key): DB pehle → Open-Meteo geocoding → shehar DB mein → 12 mahine (sirf jo DB mein nahi) → `revalidateTag('cities')` + us ke pages → browser naye page par. Ek naam kai mulkon mein (Santa Fe, Granada, Hamilton) → user chunta hai; mulk/state ("Kenya", "Maine", "Peru") → "not a city" message.
+- **Registry:** adhoore DB shehar `partial` — URL khulta hai (404 nahi), lists/links/hubs mein nahi; sitemap mein sirf un ke mukammal mahine (`months_complete`).
+- **Month page** adhoore shehar ka → `history?month=M` → backend sirf us mahine ke missing saal (~44 calls, 20 saal ke ~522 nahi).
+- **Month page "Latest actual — October 2026"** line (backend `recent`) — har mahine backend khud naya mahina laata hai.
+- `proxy.js`: `/weather/<db-city>` → us ka page (308).
+- Tests: build OK · e2e 61/62 + 5 naye (1 flaky "mobile menu" — akela 3/3 pass) · seo-check 416/0 (live API = purana backend: backward compatible) · backend 180 OK.
+- Local (temp Django 8002 + local DB): Tulum search → page 200 (Jan high 26.4°C); Granada → choose → Nicaragua page; Phoenix July page → backend sirf `month=7`, budget 44.3 calls.

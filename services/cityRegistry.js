@@ -16,6 +16,10 @@
 //    nahi (`skipped`, wajah ke saath — report ke liye).
 //  • Backend down → sirf static 160 (site gayab na ho; data na mile to
 //    page waise bhi 5xx).
+//  • Adhoore shehar (Oct 2026 — search se add hue, ya sirf kuch mahine):
+//    `partial` — URL khulta hai (page backend se sirf zaroori data
+//    mangwata hai), magar lists/links/hubs mein nahi; sitemap mein sirf un
+//    ke mukammal mahine (`months`).
 //  Sirf SERVER par (services/serverApi).
 // ─────────────────────────────────────────────────────────────
 import { cache } from 'react';

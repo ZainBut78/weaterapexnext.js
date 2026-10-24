@@ -41,11 +41,25 @@ export function buildRegistry(rows) {
   const byName = new Map(statics.map((c) => [nameKey(c.name), c]));
   const idx = rows ? new Map(rows.map((r) => [r.slug, r])) : null;
 
-  // Static: backend index mil gaya → sirf jin ka data mukammal; warna sab
-  const cities = idx ? statics.filter((c) => idx.get(c.slug) && idx.get(c.slug).history_complete !== false) : statics;
+  // Mukammal (12 mahine) → `cities` (lists, links, sitemap). Adhoore (DB mein
+  // hain, kuch mahine ya kuch nahi) → `partial`: un ka URL khulta hai (404
+  // nahi) aur page khulne par backend sirf zaroori data laata hai (owner, Oct
+  // 2026: "jitna data chahiye utni calls"), magar list/link mein nahi.
+  // months = kin mahinon ka poora 20-saal average (sitemap ke month pages).
+  const isComplete = (row) => row && row.history_complete !== false;
+  const monthsOf = (row) => (isComplete(row) ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    : (Array.isArray(row?.months_complete) ? row.months_complete : []));
+  // Static: backend index mil gaya → mukammal list mein, baqi partial; index nahi → sab
+  const cities = idx ? statics.filter((c) => isComplete(idx.get(c.slug))) : statics;
+  const partial = idx ? statics.filter((c) => idx.get(c.slug) && !isComplete(idx.get(c.slug))) : [];
   // Shehar ke climate data ki aakhri asal tabdeeli (backend climate_updated_at) —
   // sitemap lastmod (deploy par nahi badalta). Purana backend → null.
-  if (idx) for (const c of cities) c.dataDate = idx.get(c.slug)?.climate_updated_at || null;
+  if (idx) {
+    for (const c of [...cities, ...partial]) {
+      c.dataDate = idx.get(c.slug)?.climate_updated_at || null;
+      c.months = monthsOf(idx.get(c.slug));
+    }
+  }
   const aliases = new Map();   // duplicate slug → canonical slug
   const skipped = [];
 
@@ -67,27 +81,28 @@ export function buildRegistry(rows) {
       }
       if (!SLUG_OK.test(r.slug)) { skipped.push({ slug: r.slug, reason: 'invalid slug' }); continue; }
       if (getCountry(r.slug)) { skipped.push({ slug: r.slug, reason: 'slug equals a country slug' }); continue; }
-      if (r.history_complete !== true) { skipped.push({ slug: r.slug, reason: 'history not complete' }); continue; }
       if (typeof r.lat !== 'number' || typeof r.lon !== 'number') { skipped.push({ slug: r.slug, reason: 'no coordinates' }); continue; }
       seen.set(key, r.slug);
       byName.set(nameKey(r.name), { slug: r.slug, country: country.name, countrySlug: country.slug });
-      cities.push({
+      (r.history_complete === true ? cities : partial).push({
         slug: r.slug, name: r.name, country: country.name, countrySlug: country.slug,
         lat: r.lat, lon: r.lon, tz: null,
         tags: { coastal: !!r.is_coastal, hiking: !!r.has_hiking_trails }, isStatic: false,
         dataDate: r.climate_updated_at || null,
+        months: r.history_complete === true ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : monthsOf(r),
       });
     }
   }
 
-  const bySlug = new Map(cities.map((c) => [c.slug, c]));
+  const bySlug = new Map([...cities, ...partial].map((c) => [c.slug, c]));
   const byCountry = new Map();
   for (const c of cities) byCountry.set(c.countrySlug, [...(byCountry.get(c.countrySlug) || []), c]);
   for (const list of byCountry.values()) list.sort((a, b) => (a.isStatic === b.isStatic ? 0 : a.isStatic ? -1 : 1));
 
   return {
     degraded: !rows,
-    cities,
+    cities,      // mukammal — lists, links, sitemap
+    partial,     // adhoore — sirf URL khulta hai
     aliases,
     skipped,
     get: (slug) => bySlug.get(slug) || null,

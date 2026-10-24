@@ -24,6 +24,8 @@ export const ENDPOINTS = {
     // Backend round (A4/A5): DB-only, Open-Meteo ko call nahi
     cities: '/weather/cities/',
     climateSummary: '/weather/climate/summary/',
+    // Search → shehar kholo / naya add karo (sirf Next server, internal key) — Oct 2026
+    placesOpen: '/weather/places/open/',
   },
   trips: {
     plan: '/trips/plan/',

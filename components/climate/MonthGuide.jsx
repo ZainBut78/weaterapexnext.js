@@ -56,6 +56,9 @@ export default function MonthGuide({ data, city, country, month, photo, crumbs, 
   const questions = quickQuestions(f, geo, month, packing, warmer);
   const maxHigh = Math.max(...monthly.map((m) => m.avg_high ?? -99));
   const minHigh = Math.min(...monthly.map((m) => m.avg_high ?? 99));
+  // Range ke baad ka asal data (jaise October 2026) — backend har mahine khud laata hai
+  // (owner, Oct 2026). Purana backend / abhi nahi aaya → line nahi.
+  const latest = (data.recent || []).find((r) => r.month === month.num && r.year > years.end) || null;
 
   const stats = [
     { icon: Thermometer, label: 'Avg high', value: <UnitTemp c={row?.avg_high} />, tone: 'bg-orange-50 border-orange-200 text-orange-600' },
@@ -144,6 +147,17 @@ export default function MonthGuide({ data, city, country, month, photo, crumbs, 
               );
             })}
           </div>
+          {latest && (
+            <p className="mt-4 text-sm text-gray-600">
+              <span className="font-semibold text-gray-700">Latest actual — {month.name} {latest.year}:</span>{' '}
+              high <UnitTemp c={latest.avg_high} />, low <UnitTemp c={latest.avg_low} />
+              {latest.avg_rainfall != null && <>, {Math.round(latest.avg_rainfall)} mm rain</>}
+              {latest.rainy_days != null && <> on {latest.rainy_days} days</>}
+              {' '}(the {years.start}–{years.end} average above is {latest.avg_high != null && row?.avg_high != null
+                ? (latest.avg_high > row.avg_high + 0.4 ? 'cooler' : latest.avg_high < row.avg_high - 0.4 ? 'warmer' : 'about the same')
+                : 'for comparison'}).
+            </p>
+          )}
         </section>
 
         {/* 4. {Month} vs the rest of the year — 12-row table */}

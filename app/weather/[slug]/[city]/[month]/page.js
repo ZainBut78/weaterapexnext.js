@@ -31,7 +31,7 @@ async function load(params) {
   const p = await params;
   const month = resolveMonth(p.month);
   const { country, city, reg } = await resolveCity(p.slug, p.city, month.slug);
-  const data = await requireHistory(city.slug);   // data adhoora → 404; backend down → 5xx (cache nahi)
+  const data = await requireHistory(city.slug, month.num);   // adhoora shehar → sirf yeh mahina; backend down → 5xx
   return { country, city, month, data, reg };
 }
 
