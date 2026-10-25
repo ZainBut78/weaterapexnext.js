@@ -16,6 +16,7 @@ import { countryPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
 import { requireHistory, yearsOf } from '@/services/history';
+import { incompleteRobots } from '@/utils/robots';
 import { bestMonths, yearExtremes } from '@/utils/climateMath';
 
 export const revalidate = 86400;
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }) {
   const data = await requireHistory(city.slug);
   const x = yearExtremes(data.monthly_data);
   const best = bestMonths(data.monthly_data, 3).map((m) => m.name);
-  return pageMetadata({
+  // Data abhi mukammal nahi (kuch mahine) → noindex, follow; mukammal → pehle jaisa
+  return { ...pageMetadata({
     absoluteTitle: `${city.name} Weather by Month: Climate, Rain & Best Time to Visit`,
     imageTitle: `${city.name} Weather by Month`,
     kicker: country.name,
@@ -38,7 +40,7 @@ export async function generateMetadata({ params }) {
     // Har shehar alag: apne warmest/coolest/wettest + best months
     description: `${city.name === country.name ? city.name : `${city.name}, ${country.name}`} month by month: warmest in ${x.warmest?.month.name}, coolest in ${x.coolest?.month.name}, wettest in ${x.wettest?.month.name}. Best months to visit: ${best.join(', ')}. 20-year averages with charts.`,
     path: reg.cityPath(city.slug),
-  });
+  }), ...incompleteRobots(data) };
 }
 
 export default async function CityByMonthPage({ params }) {

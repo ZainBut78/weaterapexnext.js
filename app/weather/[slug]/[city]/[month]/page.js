@@ -17,6 +17,7 @@ import { countryPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
 import { getClimateSummary, getHistories, MAX_FANOUT, requireHistory, yearsOf } from '@/services/history';
+import { incompleteRobots } from '@/utils/robots';
 import { rowFor, visitVerdict } from '@/utils/climateMath';
 import { pickElsewhere } from '@/utils/elsewhere';
 import { getTravelNote } from '@/services/guides';
@@ -41,14 +42,15 @@ export async function generateMetadata({ params }) {
   const f = (c) => (c == null ? '—' : `${Math.round(c * 10) / 10}°C (${Math.round((c * 9 / 5 + 32) * 10) / 10}°F)`);
   const verdict = visitVerdict(row);
   const title = `${city.name} Weather in ${month.name}: Temperature, Rain & Tips`;
-  return pageMetadata({
+  // Is mahine ka 20-saal data abhi mukammal nahi → noindex, follow; mukammal → pehle jaisa
+  return { ...pageMetadata({
     absoluteTitle: title,
     imageTitle: `${city.name} Weather in ${month.name}`,
     kicker: country.name,
     city: city.slug,
     description: `${month.name} in ${city.name}: average high ${f(row?.avg_high)}, low ${f(row?.avg_low)}, ${row?.rainy_days ?? '—'} rainy days and ${row?.sunshine_hours ?? '—'} h of sunshine a day. ${verdict ? `${verdict.label} time to visit` : 'Climate guide'} — comparisons and packing tips.`,
     path: reg.monthPath(city.slug, month.slug),
-  });
+  }), ...incompleteRobots(data, month.num) };
 }
 
 export default async function MonthPage({ params }) {
