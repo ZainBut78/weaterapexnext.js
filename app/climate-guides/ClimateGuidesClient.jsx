@@ -10,37 +10,121 @@ import { pexelsSized, pexelsSrcSet } from '@/utils/pexels';
 import { isKnownCity } from '@/data/cities';
 import { cityPath } from '@/data/countries';
 
-// "Search any city..." — shehar ka naam likh kar us ke page par jana
-// (whitelist shehar → /weather/<country>/<city>; baqi /weather/<slug> → mulk ya 404).
+// "Search any city..." — shehar ka naam likh kar us ke climate page par jana.
+// 160 wale shehar → seedha. Baqi (owner, Oct 2026) → /api/places/open: pehle
+// hamara DB, na mile to Open-Meteo se shehar + us ka data DB mein → page.
+// Pehle yahan /weather/<slug> par 404 aata tha.
+const MESSAGES = {
+  not_found: (q) => `We couldn't find a city called “${q}”. Try adding the country, e.g. “Santa Fe, USA”.`,
+  rate_limited: () => 'Too many searches in a short time — please try again in a few minutes.',
+  limit: () => 'We are adding a lot of new cities today — please try again tomorrow.',
+  unsupported: () => 'We found this place but can’t build a climate page for it yet.',
+  error: () => 'Climate data could not be loaded right now — please try again in a minute.',
+};
+
 export function CitySearchForm() {
   const [customCity, setCustomCity] = useState('');
+  const [state, setState] = useState({ kind: 'idle' });   // loading | choose | message
   const router = useRouter();
+  const busy = state.kind === 'loading';
 
-  const handleCustomSearch = (e) => {
-    e.preventDefault();
-    if (customCity.trim()) {
-      const slug = customCity.trim().toLowerCase().replace(/\s+/g, '-');
-      router.push(isKnownCity(slug) ? cityPath(slug) : `/weather/${slug}`);
+  const open = async (payload, label) => {
+    setState({ kind: 'loading', label });
+    let d = {};
+    try {
+      const r = await fetch('/api/places/open', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+      });
+      d = await r.json().catch(() => ({}));
+    } catch {
+      d = { status: 'error' };
+    }
+    if (d.status === 'ok' && d.path) {
+      router.push(d.path);            // "loading" tab tak jab tak naya page na khule
+    } else if (d.status === 'choose' && d.choices?.length) {
+      setState({ kind: 'choose', label, choices: d.choices });
+    } else if (d.status === 'not_a_city') {
+      setState({
+        kind: 'message',
+        text: `${d.label} is a country or region, not a city — climate differs from city to city. Search for a city instead${d.suggestions?.length ? ':' : '.'}`,
+        suggestions: d.suggestions || [],
+      });
+    } else {
+      setState({ kind: 'message', text: (MESSAGES[d.status] || MESSAGES.error)(label) });
     }
   };
 
+  const handleCustomSearch = (e) => {
+    e.preventDefault();
+    const text = customCity.trim();
+    if (!text || busy) return;
+    const slug = text.toLowerCase().replace(/\s+/g, '-');
+    if (isKnownCity(slug)) router.push(cityPath(slug));
+    else open({ q: text }, text);
+  };
+
+  const place = (c) => [c.name, c.admin1 && c.admin1 !== c.name ? c.admin1 : null, c.country].filter(Boolean).join(', ');
+
   return (
-    <form onSubmit={handleCustomSearch} className="flex gap-2 max-w-md mx-auto">
-      <input
-        type="text"
-        value={customCity}
-        onChange={(e) => setCustomCity(e.target.value)}
-        placeholder="Search any city..."
-        className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 bg-white"
-      />
-      <button
-        type="submit"
-        className="bg-[#0077b6] hover:bg-[#0092cd] text-white px-6 py-3 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
-      >
-        <Search size={16} />
-        View
-      </button>
-    </form>
+    <div className="max-w-md mx-auto">
+      <form onSubmit={handleCustomSearch} className="flex gap-2">
+        <input
+          type="text"
+          value={customCity}
+          onChange={(e) => setCustomCity(e.target.value)}
+          placeholder="Search any city..."
+          aria-label="Search any city"
+          className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 bg-white"
+        />
+        <button
+          type="submit"
+          disabled={busy}
+          className="bg-[#0077b6] hover:bg-[#0092cd] disabled:opacity-70 text-white px-6 py-3 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
+        >
+          <Search size={16} />
+          View
+        </button>
+      </form>
+      <div aria-live="polite" className="text-sm text-left">
+        {state.kind === 'loading' && (
+          <p className="mt-3 text-gray-600">Loading climate data for {state.label}… a new city can take a few seconds.</p>
+        )}
+        {state.kind === 'choose' && (
+          <div className="mt-3">
+            <p className="text-gray-700 mb-2">There is more than one “{state.label}”. Which one?</p>
+            <ul className="space-y-1.5">
+              {state.choices.map((c) => (
+                <li key={`${c.geo_id}-${c.slug}`}>
+                  <button
+                    type="button"
+                    onClick={() => open(c.geo_id ? { geoId: c.geo_id } : { q: `${c.name}, ${c.country}` }, place(c))}
+                    className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:border-[#0077b6] hover:bg-blue-50 transition-colors"
+                  >
+                    <span className="font-semibold text-gray-800">{place(c)}</span>
+                    {c.population > 0 && <span className="text-gray-500"> · {c.population.toLocaleString('en-US')} people</span>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {state.kind === 'message' && (
+          <div className="mt-3 text-gray-700">
+            <p>{state.text}</p>
+            {state.suggestions?.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {state.suggestions.map((s) => (
+                  <button key={s.slug} type="button" onClick={() => open({ q: `${s.name}, ${s.country}` }, s.name)}
+                    className="px-3 py-1.5 rounded-full border border-gray-200 bg-white hover:border-[#0077b6] text-gray-700">
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

@@ -29,12 +29,12 @@ const TIMEOUT_MS = Number(process.env.BACKEND_TIMEOUT_MS || 15000);
 // network) → throw: page 5xx deta hai aur Next usay cache NAHI karta (ISR
 // purana achha page hi rakhta hai). Ghalat 200 "not found" kabhi nahi.
 // `tags`: on-demand revalidation ke liye (/api/revalidate → revalidateTag).
-export async function serverGet(path, { params, revalidate = 3600, tags } = {}) {
+export async function serverGet(path, { params, revalidate = 3600, tags, noStore = false } = {}) {
   const qs = params ? `?${new URLSearchParams(params)}` : '';
   let res;
   try {
     res = await fetch(`${API_INTERNAL_URL}${path}${qs}`, {
-      next: { revalidate, ...(tags ? { tags } : {}) },
+      ...(noStore ? { cache: 'no-store' } : { next: { revalidate, ...(tags ? { tags } : {}) } }),
       headers: INTERNAL_KEY ? { Accept: 'application/json', 'X-Internal-Key': INTERNAL_KEY } : { Accept: 'application/json' },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
@@ -51,4 +51,37 @@ export async function serverGet(path, { params, revalidate = 3600, tags } = {}) 
     throw err;
   }
   return res.json();
+}
+
+/**
+ * POST (cache nahi) — jawab ka status aur JSON dono wapas (backend ke 4xx
+ * bhi asal jawab hain, jaise "choose" / "not_found"). Network → throw.
+ */
+export async function serverPost(path, body, { timeoutMs = TIMEOUT_MS } = {}) {
+  let res;
+  try {
+    res = await fetch(`${API_INTERNAL_URL}${path}`, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...(INTERNAL_KEY ? { 'X-Internal-Key': INTERNAL_KEY } : {}),
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (e) {
+    const err = new Error(`Backend unreachable for ${path}: ${e.name}`);
+    err.status = 503;
+    err.backendDown = true;
+    throw err;
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    // khaali / HTML jawab
+  }
+  return { status: res.status, data };
 }

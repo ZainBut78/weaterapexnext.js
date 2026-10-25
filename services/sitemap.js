@@ -11,7 +11,8 @@
 //   • blog = post ka updated_at
 //   • city page = us shehar ke climate data ki aakhri tabdeeli (backend
 //     cities index `climate_updated_at`; purana backend → DATA_PERIOD_DATE)
-//   • month page = wahi, ya travel note ki "facts reviewed" (jo nayi ho)
+//   • month page = wahi, ya travel note ki "facts reviewed" (jo nayi ho);
+//     har mahine naya data aane par (backend sync) khud badalta hai
 //   • country hub = us ke shehron mein sab se nayi; /weather = sab mein nayi
 //   • static pages = neeche constants (page ka content badle to tareekh bhi)
 //  Sirf canonical + indexable + 200 URLs: login/signup/pricing (noindex),
@@ -117,8 +118,11 @@ export async function placeEntries() {
 export async function monthEntries() {
   const reg = await getCityRegistry();
   const out = [];
-  for (const c of reg.cities) {
+  // Mukammal shehar → 12 month pages; adhoora (search / month page se kuch
+  // mahine aaye) → sirf woh mahine jin ka poora 20-saal data hai (owner, Oct 2026)
+  for (const c of [...reg.cities, ...(reg.partial || [])]) {
     for (const m of MONTHS) {
+      if (c.months && !c.months.includes(m.num)) continue;
       const note = await noteDate(c.slug, m.slug);
       out.push({ path: reg.monthPath(c.slug, m.slug), lastmod: max(isoDay(cityDate(c)), note && isoDay(note)) });
     }

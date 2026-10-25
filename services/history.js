@@ -92,19 +92,32 @@ export async function onlyReady(list, slugOf = (c) => c.slug) {
   return ready ? list.filter((c) => ready.has(slugOf(c))) : list;
 }
 
+/** Sirf EK mahina (adhoore shehar ka month page) — backend sirf us mahine ke missing saal laata hai */
+export const getHistoryMonth = (citySlug, month) =>
+  serverGet(ENDPOINTS.weather.history, {
+    params: { city: citySlug, month },
+    revalidate: HISTORY_REVALIDATE,
+  });
+
 // City / month page ka data (owner review, Oct 2026):
 //  • Backend jawab na de / timeout / 5xx → THROW → 5xx, Next cache NAHI
 //    karta (pehle se bana achha page ISR mein rehta hai).
-//  • Backend ne jawab diya magar shehar ka data mukammal nahi (index mein
-//    nahi, ya history_complete false) → notFound() = asli 404. History
-//    endpoint call hi nahi hota (warna backend Open-Meteo se 20 saal mangwata).
-//  • Ghalat URL (whitelist se bahar) pehle hi resolveCity() mein 404.
-export async function requireHistory(citySlug) {
+//  • Shehar DB (index) mein hi nahi → notFound() = asli 404.
+//  • Mahina-war (owner, Oct 2026 — "jitna data chahiye utni calls"):
+//    – mukammal shehar → wahi ek history URL (13 pages, 1 cache)
+//    – adhoora shehar, month page → `?month=M`: backend SIRF us mahine ke
+//      missing saal Open-Meteo se (≈44 calls, poore 20 saal ke ≈522 nahi)
+//    – adhoora shehar, city page (12 mahine dikhata hai) → saare mahine
+//  • Data aaya magar woh mahina phir bhi khaali (Open-Meteo ke paas nahi) → 404.
+//  • Ghalat URL (registry se bahar) pehle hi resolveCity() mein 404.
+export async function requireHistory(citySlug, month = null) {
   const idx = await citiesIndexStrict();
   const info = idx.get(citySlug);
-  if (!info || info.history_complete === false) notFound();
-  const data = await getHistory(citySlug);
+  if (!info) notFound();
+  const complete = info.history_complete !== false;
+  const data = month && !complete ? await getHistoryMonth(citySlug, month) : await getHistory(citySlug);
   if (!data) notFound();
+  if (month && !data.monthly_data?.find((r) => r.month === month && r.avg_high != null)) notFound();
   return data;
 }
 

@@ -17,6 +17,8 @@
 //      singapore / hong-kong bhi: /weather/singapore → /weather/singapore/singapore
 //      (4 hisse — wapas yahan nahi aata, loop nahi). Country hubs
 //      (/weather/australia) shehar nahi → 200, bilkul waise.
+//   5) DB ka koi aur shehar (search se add hua, Oct 2026): /weather/tulum →
+//      /weather/mexico/tulum (308, registry se — warna 404 tha)
 //  Misal: /weather/Brisbane/ → ek hi hop (301) → /weather/australia/brisbane
 //
 //  Lowercase redirect page.js mein kyun nahi: city pages ISR hain; page se
@@ -75,6 +77,11 @@ export async function proxy(request) {
         const reg = await cityRegistry();
         const list = reg.citiesOfCountry(slug);
         if (list.length === 1) path = reg.cityPath(list[0].slug);
+      } else {
+        // 5) DB ka shehar (search se aaya, jaise /weather/tulum) → us ka page (308)
+        const reg = await cityRegistry();
+        const target = reg.cityPath(reg.aliases.get(slug) || slug);
+        if (target) path = target;
       }
     }
   }

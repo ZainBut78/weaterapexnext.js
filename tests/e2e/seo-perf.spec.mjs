@@ -48,8 +48,9 @@ test('homepage weather card is server-rendered for the default city (London)', a
 for (const [saved, hidden] of [['paris', true], ['london', false]]) {
   test(`saved city "${saved}": server London content ${hidden ? 'hidden' : 'visible'} before JS`, async ({ page }) => {
     await blockThirdParty(page);
-    // JS chunks rok do — sirf server HTML + inline script (hydration nahi)
-    await page.route('**/_next/static/chunks/**', (r) => r.abort());
+    // Sirf JS rok do — server HTML + CSS + inline script (hydration nahi). CSS bhi
+    // /_next/static/chunks/ mein hoti hai, us ko rokna nahi (warna chhupane wala rule hi nahi)
+    await page.route('**/_next/static/chunks/**', (r) => (r.request().resourceType() === 'script' ? r.abort() : r.continue()));
     await page.addInitScript((c) => localStorage.setItem('weatherApex_city', c), saved);
     await page.goto('/');
     const vis = await page.locator('.ssr-default-city').first().evaluate((el) => getComputedStyle(el).visibility);
