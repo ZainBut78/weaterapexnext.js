@@ -1277,6 +1277,10 @@ Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mei
 - Tests: build OK · e2e 61/62 + 5 naye (1 flaky "mobile menu" — akela 3/3 pass) · seo-check 416/0 (live API = purana backend: backward compatible) · backend 180 OK.
 - Local (temp Django 8002 + local DB): Tulum search → page 200 (Jan high 26.4°C); Granada → choose → Nicaragua page; Phoenix July page → backend sirf `month=7`, budget 44.3 calls.
 
+## 2026-10-25 — IndexNow (owner)
+- Key file: `https://weatherapex.com/<INDEXNOW_KEY>.txt` — `next.config.mjs` rewrite → `app/api/indexnow-key/route.js` (text/plain, sirf key; env khaali → 404). Key repo mein nahi: server env `INDEXNOW_KEY` (Hostinger, build ke waqt bhi — set kar ke redeploy).
+- Backend (CapRover, wahi `INDEXNOW_KEY`): blog post publish / update / unpublish / delete par post URL IndexNow ko (`blog/indexnow.py`, revalidate hook wali jagah); `python manage.py indexnow_submit_all`.
+- Tests: build OK · e2e 63/63 (1 naya, key set ho to chalta hai) · backend 192 OK (12 naye).
 ## 2026-10-25 — Climate on-demand: 2 hifazati tabdeeliyan (owner)
 - Backend (`weather/places.py`): naya shehar sirf 15,000+ abaadi (`MIN_CITY_POPULATION`) — sirf darul hukoomat (PPLC/PPLG: mulk ya jazeera-territory, jaise Hamilton, Charlotte Amalie, Willemstad, Castries) mustasna; sooba markaz (PPLA/PPLA2) ab mustasna nahi; chunne wali list (geo_id) par bhi. Roz ki global hadd `NEW_CITIES_PER_DAY` default 100 → **15**; poori hone par "limit" → "try again tomorrow".
 - Frontend: adhoore city page (12 mein se koi mahina baqi) aur adhoore month page → `<meta name="robots" content="noindex, follow">` (`utils/robots.js`, backend `months_complete`). Mukammal pages pehle jaise; sitemap qaide wahi.
