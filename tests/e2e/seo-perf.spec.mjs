@@ -95,6 +95,16 @@ test('sitemap index lists child sitemaps; children are valid with lastmod and no
   expect((await request.get('/sitemap/nope.xml')).status()).toBe(404);
 });
 
+test('IndexNow key file is served as plain text (only the real key)', async ({ request }) => {
+  const key = (process.env.INDEXNOW_KEY || '').trim();
+  test.skip(!key, 'INDEXNOW_KEY set nahi (build + test dono mein chahiye)');
+  const res = await request.get(`/${key}.txt`);
+  expect(res.status()).toBe(200);
+  expect(res.headers()['content-type']).toContain('text/plain');
+  expect((await res.text()).trim()).toBe(key);
+  expect((await request.get('/0000000000000000wrongkey.txt')).status()).toBe(404);
+});
+
 test('robots.txt blocks RSC payload URLs and links the sitemap index', async ({ request }) => {
   const txt = await (await request.get('/robots.txt')).text();
   expect(txt).toContain('Disallow: /*?_rsc=');

@@ -1276,3 +1276,8 @@ Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mei
 - `proxy.js`: `/weather/<db-city>` → us ka page (308).
 - Tests: build OK · e2e 61/62 + 5 naye (1 flaky "mobile menu" — akela 3/3 pass) · seo-check 416/0 (live API = purana backend: backward compatible) · backend 180 OK.
 - Local (temp Django 8002 + local DB): Tulum search → page 200 (Jan high 26.4°C); Granada → choose → Nicaragua page; Phoenix July page → backend sirf `month=7`, budget 44.3 calls.
+
+## 2026-10-25 — IndexNow (owner)
+- Key file: `https://weatherapex.com/<INDEXNOW_KEY>.txt` — `next.config.mjs` rewrite → `app/api/indexnow-key/route.js` (text/plain, sirf key; env khaali → 404). Key repo mein nahi: server env `INDEXNOW_KEY` (Hostinger, build ke waqt bhi — set kar ke redeploy).
+- Backend (CapRover, wahi `INDEXNOW_KEY`): blog post publish / update / unpublish / delete par post URL IndexNow ko (`blog/indexnow.py`, revalidate hook wali jagah); `python manage.py indexnow_submit_all`.
+- Tests: build OK · e2e 63/63 (1 naya, key set ho to chalta hai) · backend 192 OK (12 naye).

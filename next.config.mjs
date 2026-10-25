@@ -99,11 +99,19 @@ const nextConfig = {
     // HAMESHA rehta hai — live par bhi (proxy wale rules ke bar-aks).
     const favicon = { source: '/favicon.ico', destination: '/favicon.svg' };
 
+    // IndexNow key file: /<INDEXNOW_KEY>.txt → app/api/indexnow-key (Oct 2026).
+    // Env build ke waqt parha jata hai — Hostinger par key daal kar redeploy.
+    const indexNowKey = (process.env.INDEXNOW_KEY || '').trim();
+    const indexNow = /^[A-Za-z0-9-]{8,128}$/.test(indexNowKey)
+      ? [{ source: `/${indexNowKey}.txt`, destination: '/api/indexnow-key' }]
+      : [];
+
     const target = process.env.API_PROXY_TARGET;
-    if (!target) return [favicon];
+    if (!target) return [favicon, ...indexNow];
     const base = target.replace(/\/+$/, '');
     return [
       favicon,
+      ...indexNow,
       // PEHLA rule: jo URL "/" par khatam ho, us ka "/" aage bhi jaye.
       // BUG JO ISNE THEEK KIYA: sirf doosra rule tha, aur `:path*`
       // aakhri "/" ko nigal jata hai — backend ko
