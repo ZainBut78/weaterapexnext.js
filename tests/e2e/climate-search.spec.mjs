@@ -63,6 +63,14 @@ test('country name: explains it is not a city; not found: helpful hint', async (
   await expect(page).toHaveURL(/\/climate-guides$/);
 });
 
+test('daily new-city cap: "try again tomorrow" message', async ({ page }) => {
+  await blockThirdParty(page);
+  await page.route('**/api/places/open', (r) => r.fulfill({ status: 429, json: { status: 'limit' } }));
+  await search(page, 'Mombasa');
+  await expect(page.getByText(/please try again tomorrow/)).toBeVisible();
+  await expect(page).toHaveURL(/\/climate-guides$/);
+});
+
 test('whitelist city goes straight to its page without the API', async ({ page }) => {
   await blockThirdParty(page);
   let called = false;
