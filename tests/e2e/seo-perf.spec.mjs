@@ -64,8 +64,10 @@ test('sitemap lastmod is stable between requests (not request time)', async ({ r
   const b = await (await request.get('/sitemap/places.xml')).text();
   const dates = (x) => [...x.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]);
   expect(dates(a)).toEqual(dates(b));
-  const today = new Date().toISOString().slice(0, 10);
-  expect(dates(a).filter((d) => !d.startsWith(today)).length).toBeGreaterThan(dates(a).length / 2);
+  // Request ka waqt nahi: koi tareekh abhi (pichle 60 s) ki nahi. ("Aaj" ki ho sakti hai —
+  // har mahine backend sync naya data laata hai to us din sab shehron ki tareekh wahi.)
+  const now = Date.now();
+  expect(dates(a).filter((d) => now - new Date(d).getTime() < 60_000)).toEqual([]);
 });
 
 test('sitemap index lists child sitemaps; children are valid with lastmod and no legacy URLs', async ({ request }) => {

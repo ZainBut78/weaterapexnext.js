@@ -10,6 +10,13 @@ export const verifyOtp = (payload) =>
 export const loginUser = (payload) =>
   apiClient.post(ENDPOINTS.auth.login, payload).then((res) => res.data);
 
+// Password bhool gaye: email par 6-digit code, phir code + naya password
+export const requestPasswordReset = (email) =>
+  apiClient.post(ENDPOINTS.auth.forgotPassword, { email }).then((res) => res.data);
+
+export const resetPassword = (payload) =>
+  apiClient.post(ENDPOINTS.auth.resetPassword, payload).then((res) => res.data);
+
 // Google ka id_token backend ko bhejte hain; backend use Google ke sath
 // verify karta hai aur hamare apne JWT tokens wapas deta hai.
 // Response: { access_token, refresh_token, username, email, plan, created }

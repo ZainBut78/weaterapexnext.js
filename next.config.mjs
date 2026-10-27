@@ -20,6 +20,8 @@ const nextConfig = {
   // ISR pages ki stale-while-revalidate 1 saal ki jagah zyada se zyada 2 din
   // (sab se lamba page revalidate 1 din). SEO fixes Oct 2026.
   expireTime: 172800,
+  // `X-Powered-By: Next.js` header band — framework ka naam na bataye (security report #11)
+  poweredByHeader: false,
   // inlineCss NAAPA aur BAND rakha (Oct 2026): CSS <style> mein HTML + RSC
   // payload dono mein aati hai (+13 KB gz har page). Lighthouse (local, 2 runs):
   // home LCP 2.3 → 1.9 s behtar, magar city/month 3.0 → 3.6 s KHARAB (bara RSC
@@ -65,9 +67,29 @@ const nextConfig = {
       source: '/icons/:path*',
       headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }],
     };
-    if (!NOINDEX) return [icons];
+    // Security headers (security report #11, owner ki tajweez, Oct 2026) — har route.
+    // CSP yahan NAHI: Hostinger pehle se `Content-Security-Policy:
+    // upgrade-insecure-requests` lagata hai (do CSP headers dono lagte, takra sakte).
+    //  • X-Frame-Options SAMEORIGIN — clickjacking; Google login popup alag window, asar nahi
+    //  • Referrer-Policy — Google Sign-In ko origin chahiye, yeh deta hai
+    //  • Permissions-Policy — geolocation=(self): "Use my location" chalta rahe
+    //  • HSTS 1 saal, preload NAHI. includeSubDomains abhi NAHI — owner pehle
+    //    api./www./captain sab ka HTTPS pakka karega.
+    //  • COOP jaan boojh kar nahi (same-origin Google login popup tod deta)
+    const security = {
+      source: '/:path*',
+      headers: [
+        { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
+        { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
+      ],
+    };
+    if (!NOINDEX) return [icons, security];
     return [
       icons,
+      security,
       {
         source: '/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],

@@ -6,7 +6,7 @@
 //  ke 12 mahine (sirf jo DB mein nahi). Yeh sab Django karta hai
 //  (/api/weather/places/open/, sirf internal key). Yahan:
 //   • browser se seedha Django nahi — bots shehar na banayein: per-IP hadd
-//     (20 / 10 minute), internal key server par hi rehti hai
+//     (20 / 10 minute, asal IP: utils/clientIp), internal key server par hi rehti hai
 //   • shehar DB mein aa gaya → cities index (tag "cities") + us ke pages ka
 //     cache foran saaf (pehle 404 tha to ab page)
 //   • jawab: {status: "ok", path} — browser wahan chala jaye; ya
@@ -19,6 +19,7 @@ import { ENDPOINTS } from '@/config/endpoints';
 import { buildRegistry } from '@/utils/cityRegistryCore';
 import { MONTHS } from '@/utils/climateMath';
 import { countryPath } from '@/data/countries';
+import { clientIp } from '@/utils/clientIp';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,7 +42,9 @@ function rateLimited(ip) {
 const reply = (body, status = 200) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 
 export async function POST(request) {
-  const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'local';
+  // Asal IP (utils/clientIp) — X-Forwarded-For ki PEHLI value nahi (client khud likh sakta,
+  // security report #9). Hostinger par source CLIENT_IP_SOURCE env se (/api/places/ip-debug).
+  const ip = clientIp(request.headers);
   if (rateLimited(ip)) return reply({ status: 'rate_limited' }, 429);
 
   let body = {};
