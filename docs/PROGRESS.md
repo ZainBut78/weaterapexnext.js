@@ -1296,3 +1296,10 @@ Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mei
 - Login form: hamesha dikhne wali line "Signed up with Google? Use Continue with Google, or set a password via Forgot password." (backend ka generic error wahi — enumeration nahi).
 - Signup OTP screen: "If <email> is new, we sent a 6-digit code. Already have an account? Check your inbox for a sign-in link." (backend ab maujooda email par OTP ki jagah "account pehle se hai" email bhejta hai).
 - Tests: build OK · e2e 53/53 (auth + site + ux). Commit nahi (owner).
+
+## 2026-10-26 — Security fix ROUND 3 (frontend) — Apex_Weather/docs/SECURITY_REPORT.md
+- `next` + `@next/bundle-analyzer` 16.3.6 → **16.4.3** (exact pin) — 3 critical (RCE, deserialization) + highs band. Snyk frontend 32 → 16 (baqi axios/follow-redirects round 4, leaflet bina fix).
+- `next.config.mjs`: `poweredByHeader: false`; har route par X-Frame-Options SAMEORIGIN, nosniff, Referrer-Policy, Permissions-Policy (geolocation=self), HSTS max-age=31536000 (includeSubDomains/preload NAHI — owner pehle subdomains confirm karega). CSP nahi (Hostinger ka hai), COOP nahi (Google login).
+- `utils/clientIp.js` (naya): asal client IP — XFF daayen se pehli public IP (default) / `CLIENT_IP_SOURCE` env (`xff-right:N`, `header:<naam>`). `/api/places/open` ab isi se (pehle XFF ki pehli value = spoofable).
+- `app/api/places/ip-debug/route.js` (naya): sirf `Bearer REVALIDATE_SECRET` ke saath (warna 404) — header naam + aadhi chhupi IPs; deploy ke baad Hostinger ka asal-IP header pakka karne ke liye.
+- Tests: unit 11/11 (`node --test tests/unit/*.test.mjs`) · e2e 73 pass + 1 skip (IndexNow key) incl. naya `security-headers.spec.mjs` · seo-check 417/0 · build `npm run build` (webpack, production jaisa) OK.
