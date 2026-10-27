@@ -1303,3 +1303,7 @@ Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mei
 - `utils/clientIp.js` (naya): asal client IP — XFF daayen se pehli public IP (default) / `CLIENT_IP_SOURCE` env (`xff-right:N`, `header:<naam>`). `/api/places/open` ab isi se (pehle XFF ki pehli value = spoofable).
 - `app/api/places/ip-debug/route.js` (naya): sirf `Bearer REVALIDATE_SECRET` ke saath (warna 404) — header naam + aadhi chhupi IPs; deploy ke baad Hostinger ka asal-IP header pakka karne ke liye.
 - Tests: unit 11/11 (`node --test tests/unit/*.test.mjs`) · e2e 73 pass + 1 skip (IndexNow key) incl. naya `security-headers.spec.mjs` · seo-check 417/0 · build `npm run build` (webpack, production jaisa) OK.
+
+## 2026-10-27 — ip-debug route hataya
+- Live check (owner): default `xff-right-public` sahi IP deta hai, XFF spoof test pass → `CLIENT_IP_SOURCE` set nahi.
+- `app/api/places/ip-debug/` aur us ke 2 e2e tests hataye. `utils/clientIp.js` + unit tests rehte hain.

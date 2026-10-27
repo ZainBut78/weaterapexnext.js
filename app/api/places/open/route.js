@@ -43,7 +43,7 @@ const reply = (body, status = 200) => Response.json(body, { status, headers: { '
 
 export async function POST(request) {
   // Asal IP (utils/clientIp) — X-Forwarded-For ki PEHLI value nahi (client khud likh sakta,
-  // security report #9). Hostinger par source CLIENT_IP_SOURCE env se (/api/places/ip-debug).
+  // security report #9). Hostinger par default (xff-right-public) live par pakka hua.
   const ip = clientIp(request.headers);
   if (rateLimited(ip)) return reply({ status: 'rate_limited' }, 429);
 

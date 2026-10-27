@@ -1,7 +1,6 @@
 // ─────────────────────────────────────────────────────────────
-//  Security fix round 3 (Oct 2026) — headers, X-Powered-By, IP debug route,
+//  Security fix round 3 (Oct 2026) — headers, X-Powered-By,
 //  /api/places/open ki per-IP hadd jhooti X-Forwarded-For se bypass nahi.
-//  IP debug test ke liye server ko REVALIDATE_SECRET chahiye (env), warna skip.
 // ─────────────────────────────────────────────────────────────
 import { test, expect } from '@playwright/test';
 
@@ -20,25 +19,6 @@ test('security headers on pages, no X-Powered-By, no second CSP', async ({ reque
     expect(h['content-security-policy'], p).toBeUndefined();                // Hostinger ka hi rahe
     expect(h['cross-origin-opener-policy'], p).toBeUndefined();             // Google login popup
   }
-});
-
-test('ip-debug route hidden without the secret', async ({ request }) => {
-  expect((await request.get('/api/places/ip-debug')).status()).toBe(404);
-  expect((await request.get('/api/places/ip-debug', { headers: { Authorization: 'Bearer wrong' } })).status()).toBe(404);
-});
-
-test('ip-debug with secret shows only header names + masked IPs', async ({ request }) => {
-  const secret = process.env.REVALIDATE_SECRET;
-  test.skip(!secret, 'REVALIDATE_SECRET set nahi (server + test dono mein chahiye)');
-  const res = await request.get('/api/places/ip-debug', {
-    headers: { Authorization: `Bearer ${secret}`, 'x-forwarded-for': '6.6.6.6, 203.0.113.7' },
-  });
-  expect(res.status()).toBe(200);
-  const j = await res.json();
-  expect(j.candidates['xff-right-public']).toBe('203.0.x.x');
-  expect(j.current_pick).toBe('203.0.x.x');
-  expect(JSON.stringify(j)).not.toContain('203.0.113.7');                   // poori IP kabhi nahi
-  expect(JSON.stringify(j)).not.toContain(secret);
 });
 
 test('places/open per-IP limit: spoofed left XFF values do not bypass', async ({ request }) => {

@@ -5,8 +5,8 @@
 //  ki PEHLI value leti thi — yeh client khud likh sakta hai, har request mein
 //  nayi jhooti IP = hadd khatam. Proxy asal IP list ke AAKHIR mein jodte hain.
 //
-//  CLIENT_IP_SOURCE (server env, Hostinger) — deploy ke baad /api/places/ip-debug
-//  se pakka kar ke chunein:
+//  CLIENT_IP_SOURCE (server env, Hostinger) — live par default sahi nikla
+//  (Oct 2026), is liye set NAHI. Hosting badle to:
 //    (khaali / "xff-right-public")  XFF mein daayen se pehli PUBLIC IP (Hostinger
 //                                  ke andar ke private proxy hops chhor kar) — default
 //    "xff-right:N"                 daayen se N-wi value (N proxies bharosemand)
