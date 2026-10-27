@@ -8,6 +8,7 @@ import { registerUser, verifyOtp, googleLogin } from '@/services/authService';
 import { useAuth } from '@/context/AuthContext';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { GOOGLE_CLIENT_ID } from '@/config/googleAuth';
+import { authErrorMessage } from '@/utils/authErrors';
 
 export default function SignUp() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function SignUp() {
       setRegisteredEmail(res.email);
       setStep('otp');
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      setError(authErrorMessage(err, 'Registration failed. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -111,7 +112,7 @@ export default function SignUp() {
       login(registeredEmail, res.access_token, res.refresh_token);
       router.push('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Verification failed. Please try again.');
+      setError(authErrorMessage(err, 'Verification failed. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -249,7 +250,7 @@ export default function SignUp() {
             </Link>
             <h1 className="text-2xl font-extrabold text-[#002244]">Verify your email</h1>
             <p className="text-sm text-gray-500 mt-1">
-              Enter the code sent to <span className="font-semibold text-gray-700">{registeredEmail}</span>
+              If <span className="font-semibold text-gray-700">{registeredEmail}</span> is new, we sent a 6-digit code. Already have an account? Check your inbox for a sign-in link.
             </p>
           </div>
 

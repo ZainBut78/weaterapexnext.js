@@ -1285,3 +1285,14 @@ Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mei
 - Backend (`weather/places.py`): naya shehar sirf 15,000+ abaadi (`MIN_CITY_POPULATION`) — sirf darul hukoomat (PPLC/PPLG: mulk ya jazeera-territory, jaise Hamilton, Charlotte Amalie, Willemstad, Castries) mustasna; sooba markaz (PPLA/PPLA2) ab mustasna nahi; chunne wali list (geo_id) par bhi. Roz ki global hadd `NEW_CITIES_PER_DAY` default 100 → **15**; poori hone par "limit" → "try again tomorrow".
 - Frontend: adhoore city page (12 mein se koi mahina baqi) aur adhoore month page → `<meta name="robots" content="noindex, follow">` (`utils/robots.js`, backend `months_complete`). Mukammal pages pehle jaise; sitemap qaide wahi.
 - Tests: backend 196 OK (4 naye + 1 update: "Peru, Indiana" 11,060 ab nahi) · unit 4/4 (`node --test tests/unit/robots.test.mjs`) · e2e 63/63 (1 naya) · seo-check 416/0. Local render: Phoenix (sirf July) city page noindex, July page index, Tulum index.
+
+## 2026-10-25 — Hardening STEP 1-C (backend: Apex_Weather/docs/CLAUDE_CODE_HARDENING_PROMPT.md)
+- Login / signup (register + OTP verify): HTTP 429 → "Too many attempts, try again in X minutes." (`utils/authErrors.js`); baqi errors pehle jaise.
+- Naya `/forgot-password` (noindex, login jaisa design): email → 6-digit code + naya password → Sign in. Login ka "Forgot password?" link ab is par (pehle `#`).
+- `tests/e2e/seo-perf.spec.mjs`: lastmod test ab "request ka waqt nahi" check karta hai (mahana sync ke din sab tareekhein "aaj" hoti hain).
+- Tests: e2e 68 + 6 naye pass · seo-check 417/0. Commit nahi (owner).
+
+## 2026-10-26 — Hardening round 2: do text changes (owner)
+- Login form: hamesha dikhne wali line "Signed up with Google? Use Continue with Google, or set a password via Forgot password." (backend ka generic error wahi — enumeration nahi).
+- Signup OTP screen: "If <email> is new, we sent a 6-digit code. Already have an account? Check your inbox for a sign-in link." (backend ab maujooda email par OTP ki jagah "account pehle se hai" email bhejta hai).
+- Tests: build OK · e2e 53/53 (auth + site + ux). Commit nahi (owner).

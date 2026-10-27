@@ -8,6 +8,7 @@ import { loginUser, googleLogin } from '@/services/authService';
 import { useAuth } from '@/context/AuthContext';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { GOOGLE_CLIENT_ID } from '@/config/googleAuth';
+import { authErrorMessage } from '@/utils/authErrors';
 
 export default function SignIn() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function SignIn() {
       login(res.username, res.access_token, res.refresh_token);
       router.push('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
+      setError(authErrorMessage(err, 'Login failed. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -111,7 +112,7 @@ export default function SignIn() {
                 </button>
               </div>
               <div className="text-right mt-1.5">
-                <a href="#" className="text-xs font-semibold text-[#0077b6] hover:text-[#005a8d]">Forgot password?</a>
+                <Link href="/forgot-password" className="text-xs font-semibold text-[#0077b6] hover:text-[#005a8d]">Forgot password?</Link>
               </div>
             </div>
 
@@ -122,6 +123,10 @@ export default function SignIn() {
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
+            <p className="text-xs text-gray-500 text-center">
+              Signed up with Google? Use Continue with Google, or set a password via{' '}
+              <Link href="/forgot-password" className="font-semibold text-[#0077b6] hover:text-[#005a8d]">Forgot password</Link>.
+            </p>
           </form>
 
           {GOOGLE_CLIENT_ID && (
