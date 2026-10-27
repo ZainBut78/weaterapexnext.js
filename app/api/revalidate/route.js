@@ -6,7 +6,10 @@
 //  pehle chalti hai — filesystem route rewrites se pehle match hota hai.)
 //
 //  Secret: server-only env REVALIDATE_SECRET (NEXT_PUBLIC_ nahi). Header
-//  `Authorization: Bearer <secret>` (behtar) ya `?secret=` (query).
+//  `Authorization: Bearer <secret>`. Purana `?secret=` (query) abhi bhi
+//  qubool (security round 4, Oct 2026) — taake deploy ke beech purana
+//  backend na toote; istemal par warning log. Backend ab sirf header
+//  bhejta hai — dono deploy ke baad query wala raasta hata sakte hain.
 //  Body: {"paths": ["/blog/<slug>", "/blog", "/sitemap.xml"],
 //         "tags": ["blog:<slug>", "blog", "cities"]}  (ya `?path=` / `?tag=`).
 //  Tags (fetch data cache) foran expire ({ expire: 0 }) — agla visitor naya
@@ -24,12 +27,13 @@ function authorized(request) {
   const secret = process.env.REVALIDATE_SECRET || '';
   if (!secret) return false;
   const header = request.headers.get('authorization') || '';
-  const given = header.startsWith('Bearer ')
-    ? header.slice(7)
-    : new URL(request.url).searchParams.get('secret') || '';
+  const fromHeader = header.startsWith('Bearer ');
+  const given = fromHeader ? header.slice(7) : new URL(request.url).searchParams.get('secret') || '';
   const a = Buffer.from(given);
   const b = Buffer.from(secret);
-  return a.length === b.length && timingSafeEqual(a, b);
+  const ok = a.length === b.length && timingSafeEqual(a, b);
+  if (ok && !fromHeader) console.warn('[revalidate] secret query param se aaya (purana tareeqa) — header istemal karein');
+  return ok;
 }
 
 export async function POST(request) {

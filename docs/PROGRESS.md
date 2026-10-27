@@ -1312,3 +1312,8 @@ Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mei
 - `axios` 1.18.1 → **1.20.0** (exact pin). Lockfile mein `follow-redirects` 1.16.0 → 1.16.1 (dono advisories band; 1.16.2 sirf 2 din purana tha, is liye nahi). Code change nahi.
 - Snyk frontend 16 → **1** (sirf leaflet XSS medium — fix maujood nahi). `npm audit --omit=dev`: sirf source-map-js (Next ke andar, build-time).
 - Tests: build (webpack) OK · unit 11/11 · e2e 69 pass, 2 fail (local DB mein sirf 79 shehar poore — Australia hub 308 + sitemap < 2000; pehle jaise), 1 skip.
+
+## 2026-10-27 — Security ROUND 4, Step 5: revalidate secret header mein
+- `app/api/revalidate/route.js`: `Authorization: Bearer` header naya tareeqa; purana `?secret=` abhi bhi qubool (deploy ke beech purana backend na toote) — istemal par `console.warn` (secret log nahi). Backend ab sirf header bhejta hai; dono deploy ke baad query raasta hata sakte hain.
+- Naya `tests/e2e/revalidate-auth.spec.mjs` (3): ghalat/khaali secret 401, header 200, purana query 200.
+- Tests: build OK · e2e 72 pass, 2 fail (wahi local data — Australia 308, sitemap < 2000), 1 skip.
