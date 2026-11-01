@@ -8,11 +8,13 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { useUnits } from '@/context/UnitsContext';
+import { useT } from '@/i18n/client';
 
 export function TemperatureChart({ chartData }) {
   // °C/°F (audit 3.2) — high/low user ki unit mein
   const units = useUnits();
-  const data = chartData.map((d) => ({ ...d, high: units.temp1(d.high), low: units.temp1(d.low) }));
+  const t = useT();
+  const data =chartData.map((d) => ({ ...d, high: units.temp1(d.high), low: units.temp1(d.low) }));
   return (
     <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">
@@ -22,8 +24,8 @@ export function TemperatureChart({ chartData }) {
           <YAxis tick={{ fontSize: 12, fill: '#64748B' }} unit={units.tempSymbol} />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="high" name="Avg High" stroke="#0077b6" strokeWidth={2.5} dot={{ r: 3 }} />
-          <Line type="monotone" dataKey="low" name="Avg Low" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} />
+          <Line type="monotone" dataKey="high" name={t('climate.table.avgHigh')} stroke="#0077b6" strokeWidth={2.5} dot={{ r: 3 }} />
+          <Line type="monotone" dataKey="low" name={t('climate.table.avgLow')} stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -31,6 +33,7 @@ export function TemperatureChart({ chartData }) {
 }
 
 export function RainfallChart({ chartData }) {
+  const t = useT();
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
@@ -39,7 +42,7 @@ export function RainfallChart({ chartData }) {
           <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} />
           <YAxis tick={{ fontSize: 12, fill: '#64748B' }} unit="mm" />
           <Tooltip />
-          <Bar dataKey="rain" name="Rainfall" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="rain" name={t('climate.table.rainfall')} fill="#3b82f6" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -47,6 +50,7 @@ export function RainfallChart({ chartData }) {
 }
 
 export function SunshineChart({ chartData }) {
+  const t = useT();
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
@@ -61,7 +65,7 @@ export function SunshineChart({ chartData }) {
           <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} />
           <YAxis tick={{ fontSize: 12, fill: '#64748B' }} unit="h" />
           <Tooltip />
-          <Area type="monotone" dataKey="sunshine" name="Sunshine" stroke="#f59e0b" strokeWidth={2.5} fill="url(#sunshineGrad)" />
+          <Area type="monotone" dataKey="sunshine" name={t('climate.table.sunshine')} stroke="#f59e0b" strokeWidth={2.5} fill="url(#sunshineGrad)" />
         </AreaChart>
       </ResponsiveContainer>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { MapPin, Globe, Info } from 'lucide-react';
+import { useT } from '@/i18n/client';
 
 /**
  * Jab user shehar ki jagah MULK ya SOOBA ka naam likh de.
@@ -14,8 +15,9 @@ import { MapPin, Globe, Info } from 'lucide-react';
  * chunne ke qabil bana deta hai — user ko dobara type nahi karna parta.
  */
 const CityNeededNotice = ({ data, onPickCity, onSwitchToCountryMode }) => {
+  const t = useT();
   const suggestions = data?.suggestions || [];
-  const place = data?.place || 'That';
+  const place = data?.place || t('cityNeeded.that');
   const isCountry = data?.kind === 'country';
 
   return (
@@ -24,11 +26,10 @@ const CityNeededNotice = ({ data, onPickCity, onSwitchToCountryMode }) => {
         <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
         <div className="min-w-0">
           <p className="font-bold text-amber-900">
-            {place} is {isCountry ? 'a country' : 'a region'} — we need a city
+            {t(isCountry ? 'cityNeeded.titleCountry' : 'cityNeeded.titleRegion', { place })}
           </p>
           <p className="text-sm text-amber-800/90 mt-1">
-            Weather is different in every city within {place}, so one score for
-            the whole {isCountry ? 'country' : 'region'} would be misleading.
+            {t(isCountry ? 'cityNeeded.textCountry' : 'cityNeeded.textRegion', { place })}
           </p>
         </div>
       </div>
@@ -37,7 +38,7 @@ const CityNeededNotice = ({ data, onPickCity, onSwitchToCountryMode }) => {
         {suggestions.length > 0 ? (
           <>
             <p className="text-sm font-semibold text-slate-700 mb-3">
-              Pick a city in {place}:
+              {t('cityNeeded.pick', { place })}
             </p>
             <div className="flex flex-wrap gap-2">
               {suggestions.map((s) => (
@@ -55,14 +56,14 @@ const CityNeededNotice = ({ data, onPickCity, onSwitchToCountryMode }) => {
           </>
         ) : (
           <p className="text-sm text-slate-600">
-            Please enter a city name instead.
+            {t('cityNeeded.enterCity')}
           </p>
         )}
 
         {onSwitchToCountryMode && (
           <div className="mt-5 pt-5 border-t border-gray-100">
             <p className="text-sm text-slate-600 mb-3">
-              Want the best cities across {place} instead?
+              {t('cityNeeded.wantBest', { place })}
             </p>
             <button
               type="button"
@@ -70,7 +71,7 @@ const CityNeededNotice = ({ data, onPickCity, onSwitchToCountryMode }) => {
               className="inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-full bg-[#0077b6] hover:bg-[#005a8d] text-sm font-semibold text-white transition-colors"
             >
               <Globe className="w-4 h-4" />
-              Search by country instead
+              {t('cityNeeded.searchByCountry')}
             </button>
           </div>
         )}

@@ -2,7 +2,10 @@
 
 import React, { useRef, useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
-import Link from 'next/link';
+import Link from './LocaleLink';
+import { useLang, useT } from '@/i18n/client';
+import { countryName } from '@/i18n/format';
+import { cityName } from '@/i18n/places';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchCurrentWeather } from '../services/weatherService';
 import { getMeteoconIcon } from '../utils/meteoconsMap';
@@ -23,22 +26,22 @@ const cityHref = (name) => {
 };
 
 const cities = [
-  { city: 'Paris', country: 'France' },
-  { city: 'London', country: 'UK' },
-  { city: 'Tokyo', country: 'Japan' },
-  { city: 'Dubai', country: 'UAE' },
-  { city: 'New York', country: 'USA' },
-  { city: 'Sydney', country: 'Australia' },
-  { city: 'Mumbai', country: 'India' },
-  { city: 'Cairo', country: 'Egypt' },
-  { city: 'Singapore', country: 'Singapore' },
-  { city: 'Bangkok', country: 'Thailand' },
-  { city: 'Seoul', country: 'South Korea' },
-  { city: 'Istanbul', country: 'Turkey' },
-  { city: 'Rome', country: 'Italy' },
-  { city: 'Barcelona', country: 'Spain' },
-  { city: 'Berlin', country: 'Germany' },
-  { city: 'Toronto', country: 'Canada' },
+  { city: 'Paris', country: 'France', iso: 'FR' },
+  { city: 'London', country: 'UK', iso: 'GB' },
+  { city: 'Tokyo', country: 'Japan', iso: 'JP' },
+  { city: 'Dubai', country: 'UAE', iso: 'AE' },
+  { city: 'New York', country: 'USA', iso: 'US' },
+  { city: 'Sydney', country: 'Australia', iso: 'AU' },
+  { city: 'Mumbai', country: 'India', iso: 'IN' },
+  { city: 'Cairo', country: 'Egypt', iso: 'EG' },
+  { city: 'Singapore', country: 'Singapore', iso: 'SG' },
+  { city: 'Bangkok', country: 'Thailand', iso: 'TH' },
+  { city: 'Seoul', country: 'South Korea', iso: 'KR' },
+  { city: 'Istanbul', country: 'Turkey', iso: 'TR' },
+  { city: 'Rome', country: 'Italy', iso: 'IT' },
+  { city: 'Barcelona', country: 'Spain', iso: 'ES' },
+  { city: 'Berlin', country: 'Germany', iso: 'DE' },
+  { city: 'Toronto', country: 'Canada', iso: 'CA' },
 ];
 
 const skylineSvgs = {
@@ -67,6 +70,10 @@ const skylineSvgs = {
 const PopularDestinations = () => {
   const { setCity } = useCity();
   const units = useUnits(); // °C/°F (audit 3.2)
+  const t = useT();
+  const lang = useLang();
+  // English: wahi chhote naam (UK, USA); baqi zabanein Intl.DisplayNames se
+  const countryLabel = (item) => (lang === 'en' ? item.country : countryName(lang, item.iso, item.country));
   const scrollRef = useRef(null);
 
   // Card dabane par wahi ho jo navbar search se hota hai: upar ka weather
@@ -116,13 +123,13 @@ const PopularDestinations = () => {
         
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-extrabold text-[#002244] tracking-tight">
-            Popular Destinations
+            {t('popular.title')}
           </h2>
           <div className="flex gap-2">
             {showLeft && (
               <button
                 onClick={() => scroll('left')}
-                aria-label="Scroll destinations left"
+                aria-label={t('popular.scrollLeft')}
                 className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-white hover:border-gray-400 transition-all"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -131,7 +138,7 @@ const PopularDestinations = () => {
             {showRight && (
               <button
                 onClick={() => scroll('right')}
-                aria-label="Scroll destinations right"
+                aria-label={t('popular.scrollRight')}
                 className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-white hover:border-gray-400 transition-all"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -168,6 +175,8 @@ const PopularDestinations = () => {
               weatherData?.current?.is_day,
             );
             const imageUrl = brokenImages.has(item.city) ? null : weatherData?.image_url;
+            // Dikhane ke liye user ki zaban ka naam (ロンドン); logic English naam se
+            const label = cityName(lang, item.city.toLowerCase().replace(/ /g, '-'), item.city);
 
             return (
               <div
@@ -196,7 +205,7 @@ const PopularDestinations = () => {
                       srcSet={pexelsSrcSet(imageUrl, [400, 800], CARD_RATIO)}
                       sizes="240px"
                       width={400} height={Math.round(400 * CARD_RATIO)}
-                      alt={item.city} className="absolute inset-0 w-full h-full object-cover"
+                      alt={label} className="absolute inset-0 w-full h-full object-cover"
                       onError={() => setBrokenImages((prev) => new Set(prev).add(item.city))}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#002244]/85 via-[#002244]/35 to-[#002244]/10" />
@@ -210,16 +219,16 @@ const PopularDestinations = () => {
                 <div className="flex justify-between items-start z-10">
                   <div>
                     {/* Card ka naam content se (a11y: dikhne wala text naam mein ho) */}
-                    <span className="sr-only">Show weather for </span>
+                    <span className="sr-only">{t('popular.showWeatherFor')}</span>
                     <h3 className={`text-xl font-bold leading-tight ${imageUrl ? 'text-white' : 'text-[#002244]'}`}>
-                      {item.city}
+                      {label}
                     </h3>
                     <p className={`text-xs font-semibold mt-0.5 ${imageUrl ? 'text-white/80' : 'text-gray-400'}`}>
-                      {isLoading ? 'Loading...' : item.country}
+                      {isLoading ? t('common.loading') : countryLabel(item)}
                     </p>
                   </div>
                   {!isLoading && !isError && (
-                    <img loading="lazy" decoding="async" src={getMeteoconIcon(code, cityIsNight)} alt={item.city} className="w-14 h-14 drop-shadow-md" />
+                    <img loading="lazy" decoding="async" src={getMeteoconIcon(code, cityIsNight)} alt={label} className="w-14 h-14 drop-shadow-md" />
                   )}
                 </div>
 
@@ -237,7 +246,7 @@ const PopularDestinations = () => {
                     onKeyDown={(e) => e.stopPropagation()}
                     className={`inline-block py-1 text-xs font-semibold mb-1 hover:underline focus:outline-none focus-visible:underline ${imageUrl ? 'text-white/90' : 'text-[#0077b6]'}`}
                   >
-                    Climate guide →
+                    {t('popular.climateGuide')}
                   </Link>
                 </div>
               </div>

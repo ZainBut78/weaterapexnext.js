@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Link from './LocaleLink';
+import { useT } from '@/i18n/client';
 import { Sparkles, X, Check } from 'lucide-react';
 
 /**
@@ -22,16 +23,18 @@ import { Sparkles, X, Check } from 'lucide-react';
 
 export const FREE_LIMIT_EVENT = 'weatherapex:free-limit';
 
-const FEATURE_LABEL = {
-  trip_planner: 'Trip Planner',
-  country_recommend: 'Trip Planner',
-  event_risk: 'Event Risk Score',
-  weather_new_city: 'new city lookups',
-  history_new_city: 'climate history',
+// feature code → messages `freeLimit.features.<code>`
+const FEATURE_KEY = {
+  trip_planner: 'tripPlanner',
+  country_recommend: 'tripPlanner',
+  event_risk: 'eventRisk',
+  weather_new_city: 'newCity',
+  history_new_city: 'climateHistory',
 };
 
 const FreeLimitModal = () => {
   const [info, setInfo] = useState(null);
+  const t = useT();
 
   useEffect(() => {
     const onLimit = (e) => setInfo(e.detail || {});
@@ -55,7 +58,7 @@ const FreeLimitModal = () => {
   if (!info) return null;
 
   const limit = info.limit ?? 3;
-  const feature = FEATURE_LABEL[info.feature] || 'this feature';
+  const feature = t(`freeLimit.features.${FEATURE_KEY[info.feature] || 'other'}`);
 
   return (
     <div
@@ -81,21 +84,16 @@ const FreeLimitModal = () => {
             <Sparkles className="w-7 h-7 text-white" />
           </div>
           <h2 id="free-limit-title" className="text-xl sm:text-2xl font-extrabold text-white leading-tight">
-            You've used your {limit} free {limit === 1 ? 'check' : 'checks'} today
+            {t('freeLimit.title', { count: limit })}
           </h2>
           <p className="text-sm text-white/80 mt-2">
-            Create a free account to keep using {feature} — it takes about a minute.
+            {t('freeLimit.text', { feature })}
           </p>
         </div>
 
         <div className="px-6 py-6">
           <ul className="space-y-3 mb-6">
-            {[
-              'Unlimited trip plans and event risk checks',
-              'Full 15-day forecasts for any city',
-              '20 years of climate history',
-              'A free API key for your own projects',
-            ].map((item) => (
+            {t.raw('freeLimit.benefits').map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-slate-700">
                 <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center">
                   <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -110,17 +108,17 @@ const FreeLimitModal = () => {
             onClick={() => setInfo(null)}
             className="flex items-center justify-center w-full min-h-12 rounded-full bg-[#00a8e8] hover:bg-[#0092cd] text-white text-sm font-bold transition-colors shadow-sm"
           >
-            Create free account
+            {t('freeLimit.createAccount')}
           </Link>
 
           <p className="text-center text-sm text-slate-500 mt-4">
-            Already have one?{' '}
+            {t('freeLimit.haveOne')}{' '}
             <Link
               href="/login"
               onClick={() => setInfo(null)}
               className="font-semibold text-[#0077b6] hover:text-[#005a8d]"
             >
-              Sign in
+              {t('freeLimit.signIn')}
             </Link>
           </p>
 
@@ -129,14 +127,14 @@ const FreeLimitModal = () => {
             onClick={() => setInfo(null)}
             className="block mx-auto mt-4 min-h-11 px-4 text-xs font-semibold text-slate-400 hover:text-slate-600 transition-colors"
           >
-            Maybe later
+            {t('freeLimit.later')}
           </button>
         </div>
 
         <button
           type="button"
           onClick={() => setInfo(null)}
-          aria-label="Close"
+          aria-label={t('common.close')}
           className="absolute top-3 right-3 w-11 h-11 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
         >
           <X className="w-5 h-5" />

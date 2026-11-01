@@ -11,7 +11,7 @@
 //  Data sirf un shehron ka jo services/history.js ne diya (hadd 6).
 //  Table aur intro SIRF mile hue data se; city cards (links) saare.
 // ─────────────────────────────────────────────────────────────
-import Link from 'next/link';
+import Link from '@/components/LocaleLink';   // i18n: andar ke links zaban ka prefix lete hain
 import { MapPin, CalendarRange, Sparkles, Thermometer } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -20,6 +20,8 @@ import UnitTempShort from './UnitTempShort';
 import { UnitTemp } from './UnitText';
 import { pexelsSized, pexelsSrcSet } from '@/utils/pexels';
 import { MONTHS, annualMeanHigh, rowFor, visitVerdict } from '@/utils/climateMath';
+import { cityName, countryName } from '@/i18n/places';
+import { climateText } from './text';
 
 // Halka rang-scale (average high °C) — sirf pas-e-manzar, text hamesha parha jaye
 function heat(c) {
@@ -32,7 +34,12 @@ function heat(c) {
   return 'bg-red-100 text-red-900';
 }
 
-export default function CountryClimate({ country, cities, histories, crumbs }) {
+// lang (i18n Phase 1): links/breadcrumb JSON-LD; copy Phase 3 mein
+export default function CountryClimate({ country, cities: citiesIn, histories, crumbs, lang = 'en' }) {
+  const L = climateText(lang);
+  const countryN = countryName(lang, country);
+  // Shehron ke naam is zaban mein (English: wahi)
+  const cities = lang === 'en' ? citiesIn : citiesIn.map((c) => ({ ...c, name: cityName(lang, c) }));
   const loaded = cities.filter((c) => histories.has(c.slug));
 
   // Intro: sab se garam / thanda shehar (saal ka avg high), sab se geela mahina
@@ -60,7 +67,7 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
 
   return (
     <div className="min-h-screen bg-[#f3f7ff]">
-      <JsonLd data={breadcrumbs(crumbs)} />
+      <JsonLd data={breadcrumbs(crumbs, lang)} />
       <Navbar />
       {/* Ek <main> landmark — Navbar/Footer bahar (a11y Task 7) */}
       <main>
@@ -71,11 +78,11 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
             {crumbs.slice(0, -1).map((b) => (
               <span key={b.path}><Link href={b.path} className="hover:underline">{b.name}</Link> <span aria-hidden="true">›</span> </span>
             ))}
-            <span className="text-white font-semibold">{country.name}</span>
+            <span className="text-white font-semibold">{countryN}</span>
           </nav>
-          <h1 className="text-3xl sm:text-5xl font-extrabold mb-3">{country.name} Weather by City &amp; Month</h1>
+          <h1 className="text-3xl sm:text-5xl font-extrabold mb-3">{L.countryH1(countryN, country)}</h1>
           <p className="text-blue-100/90 max-w-2xl mx-auto">
-            Month-by-month averages for {cities.length} {cities.length === 1 ? 'city' : 'cities'} in {country.name}, from 20 years of historical weather data.
+            {L.countrySub(cities.length, countryN, country)}
           </p>
         </div>
       </div>
@@ -85,23 +92,20 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
         <section className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
           <div className="flex items-center gap-2 mb-4">
             <Thermometer className="w-5 h-5 text-[#0077b6]" />
-            <h2 className="text-xl font-bold text-[#002244]">Climate across {country.name}</h2>
+            <h2 className="text-xl font-bold text-[#002244]">{L.climateAcross(countryN, country)}</h2>
           </div>
           {loaded.length ? (
             <p className="text-gray-600 leading-relaxed">
-              {single && (
-                <><strong className="text-gray-800">{single.c.name}</strong> has an average daytime high of <UnitTemp c={Math.round(single.v * 10) / 10} /> across the year</>
-              )}
-              {warmest && (
-                <>Of the cities below, <strong className="text-gray-800">{warmest.c.name}</strong> is the warmest, with an average daytime high of <UnitTemp c={Math.round(warmest.v * 10) / 10} /> across the year</>
-              )}
-              {coolest && coolest.c.slug !== warmest?.c.slug && (
-                <>, while <strong className="text-gray-800">{coolest.c.name}</strong> is the coolest at <UnitTemp c={Math.round(coolest.v * 10) / 10} /></>
-              )}
-              .{wettest && <> {loaded.length > 1 ? 'Across these cities' : `In ${loaded[0].name}`}, <strong className="text-gray-800">{wettest.m.name}</strong> is usually the wettest month (about {Math.round(wettest.v)} mm on average).</>}
+              <L.CountryIntro
+                single={single && { name: single.c.name, v: Math.round(single.v * 10) / 10 }}
+                warmest={warmest && { name: warmest.c.name, v: Math.round(warmest.v * 10) / 10 }}
+                coolest={coolest && coolest.c.slug !== warmest?.c.slug ? { name: coolest.c.name, v: Math.round(coolest.v * 10) / 10 } : null}
+                wettest={wettest && { name: L.month(wettest.m.num), v: wettest.v }}
+                loaded={loaded}
+              />
             </p>
           ) : (
-            <p className="text-gray-600">Climate data for these cities is being prepared.</p>
+            <p className="text-gray-600">{L.preparing}</p>
           )}
         </section>
 
@@ -109,23 +113,23 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
         <section>
           <div className="flex items-center gap-2 mb-4">
             <MapPin className="w-5 h-5 text-[#0077b6]" />
-            <h2 className="text-xl font-bold text-[#002244]">{country.name} cities by month</h2>
+            <h2 className="text-xl font-bold text-[#002244]">{L.citiesByMonth(countryN, country)}</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {cities.map((c) =>
               c.photo ? (
                 <Link key={c.slug} href={c.href} className="group relative block h-32 sm:h-36 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition-all">
-                  <img src={pexelsSized(c.photo, 400, 0.72)} srcSet={pexelsSrcSet(c.photo, [400, 800], 0.72)} sizes="(min-width: 768px) 270px, (min-width: 640px) 33vw, 50vw" alt={`${c.name}, ${country.name}`} loading="lazy" decoding="async" width={400} height={288} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <img src={pexelsSized(c.photo, 400, 0.72)} srcSet={pexelsSrcSet(c.photo, [400, 800], 0.72)} sizes="(min-width: 768px) 270px, (min-width: 640px) 33vw, 50vw" alt={L.place(c.name, countryN)} loading="lazy" decoding="async" width={400} height={288} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#002244]/85 via-[#002244]/35 to-[#002244]/10" />
                   <div className="absolute inset-x-0 bottom-0 p-4">
                     <p className="font-semibold text-white leading-tight">{c.name}</p>
-                    <p className="text-sm text-white/80">{country.name}</p>
+                    <p className="text-sm text-white/80">{countryN}</p>
                   </div>
                 </Link>
               ) : (
                 <Link key={c.slug} href={c.href} className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-blue-300 transition-all">
                   <p className="font-semibold text-slate-900">{c.name}</p>
-                  <p className="text-sm text-slate-400">{country.name}</p>
+                  <p className="text-sm text-slate-400">{countryN}</p>
                 </Link>
               ),
             )}
@@ -137,16 +141,16 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
         <section className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
           <div className="flex items-center gap-2 mb-1">
             <CalendarRange className="w-5 h-5 text-[#0077b6]" />
-            <h2 className="text-xl font-bold text-[#002244]">Average high by month</h2>
+            <h2 className="text-xl font-bold text-[#002244]">{L.avgHighByMonth}</h2>
           </div>
-          <p className="text-sm text-gray-500 mb-5">Tap a value to open that city&apos;s month guide.</p>
+          <p className="text-sm text-gray-500 mb-5">{L.tapValue}</p>
           <div className="overflow-x-auto -mx-2 px-2">
             <table className="w-full text-sm border-separate border-spacing-0">
               <thead>
                 <tr className="text-gray-500">
-                  <th scope="col" className="sticky left-0 z-10 bg-white text-left font-semibold px-3 py-2 min-w-[8rem]">City</th>
+                  <th scope="col" className="sticky left-0 z-10 bg-white text-left font-semibold px-3 py-2 min-w-[8rem]">{L.cityTh}</th>
                   {MONTHS.map((m) => (
-                    <th key={m.slug} scope="col" className="font-semibold px-1 py-2 text-center min-w-[3.25rem]">{m.short}</th>
+                    <th key={m.slug} scope="col" className="font-semibold px-1 py-2 text-center min-w-[3.25rem]">{L.monthShort(m.num)}</th>
                   ))}
                 </tr>
               </thead>
@@ -165,7 +169,7 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
                         return (
                           <td key={m.slug} className="p-0.5 border-t border-gray-100">
                             {v != null ? (
-                              <Link href={`${c.href}/${m.slug}`} className={`block rounded-md px-1 py-1.5 text-center font-semibold leading-tight hover:ring-2 hover:ring-[#0077b6] ${heat(v)}`} aria-label={`${c.name} in ${m.name}`}>
+                              <Link href={`${c.href}/${m.slug}`} className={`block rounded-md px-1 py-1.5 text-center font-semibold leading-tight hover:ring-2 hover:ring-[#0077b6] ${heat(v)}`} aria-label={L.cellAria(c.name, L.month(m.num))}>
                                 <UnitTempShort c={v} dual />
                               </Link>
                             ) : (
@@ -188,13 +192,14 @@ export default function CountryClimate({ country, cities, histories, crumbs }) {
           <section className="bg-[#EFF6FF] rounded-2xl p-6 sm:p-8">
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-5 h-5 text-[#0077b6]" />
-              <h2 className="text-lg font-bold text-[#002244]">Best months to visit {country.name}</h2>
+              <h2 className="text-lg font-bold text-[#002244]">{L.bestMonthsTitle(countryN, country)}</h2>
             </div>
             <p className="text-gray-600 leading-relaxed">
-              Based on comfortable temperatures, rainy days and sunshine across {loaded.length === cities.length ? 'these cities' : `${loaded.map((c) => c.name).join(', ')}`},
-              the most pleasant months are usually <strong className="text-gray-800">{bestMonths.map((b) => b.m.name).join(', ')}</strong>
-              {worstMonth && <>; <strong className="text-gray-800">{worstMonth.m.name}</strong> is usually the least comfortable</>}.
-              These are historical averages, not a forecast.
+              <L.BestMonthsText
+                across={loaded.length === cities.length ? null : L.list(loaded.map((c) => c.name))}
+                best={L.list(bestMonths.map((b) => L.month(b.m.num)))}
+                worst={worstMonth ? L.month(worstMonth.m.num) : null}
+              />
             </p>
           </section>
         )}

@@ -37,8 +37,12 @@ export function solarDay(year, month, day, lat, lon) {
 }
 
 /** UTC minutes (us din) → "7:14 am" shehar ke local waqt mein */
-export function localClock(year, month, day, utcMinutes, tz) {
+// locale (i18n): 'en' → "7:14 am" (pehle jaisa) · baqi → us zaban ka 24 ghante wala ("07:14")
+export function localClock(year, month, day, utcMinutes, tz, locale = null) {
   const d = new Date(Date.UTC(year, month - 1, day) + Math.round(utcMinutes) * 60000);
+  if (locale) {
+    return new Intl.DateTimeFormat(locale, { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
+  }
   return new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true })
     .format(d).replace(/\s+/g, ' ').toLowerCase();
 }
@@ -57,14 +61,14 @@ export function hoursMinutes(mins) {
  * aur fixed saal se page ka text har build par ek jaisa rehta hai.
  * @returns {null | { sunrise, sunset, dayMinutes, change, polar }}
  */
-export function monthDaylight(city, monthNum, year = 2025) {
+export function monthDaylight(city, monthNum, year = 2025, locale = null) {
   if (!city || typeof city.lat !== 'number' || typeof city.lon !== 'number' || !city.tz) return null;
   const cur = solarDay(year, monthNum, 15, city.lat, city.lon);
   const pm = monthNum === 1 ? 12 : monthNum - 1;
   const prev = solarDay(monthNum === 1 ? year - 1 : year, pm, 15, city.lat, city.lon);
   return {
-    sunrise: cur.sunriseUtc == null ? null : localClock(year, monthNum, 15, cur.sunriseUtc, city.tz),
-    sunset: cur.sunsetUtc == null ? null : localClock(year, monthNum, 15, cur.sunsetUtc, city.tz),
+    sunrise: cur.sunriseUtc == null ? null : localClock(year, monthNum, 15, cur.sunriseUtc, city.tz, locale),
+    sunset: cur.sunsetUtc == null ? null : localClock(year, monthNum, 15, cur.sunsetUtc, city.tz, locale),
     dayMinutes: Math.round(cur.dayMinutes),
     change: Math.round(cur.dayMinutes - prev.dayMinutes),
     polar: cur.polar,

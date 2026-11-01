@@ -1,0 +1,937 @@
+{
+  "meta": {
+    "siteDescription": "Pianifica viaggi ed eventi all'aperto con sicurezza: punteggio meteo giorno per giorno, analisi del rischio per eventi e 20 anni di dati climatici per città di tutto il mondo."
+  },
+  "nav": {
+    "home": "Home",
+    "tripPlanner": "Pianificatore di viaggio",
+    "events": "Eventi",
+    "climateGuides": "Guide sul clima",
+    "blog": "Blog",
+    "apiDocs": "Documentazione API",
+    "logout": "Esci",
+    "signIn": "Accedi",
+    "signUp": "Registrati",
+    "closeMenu": "Chiudi menu",
+    "openMenu": "Apri menu"
+  },
+  "langSwitch": {
+    "label": "Lingua"
+  },
+  "footer": {
+    "tagline": "Ripensiamo l'informazione meteorologica per un mondo in continuo movimento. Dati precisi, semplici per tutti.",
+    "share": "Condividi",
+    "emailContact": "Contatto e-mail",
+    "websiteLink": "Sito web",
+    "product": "Prodotto",
+    "localForecasts": "Previsioni locali",
+    "historicalData": "Dati storici",
+    "apiForDevelopers": "API per sviluppatori",
+    "radar": "Visualizzazione radar",
+    "company": "Azienda",
+    "aboutUs": "Chi siamo",
+    "careers": "Lavora con noi",
+    "scientificBoard": "Comitato scientifico",
+    "pressRoom": "Area stampa",
+    "stayInformed": "Resta aggiornato",
+    "newsletterText": "Ricevi gli avvisi di maltempo per la tua zona direttamente nella tua casella di posta.",
+    "emailPlaceholder": "Indirizzo e-mail",
+    "join": "Iscriviti",
+    "copyright": "© 2024 WeatherApex. Dati precisi per il viaggiatore moderno.",
+    "privacy": "Informativa sulla privacy",
+    "terms": "Termini di servizio",
+    "cookies": "Impostazioni cookie"
+  },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "heading": "Questa pagina è uscita dalla mappa",
+    "text": "La pagina che cerchi non esiste o è stata spostata. Ti riportiamo alle previsioni.",
+    "backHome": "Torna alla home",
+    "planTrip": "Pianifica un viaggio"
+  },
+  "errors": {
+    "pageTitle": "Qualcosa è andato storto",
+    "pageText": "Un errore imprevisto ha impedito il caricamento della pagina. Di solito basta ricaricarla.",
+    "reload": "Ricarica la pagina",
+    "goHome": "Vai alla home",
+    "api": {
+      "generic": "Qualcosa è andato storto. Riprova.",
+      "fields_required": "Compila tutti i campi obbligatori.",
+      "password_too_short": "La password deve contenere almeno 8 caratteri.",
+      "password_too_common": "Questa password è troppo comune. Scegline una più sicura.",
+      "password_entirely_numeric": "La password non può contenere solo numeri.",
+      "password_too_similar": "La password è troppo simile al nome utente o all'email.",
+      "password_invalid": "Scegli una password più sicura.",
+      "username_taken": "Questo nome utente è già in uso.",
+      "otp_invalid": "Il codice non è valido o è scaduto. Richiedine uno nuovo.",
+      "user_not_found": "Non abbiamo trovato questo account.",
+      "invalid_credentials": "Email/nome utente o password non corretti.",
+      "account_not_verified": "Il tuo account non è ancora verificato. Inserisci il codice che ti abbiamo inviato via email.",
+      "google_not_configured": "L'accesso con Google non è disponibile al momento.",
+      "google_invalid_token": "Accesso con Google non riuscito. Riprova.",
+      "google_no_email": "Il tuo account Google non ha un indirizzo email.",
+      "google_email_unverified": "L'email del tuo account Google non è verificata.",
+      "city_required": "Inserisci una città.",
+      "dates_required": "Scegli una data di inizio e una di fine.",
+      "invalid_date": "Scegli una data valida.",
+      "end_before_start": "La data di fine deve essere successiva a quella di inizio.",
+      "max_days": "Puoi pianificare fino a {max} giorni alla volta.",
+      "city_not_found": "Non abbiamo trovato questa città.",
+      "weather_unavailable": "I dati meteo non sono disponibili al momento. Riprova tra poco.",
+      "no_cities_for_country": "Non abbiamo ancora città per {country}.",
+      "city_date_required": "Scegli una città e una data.",
+      "invalid_time": "Scegli un orario valido.",
+      "date_too_far": "La previsione copre solo i prossimi {max} giorni.",
+      "date_in_past": "La data non può essere nel passato.",
+      "time_not_in_forecast": "Non c'è ancora una previsione per questo orario.",
+      "no_forecast_for_date": "Non c'è ancora una previsione per questa data.",
+      "rate_limited": "Troppe richieste. Attendi un momento e riprova."
+    }
+  },
+  "about": {
+    "metaTitle": "Chi siamo",
+    "metaDescription": "Cos'è WeatherApex e come valutiamo il meteo.",
+    "badge": "Chi siamo",
+    "tagline": "Creiamo prodotti digitali: i nostri e i vostri.",
+    "intro": "Una consulenza business e tecnologica a 360°. Sviluppiamo prodotti digitali nostri e realizziamo applicazioni web per aziende che hanno bisogno di qualcosa di fatto bene, su misura per le loro esigenze.",
+    "startProject": "Avvia un progetto",
+    "whatWeDo": "Cosa facciamo",
+    "whoWeAre": "Chi siamo",
+    "whoParagraphs": [
+      "{company} è una società di consulenza che sviluppa software. Non presentazioni sul software, ma il prodotto vero, consegnato e funzionante.",
+      "Lavoriamo in due direzioni. Sviluppiamo e gestiamo prodotti digitali nostri, ed è da qui che nasce WeatherApex. E realizziamo applicazioni web per i clienti, progettate sulle loro esigenze e non sul modello più rapido per noi.",
+      "Gestire prodotti nostri cambia il modo in cui sviluppiamo per gli altri. Il costo di ogni scorciatoia lo paghiamo noi: la query lenta, l'errore non gestito, l'interfaccia che si rompe sul telefono. Questo rende un team attento in un modo che una semplice agenzia non è mai costretta a imparare."
+    ],
+    "atAGlance": "In sintesi",
+    "glance": {
+      "founded": "Fondata nel",
+      "focus": "Specializzazione",
+      "focusValue": "App web e prodotti digitali",
+      "clients": "Clienti",
+      "clientsValue": "Locali e internazionali",
+      "product": "Il nostro prodotto"
+    },
+    "whatWeDoText": "Se hai bisogno di realizzare qualcosa per il web, questo è il nostro campo d'azione.",
+    "services": [
+      {
+        "title": "Applicazioni web su misura",
+        "desc": "Costruite sulle tue esigenze, non forzate in un modello. Dashboard, sistemi di prenotazione, strumenti interni, portali clienti: ciò di cui l'azienda ha davvero bisogno."
+      },
+      {
+        "title": "Design e sviluppo di prodotto",
+        "desc": "Da un'idea discussa al telefono a un prodotto funzionante: ambito, design, sviluppo, lancio. Restiamo anche nelle fasi che molte agenzie delegano."
+      },
+      {
+        "title": "API e sistemi backend",
+        "desc": "Pipeline di dati, integrazioni con terze parti, API documentate su cui altri team possono costruire. Lavoro che deve essere corretto, non solo sembrarlo."
+      },
+      {
+        "title": "Siti web responsive",
+        "desc": "Siti e app web che funzionano bene sul telefono quanto sul desktop, perché è lì che si trova la maggior parte dei tuoi visitatori."
+      },
+      {
+        "title": "Design delle interfacce",
+        "desc": "Layout e flussi pensati per ciò che l'utente vuole fare, poi testati su schermi reali prima che una sola riga di codice vada online."
+      },
+      {
+        "title": "Audit e interventi di recupero",
+        "desc": "Hai ereditato un codice che nessuno vuole toccare? Verifichiamo sicurezza, prestazioni e correttezza, poi sistemiamo ciò che è davvero rotto."
+      }
+    ],
+    "values": [
+      {
+        "title": "Prima verificare, poi affermare",
+        "desc": "Se diciamo che qualcosa funziona, è perché l'abbiamo testato. I numeri nei nostri report vengono da misurazioni, non da stime."
+      },
+      {
+        "title": "Dire cosa non va davvero",
+        "desc": "A un cliente serve più un problema detto con onestà che una risposta comoda. Segnaliamo ciò che troviamo, anche quando l'errore è nostro."
+      },
+      {
+        "title": "Progettare per chi lo usa",
+        "desc": "La maggior parte del mondo naviga con uno smartphone di fascia media e una connessione normale. È per queste persone che progettiamo per prime."
+      },
+      {
+        "title": "Lavorare su più fusi orari",
+        "desc": "Lavoriamo con clienti in tutto il mondo e ci organizziamo sui loro orari, non sui nostri."
+      }
+    ],
+    "founders": {
+      "zain": {
+        "role": "Fondatore e Lead Engineer",
+        "bio": "Guida lo sviluppo in tutta l'azienda: architettura, sistemi backend e le parti di un prodotto che devono reggere all'uso reale. Ha costruito WeatherApex dallo schema del database fino all'API che oggi lo alimenta.",
+        "focus": [
+          "Architettura backend",
+          "API e dati",
+          "Ingegneria di prodotto"
+        ]
+      },
+      "sarim": {
+        "role": "Cofondatore",
+        "bio": "Gestisce la consulenza: definisce i progetti dei clienti, trasforma i requisiti in qualcosa di realizzabile e mantiene onesta la consegna su tempi e costi. È la prima persona con cui parla un nuovo cliente.",
+        "focus": [
+          "Strategia clienti",
+          "Requisiti e ambito",
+          "Consegna"
+        ]
+      }
+    },
+    "disciplines": [
+      {
+        "title": "Sviluppo frontend",
+        "desc": "React, interfacce responsive, accessibilità"
+      },
+      {
+        "title": "Sviluppo backend",
+        "desc": "Django, PostgreSQL, design delle API"
+      },
+      {
+        "title": "Product design",
+        "desc": "Design delle interfacce, design system, prototipazione"
+      },
+      {
+        "title": "Qualità e test",
+        "desc": "Test automatici, prestazioni, revisione della sicurezza"
+      }
+    ],
+    "ourProduct": "Il nostro prodotto",
+    "productText1": "La maggior parte dei servizi meteo ti dice che tempo fa. WeatherApex ti dice cosa significa per i tuoi piani: un punteggio per ogni giorno di viaggio, una valutazione del rischio per un evento all'aperto e vent'anni di storia climatica per città di tutto il mondo.",
+    "productText2": "È anche un esempio concreto di ciò che sviluppiamo: un'API pubblica documentata, dati di previsione reali e un'interfaccia pensata prima di tutto per lo smartphone.",
+    "tryTripPlanner": "Prova il pianificatore di viaggio",
+    "readApiDocs": "Leggi la documentazione API",
+    "leadership": "Direzione",
+    "leadershipText": "Le persone con cui lavorerai davvero.",
+    "widerTeam": "Il team allargato",
+    "widerTeamText": "Sviluppatori e designer che lavorano su ogni progetto che seguiamo.",
+    "howWeWork": "Come lavoriamo",
+    "ctaTitle": "Hai qualcosa da realizzare?",
+    "ctaText": "Un'applicazione web, il sito aziendale, uno strumento interno o un prodotto che volevi avviare da tempo: dicci cosa deve fare e ti diremo con onestà cosa serve per realizzarlo. Lavoriamo con clienti locali e internazionali.",
+    "contact": {
+      "email": "E-mail",
+      "phone": "Telefono",
+      "location": "Dove siamo",
+      "companyPage": "Pagina aziendale",
+      "soonTitle": "Contatti in arrivo",
+      "soonText": "Stiamo definendo i nostri canali di contatto. Nel frattempo puoi raggiungerci tramite i riferimenti nel footer del sito."
+    }
+  },
+  "common": {
+    "lastUpdated": "Ultimo aggiornamento: {date}",
+    "close": "Chiudi",
+    "loading": "Caricamento…",
+    "newTab": "(si apre in una nuova scheda)"
+  },
+  "pricing": {
+    "title": "Prezzi",
+    "metaDescription": "Piani e prezzi di WeatherApex.",
+    "comingSoon": "Prezzi – in arrivo"
+  },
+  "privacy": {
+    "title": "Informativa sulla privacy",
+    "metaDescription": "Come WeatherApex tratta i tuoi dati.",
+    "sections": [
+      {
+        "title": "1. Dati che raccogliamo",
+        "content": "Raccogliamo i dati che fornisci in fase di registrazione: nome utente, indirizzo e-mail e password (salvata come hash con salt). Registriamo inoltre l'utilizzo dell'API, inclusi endpoint richiamato, data e ora e codice di stato della risposta. Le ricerche di città vengono registrate temporaneamente per migliorare il servizio. NON raccogliamo dati di posizione precisi, cronologia di navigazione né documenti d'identità."
+      },
+      {
+        "title": "2. Come utilizziamo i tuoi dati",
+        "content": "La tua e-mail viene usata per la verifica dell'account (OTP), il ripristino della password e le comunicazioni di servizio importanti. I log di utilizzo servono a far rispettare i limiti, diagnosticare errori e migliorare la nostra API. Non vendiamo, affittiamo né condividiamo i tuoi dati personali con terzi. Statistiche aggregate e anonime possono essere usate per report pubblici sulla trasparenza."
+      },
+      {
+        "title": "3. Conservazione e sicurezza",
+        "content": "Le password vengono cifrate con l'algoritmo PBKDF2 di Django. Le chiavi API sono salvate come hash SHA-256: se perdi la chiave non possiamo recuperarla. I dati sono conservati in database PostgreSQL ospitati in data center sicuri. Tutte le comunicazioni con l'API avvengono via HTTPS. I log di utilizzo gratuito (basati sull'IP) vengono conservati per 30 giorni e poi resi anonimi."
+      },
+      {
+        "title": "4. Cookie",
+        "content": "Utilizziamo solo l'archiviazione strettamente necessaria per l'accesso (token JWT salvati nel localStorage del browser). Non usiamo cookie di tracciamento, di analisi o di terze parti. Puoi cancellare la memoria locale in qualsiasi momento: verrai disconnesso, ma le funzioni principali restano disponibili. Non utilizziamo fingerprinting né altre tecnologie di tracciamento degli utenti."
+      },
+      {
+        "title": "5. Dati di terze parti",
+        "content": "I dati meteo provengono da Open-Meteo, un'API meteo gratuita e open data. Open-Meteo utilizza ECMWF, DWD e altri modelli meteorologici pubblici. Non controlliamo l'accuratezza delle fonti di terze parti. La geocodifica avviene tramite l'API di geocoding di Open-Meteo e nessun dato di indirizzo viene conservato in modo permanente."
+      },
+      {
+        "title": "6. I tuoi diritti",
+        "content": "Puoi chiedere in qualsiasi momento la cancellazione del tuo account e dei dati associati scrivendo a privacy@weatherapex.com. La cancellazione rimuove profilo, chiavi API e log di utilizzo entro 30 giorni. Puoi richiedere una copia dei dati conservati. I codici OTP vengono eliminati automaticamente dopo 10 minuti (scadenza) o dopo l'uso."
+      },
+      {
+        "title": "7. Privacy dei minori",
+        "content": "WeatherApex non è rivolto a minori di 13 anni. Non raccogliamo consapevolmente dati da minori. Se ritieni che un minore ci abbia fornito dati personali, contattaci subito e li cancelleremo."
+      },
+      {
+        "title": "8. Modifiche alla presente informativa",
+        "content": "Potremmo aggiornare periodicamente questa informativa. Le modifiche sostanziali verranno comunicate via e-mail agli utenti registrati. L'uso continuato del servizio dopo le modifiche ne costituisce l'accettazione."
+      },
+      {
+        "title": "9. Contatti",
+        "content": "Per domande sulla privacy contatta il nostro responsabile della protezione dei dati all'indirizzo privacy@weatherapex.com. Indirizzo: WeatherApex HQ, Lahore, Pakistan."
+      }
+    ]
+  },
+  "terms": {
+    "title": "Termini di servizio",
+    "metaDescription": "Termini di servizio di WeatherApex.",
+    "sections": [
+      {
+        "title": "1. Accettazione dei termini",
+        "content": "Accedendo o utilizzando WeatherApex (il «Servizio») accetti di essere vincolato dai presenti Termini di servizio. Se non li accetti, non utilizzare il Servizio. Ci riserviamo il diritto di aggiornare i termini in qualsiasi momento; l'uso continuato costituisce accettazione delle modifiche."
+      },
+      {
+        "title": "2. Descrizione del servizio",
+        "content": "WeatherApex fornisce dati meteo, consigli per la pianificazione dei viaggi, valutazioni del rischio per eventi e accesso API per sviluppatori. Il Servizio è fornito «così com'è» e non offriamo garanzie su accuratezza, disponibilità o idoneità a uno scopo specifico."
+      },
+      {
+        "title": "3. Account utente",
+        "content": "Sei responsabile della riservatezza delle tue credenziali. In fase di registrazione devi fornire informazioni corrette. Una stessa persona non può avere più account gratuiti. Gli account che violano queste regole possono essere sospesi senza preavviso."
+      },
+      {
+        "title": "4. Limiti di utilizzo dell'API",
+        "content": "L'accesso gratuito all'API è limitato a 100 chiamate totali per chiave API. Una volta esaurite, la chiave viene disattivata. Puoi registrare un nuovo account per ottenere una nuova chiave. La creazione automatica di account o qualsiasi tentativo di aggirare i limiti è vietato e comporta il blocco permanente."
+      },
+      {
+        "title": "5. Uso consentito",
+        "content": "Ti impegni a non: (a) usare il Servizio per scopi illeciti; (b) tentare di violare la sicurezza o testare vulnerabilità senza autorizzazione scritta; (c) ridistribuire o rivendere i dati dell'API senza esplicito permesso; (d) usare strumenti automatici per estrarre, scansionare o raccogliere dati oltre il normale utilizzo dell'API; (e) ostacolare l'accesso di altri utenti al Servizio."
+      },
+      {
+        "title": "6. Proprietà intellettuale",
+        "content": "Il nome WeatherApex, il logo e il design dell'interfaccia sono di nostra proprietà. I dati meteo sottostanti provengono da Open-Meteo e da altre fonti pubbliche. I nostri algoritmi di valutazione, i consigli sulle attività e le analisi delle città sono segreti commerciali."
+      },
+      {
+        "title": "7. Limitazione di responsabilità",
+        "content": "WeatherApex non è responsabile per danni indiretti, incidentali o consequenziali derivanti dall'uso del Servizio. Le previsioni meteo sono per natura incerte: verifica sempre le decisioni importanti con le autorità locali. La nostra responsabilità complessiva è limitata all'importo eventualmente pagato per il Servizio."
+      },
+      {
+        "title": "8. Risoluzione",
+        "content": "Possiamo sospendere o interrompere il tuo accesso in qualsiasi momento, senza preavviso, in caso di violazione dei presenti termini. Con la risoluzione, le tue chiavi API vengono revocate immediatamente. Puoi smettere di usare il Servizio in qualsiasi momento."
+      },
+      {
+        "title": "9. Legge applicabile",
+        "content": "I presenti termini sono regolati dalla legge del Pakistan. Qualsiasi controversia sarà risolta dai tribunali di Lahore, Pakistan."
+      },
+      {
+        "title": "10. Contatti",
+        "content": "Per domande su questi termini scrivici a legal@weatherapex.com. Cerchiamo di rispondere entro 5 giorni lavorativi."
+      }
+    ]
+  },
+  "auth": {
+    "metaSignInTitle": "Accedi",
+    "metaSignInDescription": "Accedi al tuo account WeatherApex.",
+    "metaSignUpTitle": "Crea un account",
+    "metaSignUpDescription": "Crea un account WeatherApex gratuito per pianificare viaggi e ottenere una chiave API.",
+    "metaResetTitle": "Reimposta la password",
+    "metaResetDescription": "Reimposta la password del tuo account WeatherApex.",
+    "email": "E-mail",
+    "password": "Password",
+    "hidePassword": "Nascondi password",
+    "showPassword": "Mostra password",
+    "orContinueWith": "oppure continua con",
+    "tooMany": {
+      "one": "Troppi tentativi, riprova tra {count} minuto.",
+      "other": "Troppi tentativi, riprova tra {count} minuti."
+    },
+    "loginFailed": "Accesso non riuscito. Riprova.",
+    "googleSignInFailed": "Accesso con Google non riuscito. Riprova.",
+    "welcomeBack": "Bentornato",
+    "signInSubtitle": "Accedi al tuo account",
+    "passwordPlaceholder": "Inserisci la password",
+    "forgotPasswordQ": "Password dimenticata?",
+    "forgotPassword": "Password dimenticata",
+    "signingIn": "Accesso in corso…",
+    "signIn": "Accedi",
+    "signUp": "Registrati",
+    "googleHint": "Ti sei registrato con Google? Usa «Continua con Google» oppure imposta una password tramite {link}.",
+    "googleSignInLoad": "Impossibile caricare l'accesso con Google. Controlla la connessione o il blocco annunci.",
+    "noAccount": "Non hai un account?",
+    "haveAccount": "Hai già un account?",
+    "registrationFailed": "Registrazione non riuscita. Riprova.",
+    "googleSignUpFailed": "Registrazione con Google non riuscita. Riprova.",
+    "enterAllDigitsVerification": "Inserisci tutte le 6 cifre del codice di verifica.",
+    "verificationFailed": "Verifica non riuscita. Riprova.",
+    "createAccountTitle": "Crea un account",
+    "getStarted": "Inizia con WeatherApex",
+    "newPasswordPlaceholder": "Crea una password (min. 8 caratteri)",
+    "companyOptional": "Nome dell'azienda (facoltativo)",
+    "companyPlaceholder": "La tua azienda",
+    "creatingAccount": "Creazione account…",
+    "createAccount": "Crea account",
+    "googleSignUpLoad": "Impossibile caricare la registrazione con Google. Controlla la connessione o il blocco annunci.",
+    "verifyEmailTitle": "Verifica la tua e-mail",
+    "verifyEmailText": "Se {email} è nuova, ti abbiamo inviato un codice di 6 cifre. Hai già un account? Controlla la posta: troverai un link per accedere.",
+    "verificationCode": "Codice di verifica",
+    "digitOf": "Cifra {n} di 6",
+    "verifying": "Verifica in corso…",
+    "verifyEmail": "Verifica e-mail",
+    "backToSignUp": "Torna alla registrazione",
+    "sendCodeFailed": "Impossibile inviare il codice. Riprova.",
+    "enterAllDigits": "Inserisci tutte le 6 cifre del codice.",
+    "resetFailed": "Reimpostazione della password non riuscita. Riprova.",
+    "passwordUpdated": "Password aggiornata",
+    "resetTitle": "Reimposta la password",
+    "resetIntro": "Inserisci la tua e-mail e ti invieremo un codice di 6 cifre.",
+    "resetSent": "Se esiste un account per {email}, ti abbiamo inviato un codice. Scade tra 10 minuti.",
+    "resetDone": "Ora puoi accedere con la nuova password.",
+    "sendingCode": "Invio del codice…",
+    "sendCode": "Invia codice",
+    "sixDigitCode": "Codice di 6 cifre",
+    "newPassword": "Nuova password",
+    "saving": "Salvataggio…",
+    "setNewPassword": "Imposta nuova password",
+    "differentEmail": "Usa un'altra e-mail o invia di nuovo",
+    "rememberedIt": "Te la sei ricordata?",
+    "googleLoadFailed": "Impossibile caricare l'accesso con Google. Disattiva il blocco annunci e riprova."
+  },
+  "freeLimit": {
+    "features": {
+      "tripPlanner": "il pianificatore di viaggio",
+      "eventRisk": "il punteggio di rischio eventi",
+      "newCity": "la ricerca di nuove città",
+      "climateHistory": "lo storico climatico",
+      "other": "questa funzione"
+    },
+    "title": {
+      "one": "Hai usato oggi il tuo {count} controllo gratuito",
+      "other": "Hai usato oggi i tuoi {count} controlli gratuiti"
+    },
+    "text": "Crea un account gratuito per continuare a usare {feature}: ci vuole circa un minuto.",
+    "benefits": [
+      "Piani di viaggio e controlli del rischio eventi illimitati",
+      "Previsioni complete a 15 giorni per qualsiasi città",
+      "20 anni di storico climatico",
+      "Una chiave API gratuita per i tuoi progetti"
+    ],
+    "createAccount": "Crea un account gratuito",
+    "haveOne": "Ne hai già uno?",
+    "signIn": "Accedi",
+    "later": "Magari più tardi",
+    "noticeText": "Crea un account gratuito per continuare: piani di viaggio illimitati, controlli del rischio eventi e 20 anni di storico climatico.",
+    "haveAccount": "Ho già un account"
+  },
+  "cityNeeded": {
+    "that": "Questo luogo",
+    "titleCountry": "{place} è un Paese: ci serve una città",
+    "titleRegion": "{place} è una regione: ci serve una città",
+    "textCountry": "Il meteo cambia da città a città in {place}, quindi un unico punteggio per tutto il Paese sarebbe fuorviante.",
+    "textRegion": "Il meteo cambia da città a città in {place}, quindi un unico punteggio per tutta la regione sarebbe fuorviante.",
+    "pick": "Scegli una città in {place}:",
+    "enterCity": "Inserisci invece il nome di una città.",
+    "wantBest": "Preferisci confrontare le città migliori di {place}?",
+    "searchByCountry": "Cerca invece per Paese"
+  },
+  "search": {
+    "placeholder": "Cerca città o CAP",
+    "suggestions": "Città suggerite",
+    "didYouMean": "Forse cercavi…?"
+  },
+  "wx": {
+    "unknown": {
+      "title": "Non disponibile",
+      "desc": "I dati meteo non sono disponibili al momento."
+    },
+    "thunder": {
+      "title": "Temporali",
+      "desc": "Probabili temporali."
+    },
+    "thunderHail": {
+      "title": "Temporali con grandine",
+      "desc": "Probabili temporali con grandine."
+    },
+    "heavySnow": {
+      "title": "Neve forte",
+      "desc": "Previste abbondanti nevicate."
+    },
+    "snowShowers": {
+      "title": "Rovesci di neve",
+      "desc": "Previste nevicate intermittenti."
+    },
+    "snowGrains": {
+      "title": "Neve granulosa",
+      "desc": "Prevista neve granulosa fine."
+    },
+    "snow": {
+      "title": "Neve",
+      "desc": "Previste nevicate."
+    },
+    "freezingRain": {
+      "title": "Pioggia gelata",
+      "desc": "Pioggia gelata: possibili superfici ghiacciate."
+    },
+    "heavyFreezingRain": {
+      "title": "Forte pioggia gelata",
+      "desc": "Forte pioggia gelata: ghiaccio sulle strade."
+    },
+    "freezingDrizzle": {
+      "title": "Pioviggine gelata",
+      "desc": "Pioviggine gelata: possibili superfici ghiacciate."
+    },
+    "violentShowers": {
+      "title": "Forti rovesci",
+      "desc": "Previsti rovesci di pioggia violenti."
+    },
+    "heavyShowers": {
+      "title": "Forti rovesci",
+      "desc": "Previste piogge abbondanti."
+    },
+    "rainShowers": {
+      "title": "Rovesci di pioggia",
+      "desc": "Prevista pioggia a tratti."
+    },
+    "heavyRain": {
+      "title": "Pioggia forte",
+      "desc": "Previste piogge abbondanti."
+    },
+    "rain": {
+      "title": "Pioggia",
+      "desc": "Prevista pioggia continua."
+    },
+    "rainMostDay": {
+      "title": "Pioggia",
+      "desc": "Pioggia probabile per gran parte della giornata."
+    },
+    "lightRain": {
+      "title": "Pioggia debole",
+      "desc": "Deboli piogge occasionali."
+    },
+    "drizzle": {
+      "title": "Pioviggine",
+      "desc": "Prevista pioviggine leggera."
+    },
+    "foggy": {
+      "title": "Nebbia",
+      "desc": "Visibilità ridotta probabile."
+    },
+    "cloudy": {
+      "title": "Nuvoloso",
+      "desc": "Cielo coperto previsto."
+    },
+    "partlySunny": {
+      "title": "Parzialmente soleggiato",
+      "desc": "Alternanza di sole e nuvole."
+    },
+    "sunny": {
+      "title": "Soleggiato",
+      "desc": "Cielo sereno per tutta la giornata."
+    }
+  },
+  "wxNight": {
+    "unknown": "Non disponibile",
+    "storms": "Possibili temporali",
+    "heavySnow": "Neve forte",
+    "snow": "Neve",
+    "freezingRain": "Pioggia gelata",
+    "freezingDrizzle": "Pioviggine gelata",
+    "showers": "Rovesci",
+    "rainLikely": "Pioggia probabile",
+    "drizzle": "Pioviggine",
+    "foggy": "Nebbia",
+    "overcast": "Coperto",
+    "partlyCloudy": "Parzialmente nuvoloso",
+    "clearSky": "Sereno"
+  },
+  "units": {
+    "tempUnit": "Unità di temperatura",
+    "showCelsius": "°C – mostra in Celsius",
+    "showFahrenheit": "°F – mostra in Fahrenheit"
+  },
+  "weather": {
+    "notFound": "Non abbiamo trovato «{query}».",
+    "didYouMean": "Forse cercavi:",
+    "checkSpelling": "Controlla l'ortografia o prova una grande città vicina.",
+    "loadFailed": "Impossibile caricare i dati meteo.",
+    "locating": "Ricerca della tua posizione…",
+    "useMyLocation": "Usa la mia posizione",
+    "geoDenied": "L'accesso alla posizione è stato bloccato: cerca invece la tua città.",
+    "geoError": "Impossibile trovare la tua città: cercala invece manualmente.",
+    "precipitation": "Precipitazioni",
+    "humidity": "Umidità",
+    "wind": "Vento",
+    "tabs": {
+      "temperature": "Temperatura",
+      "precipitation": "Precipitazioni",
+      "wind": "Vento"
+    },
+    "chartUnavailable": "Il grafico orario non è disponibile al momento.",
+    "forecastTitle": "Previsioni a lungo termine",
+    "today": "OGGI",
+    "cols": {
+      "day": "Giorno",
+      "cond": "Tempo",
+      "hiLo": "Max / Min",
+      "description": "Descrizione",
+      "night": "Notte",
+      "precip": "Pioggia"
+    },
+    "nightLabel": "Notte: ",
+    "showerChance": "Per lo più asciutto: possibile un breve rovescio (probabilità {p}%).",
+    "showerPossible": "Per lo più asciutto: possibile un breve rovescio.",
+    "thunderChance": "Possibile temporale (probabilità {p}%).",
+    "loadingWeather": "Caricamento dei dati meteo…",
+    "loadingForecast": "Caricamento delle previsioni…",
+    "iconAlt": "icona meteo",
+    "mapTitle": "Mappa meteo",
+    "radar": "Radar delle precipitazioni",
+    "layerDark": "Scuro",
+    "layerSatellite": "Satellite"
+  },
+  "home": {
+    "metaTitle": "WeatherApex – Meteo intelligente per viaggi ed eventi all'aperto",
+    "metaImageTitle": "Previsioni meteo, pianificazione viaggi e guide sul clima",
+    "metaDescription": "Pianifica viaggi ed eventi all'aperto con sicurezza: punteggio meteo giorno per giorno, analisi del rischio per eventi e 20 anni di dati climatici per città di tutto il mondo.",
+    "h1": "Previsioni meteo, pianificazione viaggi e guide sul clima",
+    "featuresSubtitle": "Molto più di una previsione. I nostri strumenti professionali offrono indicazioni concrete per logistica complessa e pianificazione dei viaggi.",
+    "features": [
+      {
+        "title": "Pianificatore meteo di viaggio",
+        "description": "Simula le condizioni meteo lungo tutto il percorso per viaggiare sicuro e comodo anche sulle lunghe distanze.",
+        "linkText": "Scopri di più"
+      },
+      {
+        "title": "Punteggio di rischio eventi",
+        "description": "Stai organizzando un matrimonio o una maratona all'aperto? Il nostro algoritmo calcola il rischio meteo fino a 6 mesi prima.",
+        "linkText": "Provalo"
+      },
+      {
+        "title": "Analisi dei dati storici",
+        "description": "Accedi a decenni di dati climatici per luoghi specifici e prendi decisioni basate sui dati per infrastrutture e agricoltura.",
+        "linkText": "Vai all'archivio"
+      }
+    ],
+    "workflow": {
+      "title": "Come funziona WeatherApex",
+      "steps": [
+        {
+          "title": "Definisci i parametri",
+          "description": "Inserisci luogo, periodo e sensibilità ai diversi fenomeni meteo."
+        },
+        {
+          "title": "Sintesi dei dati",
+          "description": "I nostri sistemi aggregano in tempo reale i dati di oltre 40.000 stazioni e immagini satellitari proprietarie."
+        },
+        {
+          "title": "Report utili",
+          "description": "Ricevi riepiloghi PDF automatici o avvisi in tempo reale sulla dashboard, personalizzati sulle tue esigenze."
+        }
+      ]
+    },
+    "digest": {
+      "title": "Il magazine del meteo",
+      "subtitle": "Analisi di esperti su tendenze climatiche e consigli di viaggio.",
+      "viewAll": "Tutti gli articoli",
+      "articles": [
+        {
+          "category": "TENDENZE CLIMATICHE",
+          "title": "Come cambiano gli inverni europei nel 2024",
+          "description": "Dati recenti indicano uno spostamento profondo dei sistemi di alta pressione sull'Europa centrale, con effetti sulle stagioni sciistiche e…"
+        },
+        {
+          "category": "TECNOLOGIA",
+          "title": "Come l'IA sta rivoluzionando le previsioni locali",
+          "description": "I modelli di machine learning superano ormai le simulazioni fluidodinamiche tradizionali nel prevedere i temporali locali…"
+        },
+        {
+          "category": "CONSIGLI DI VIAGGIO",
+          "title": "Affrontare la stagione dei monsoni a Bali",
+          "description": "Non lasciare che la pioggia rovini il viaggio. Scopri come programmare le escursioni con i dati microclimatici dell'Indonesia…"
+        }
+      ]
+    }
+  },
+  "popular": {
+    "title": "Destinazioni popolari",
+    "scrollLeft": "Scorri le destinazioni a sinistra",
+    "scrollRight": "Scorri le destinazioni a destra",
+    "showWeatherFor": "Mostra il meteo di ",
+    "climateGuide": "Guida sul clima →"
+  },
+  "trip": {
+    "metaTitle": "Pianificatore meteo di viaggio",
+    "metaDescription": "Valuta ogni giorno del tuo viaggio in base a pioggia, vento e temperatura e scopri quale giorno è migliore per cosa.",
+    "h1": "Pianificatore di viaggio",
+    "intro": "Trova i giorni migliori per viaggiare con un punteggio meteo per ogni giorno",
+    "noImage": "Nessuna immagine disponibile",
+    "err": {
+      "city": "Inserisci il nome di una città",
+      "country": "Inserisci il nome di un Paese",
+      "wait": "Attendi un momento e riprova",
+      "tapBoth": "Tocca il primo e l'ultimo giorno del viaggio",
+      "tapLast": "Ora tocca l'ultimo giorno del viaggio (tocca di nuovo lo stesso giorno per una gita di un giorno)",
+      "outOfRange": "Scegli date tra il {from} e il {to}: le previsioni non vanno oltre.",
+      "startDate": "Seleziona una data di partenza",
+      "startRange": "Scegli una data di partenza tra il {from} e il {to}",
+      "endDate": "Seleziona una data di ritorno",
+      "endBeforeStart": "La data di ritorno deve essere uguale o successiva a quella di partenza",
+      "estimateFrom": "Le stime valgono per viaggi che terminano dal {date} in poi: per date precedenti usa le previsioni in tempo reale.",
+      "endMax": "Scegli una data di ritorno precedente al {date}",
+      "maxDays": "Sono supportati viaggi fino a {max} giorni (ne hai selezionati {days})"
+    },
+    "byCity": "Cerca per città",
+    "byCountry": "Cerca per Paese",
+    "city": "Città",
+    "country": "Paese",
+    "cityPlaceholder": "es. Londra, Tokyo, Dubai",
+    "countryPlaceholder": "es. Spagna, Italia, Giappone",
+    "tripDates": "Date del viaggio",
+    "estimate": "Stima",
+    "liveForecast": "Previsioni in tempo reale",
+    "estimateNote": "Stima basata su 20 anni di dati climatici, non una previsione",
+    "startDate": "Data di partenza",
+    "endDate": "Data di ritorno",
+    "estimateHint": "Per viaggi che terminano dal {date} in poi · fino a 20 giorni",
+    "backToForecast": "Torna alle previsioni in tempo reale",
+    "furtherAhead": "Pianifichi più in là nel tempo?",
+    "planTrip": "Pianifica il viaggio",
+    "exploreCountry": "Esplora il Paese",
+    "fetchFailed": "Impossibile recuperare i dati",
+    "emptyTitle": "Pianifica il tuo viaggio",
+    "emptyText": "Cerca una città per ottenere un punteggio per ogni giorno, oppure un Paese per confrontare le città",
+    "citiesIn": "Città in {country}",
+    "viewDetails": "Vedi dettagli →",
+    "clickCity": "Fai clic su una città per vedere il piano di viaggio giorno per giorno",
+    "backToCities": "← Torna a tutte le città",
+    "packing": {
+      "rain": "Pioggia prevista",
+      "sun": "UV alto / caldo",
+      "activity": "Attività all'aperto",
+      "clothing": "Abbigliamento",
+      "gear": "Attrezzatura essenziale"
+    },
+    "shopAmazon": "Acquista su Amazon",
+    "historicalEstimate": "Stima storica",
+    "overall": "Totale",
+    "bestDay": "Giorno migliore:",
+    "na": "N/D",
+    "leastIdeal": "Meno indicato:",
+    "packingTitle": "Cosa mettere in valigia",
+    "packingText": "Attrezzatura selezionata per il meteo previsto a {city}.",
+    "showLess": "Mostra meno",
+    "viewMore": "Mostra altri prodotti",
+    "tripDays": "Giorni del viaggio",
+    "firstDaySuffix": ", primo giorno",
+    "lastDaySuffix": ", ultimo giorno",
+    "forecastAvailable": {
+      "one": "Previsioni disponibili per il prossimo {count} giorno:",
+      "other": "Previsioni disponibili per i prossimi {count} giorni:"
+    },
+    "tapFirst": "Tocca il primo giorno",
+    "tapLast": "Ora tocca l'ultimo giorno",
+    "selected": "{range} selezionato",
+    "activities": {
+      "beach_water": "Spiaggia / sport acquatici",
+      "picnic_park": "Picnic / parco",
+      "hiking_outdoor": "Escursioni / all'aperto",
+      "indoor_museum": "Museo / al chiuso",
+      "indoor_sheltered": "Al riparo, al chiuso",
+      "indoor_midday": "Evita il caldo di mezzogiorno",
+      "city_sightseeing": "Visita della città"
+    },
+    "score": {
+      "excellent": "Ottimo",
+      "good": "Buono",
+      "fair": "Discreto",
+      "poor": "Scarso"
+    },
+    "scoreRange": {
+      "excellent": "8,5–10",
+      "good": "7–8,4",
+      "fair": "5–6,9",
+      "poor": "sotto 5"
+    },
+    "parts": {
+      "morning": "Mattina",
+      "afternoon": "Pomeriggio",
+      "evening": "Sera"
+    },
+    "partHours": {
+      "morning": "6–12",
+      "afternoon": "12–18",
+      "evening": "18–22"
+    },
+    "reason": {
+      "rainHours": {
+        "one": "Pioggia prevista per circa {count} ora di giorno: i piani al chiuso sono la scelta più sicura.",
+        "other": "Pioggia prevista per circa {count} ore di giorno: i piani al chiuso sono la scelta più sicura."
+      },
+      "rainChanceIndoor": "Probabilità di pioggia del {rain}%: i piani al chiuso sono la scelta più sicura.",
+      "strongWind": "Vento forte fino a {wind}: scegli luoghi riparati.",
+      "hotCoast": "Caldo ({temp}) sulla costa: ideale passarlo vicino all'acqua.",
+      "warmCoast": "Caldo e per lo più asciutto sulla costa: ottimo per la spiaggia.",
+      "veryHot": "Molto caldo ({temp}): esci presto o tardi e resta al chiuso a mezzogiorno.",
+      "mildTrails": "Mite ({temp}) e abbastanza asciutto per i sentieri.",
+      "mildParks": "Mite ({temp}): piacevole per parchi e picnic.",
+      "cool": "Fresco ({temp}): vestiti caldo per le visite.",
+      "comfortable": "Piacevole ({temp}) per passeggiare in città.",
+      "showerChance": "Per lo più asciutto: possibile un breve rovescio (probabilità {p}%).",
+      "showerPossible": "Per lo più asciutto: possibile un breve rovescio.",
+      "umbrella": "Probabilità di pioggia del {rain}%: porta l'ombrello.",
+      "thunder": "Possibile temporale (probabilità {p}%): tieni d'occhio il cielo.",
+      "breezy": "Ventilato, fino a {wind}."
+    },
+    "showerPossible": "Possibile rovescio",
+    "thunderPossible": "Possibile temporale",
+    "duringDay": "Meteo durante la giornata",
+    "partRain": "{p}% pioggia",
+    "dayScore": "Punteggio del giorno (su 10):",
+    "bestDayPill": "Giorno migliore",
+    "leastIdealPill": "Meno indicato",
+    "bestFor": "Ideale per:",
+    "bestTime": "Momento migliore:",
+    "temperature": "Temperatura",
+    "highLow": "Max {high}° · Min {low}°",
+    "rainChance": "Probabilità di pioggia",
+    "wind": "Vento"
+  },
+  "events": {
+    "metaTitle": "Rischio meteo per eventi all'aperto",
+    "metaDescription": "Valutazione del rischio meteo per matrimoni, concerti, maratone e altri eventi all'aperto, con date alternative migliori.",
+    "h1": "Rischio meteo per eventi all'aperto",
+    "intro": "Pianifica con fiducia. Analizziamo il meteo a livello iperlocale per valutare sicurezza e comfort del tuo evento all'aperto.",
+    "dateAt": "{date} alle {time}",
+    "selectedLabel": "{date} (selezionato)",
+    "tomorrowLabel": "Domani, {date}",
+    "analyzing": "Analisi del meteo per il tuo evento…",
+    "fetchFailed": "Impossibile recuperare i dati sul rischio",
+    "types": {
+      "wedding": "Matrimonio",
+      "marathon": "Maratona",
+      "concert": "Concerto",
+      "sports": "Sport",
+      "festival": "Festival"
+    },
+    "eventType": "Tipo di evento",
+    "location": "Luogo",
+    "locationPlaceholder": "Città, Paese",
+    "date": "Data",
+    "specificTime": "Orario preciso?",
+    "checkRisk": "Calcola il rischio",
+    "risk": {
+      "low": "RISCHIO BASSO",
+      "moderate": "RISCHIO MODERATO",
+      "high": "RISCHIO ALTO"
+    },
+    "editDetails": "Modifica dettagli",
+    "edit": "Modifica",
+    "safeToProceed": "Si può procedere",
+    "wholeDayCaution": "Attenzione per tutta la giornata",
+    "stat": {
+      "rain": "PIOGGIA",
+      "wind": "VENTO ({unit})",
+      "temp": "TEMP.",
+      "humidity": "UMIDITÀ"
+    },
+    "timelineTitle": "Analisi oraria",
+    "timelineWindow": "Abbiamo trovato la finestra ottimale di {count} ore per il tuo evento, così da ridurre al minimo i disagi meteo.",
+    "timelineAny": "Abbiamo trovato la fascia oraria ottimale per il tuo evento, così da ridurre al minimo i disagi meteo.",
+    "hourWeather": "Meteo alle {hour}",
+    "nearbyTitle": "Confronto con le date vicine",
+    "recommended": "CONSIGLIATO",
+    "betterOption": "SCELTA MIGLIORE",
+    "selected": "SELEZIONATO",
+    "advice": {
+      "low": "Puoi procedere con i tuoi piani all'aperto.",
+      "moderate": "È presente un certo rischio.",
+      "rainBackup": "Valuta un piano alternativo al coperto in caso di pioggia.",
+      "high": "Rischio elevato: valuta seriamente di rimandare o di spostarti al coperto.",
+      "narrowWindow": "Nota: per gran parte della giornata le condizioni sono sfavorevoli; questa fascia è un'eccezione. Verifica che la durata dell'evento ci rientri.",
+      "dayWarning": "In questa giornata le condizioni sono sfavorevoli per {risky} ore su {total} (6–22). Solo una breve fascia è favorevole."
+    }
+  },
+  "guides": {
+    "metaTitle": "Guide sul clima",
+    "metaDescription": "Guide sul clima mese per mese basate su 20 anni di dati meteo storici.",
+    "h1": "Guide sul clima delle città",
+    "intro": "Scopri temperature medie, precipitazioni e andamento del meteo nelle città di tutto il mondo",
+    "status": {
+      "not_found": "Non abbiamo trovato nessuna città chiamata «{q}». Prova ad aggiungere il Paese, ad es. «Santa Fe, USA».",
+      "rate_limited": "Troppe ricerche in poco tempo: riprova tra qualche minuto.",
+      "limit": "Oggi stiamo aggiungendo molte nuove città: riprova domani.",
+      "unsupported": "Abbiamo trovato questo luogo, ma non possiamo ancora creare una pagina sul clima.",
+      "error": "Impossibile caricare i dati climatici in questo momento: riprova tra un minuto."
+    },
+    "notACity": "{label} è un Paese o una regione, non una città: il clima cambia da città a città. Cerca invece una città.",
+    "notACityPick": "{label} è un Paese o una regione, non una città: il clima cambia da città a città. Cerca invece una città:",
+    "searchPlaceholder": "Cerca una città…",
+    "searchLabel": "Cerca una città",
+    "view": "Vedi",
+    "loadingCity": "Caricamento dei dati climatici per {label}… una nuova città può richiedere qualche secondo.",
+    "moreThanOne": "Esiste più di un luogo chiamato «{label}». Quale intendi?",
+    "people": "{n} abitanti",
+    "popular": "Destinazioni popolari",
+    "filterPlaceholder": "Filtra le città…",
+    "noMatch": "Nessuna città corrisponde a «{search}»",
+    "noMatchHint": "Usa la ricerca qui sopra per aprire la guida sul clima di qualsiasi città.",
+    "planInstead": "Pianifica invece un viaggio",
+    "byMonthTitle": "Guide meteo mese per mese",
+    "byMonthText": "Com'è ogni mese: temperature, pioggia e il periodo migliore per andarci.",
+    "browseAll": "Sfoglia tutti i Paesi",
+    "cityByMonth": "{city} mese per mese",
+    "cantFind": "Non trovi la tua città?",
+    "cantFindText": "Cerca qualsiasi città qui sopra e creeremo subito la sua guida sul clima."
+  },
+  "blog": {
+    "title": "Blog",
+    "titlePage": "Blog – Pagina {page}",
+    "description": "Guide meteo per viaggiare, analisi del clima e consigli su cosa mettere in valigia da WeatherApex.",
+    "descriptionPage": "Guide meteo per viaggiare, analisi del clima e consigli su cosa mettere in valigia da WeatherApex – pagina {page}.",
+    "h1": "Il blog di WeatherApex",
+    "intro": "Approfondimenti sul clima, guide alle città e consigli di viaggio degli esperti.",
+    "read": "Leggi",
+    "noPosts": "Ancora nessun articolo",
+    "checkBack": "Torna presto per nuovi articoli.",
+    "previous": "← Precedente",
+    "next": "Successivo →",
+    "pageOf": "Pagina {page} di {total}",
+    "notFound": "Articolo non trovato",
+    "kicker": "Blog di WeatherApex",
+    "back": "Torna al blog",
+    "gear": "Attrezzatura consigliata",
+    "viewOnAmazon": "Vedi su Amazon →",
+    "weatherIn": "Meteo a {cities}",
+    "cityWeatherLink": "Meteo a {city} mese per mese e clima",
+    "alsoLike": "Potrebbe interessarti anche",
+    "related": "Articoli correlati",
+    "toc": "Indice",
+    "onThisPage": "In questa pagina",
+    "faq": "Domande frequenti",
+    "furtherReading": "Per approfondire",
+    "sources": "Fonti",
+    "categories": {
+      "usa-weather-guides": "Guide meteo USA",
+      "travel-guides": "Guide di viaggio",
+      "weather-tips": "Consigli meteo"
+    }
+  },
+  "weatherHub": {
+    "crumb": "Meteo",
+    "metaTitle": "Meteo per Paese e mese – WeatherApex",
+    "metaImageTitle": "Meteo per Paese e mese",
+    "metaDescription": "Guide sul clima per {cities} città in {countries} Paesi e territori: temperature e piogge mese per mese e il periodo migliore per andarci.",
+    "h1": "Meteo per Paese",
+    "intro": "Il meteo mese per mese di {cities} città in {countries} Paesi e territori, basato su 20 anni di dati meteo storici.",
+    "regions": {
+      "europe": "Europa",
+      "north-america": "Nord America",
+      "latin-america": "America Latina",
+      "middle-east-africa": "Medio Oriente e Africa",
+      "asia": "Asia",
+      "oceania": "Oceania"
+    },
+    "regionCount": "{countries} Paesi · {cities} città",
+    "cities": {
+      "one": "{count} città",
+      "other": "{count} città"
+    }
+  },
+  "climate": {
+    "table": {
+      "month": "Mese",
+      "avgHigh": "Max media",
+      "avgLow": "Min media",
+      "rainfall": "Precipitazioni",
+      "rainyDays": "Giorni di pioggia",
+      "sunshine": "Sole"
+    },
+    "showLess": "Mostra meno",
+    "fullYear": "Mostra tutto l'anno",
+    "same": "uguale"
+  }
+}

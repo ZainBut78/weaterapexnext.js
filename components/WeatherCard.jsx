@@ -11,7 +11,12 @@ import HourlyStrip from './HourlyStrip';
 import { WeatherCardSkeleton } from './HomeSkeletons';
 import { useUnits } from '../context/UnitsContext';
 import { matchCities } from '../utils/fuzzyCity';
+import { cityDisplayName, countryLabel } from '../utils/placeLabel';
 import { MapPin } from 'lucide-react';
+import { useLang, useT } from '@/i18n/client';
+
+// Tab ids (state) — label messages `weather.tabs.*` se
+const TAB_KEY = { Temperature: 'temperature', Precipitation: 'precipitation', Wind: 'wind' };
 
 // framer-motion (~44K gz) sirf hourly strip aur barish mein — pehle shared
 // chunk mein ja kar HAR page (blog, city…) par load hota tha. Ab alag chunk,
@@ -84,12 +89,14 @@ function getUpcomingHours(hourlyData, currentTimeStr, count = 12) {
 // 160 cities se "Did you mean" (local, zero API calls). UX fixes B3.
 // Sirf message badla hai, card wahi hai.
 function CityNotFoundMessage({ query, onPick }) {
-  const matches = matchCities(query, { partial: false, limit: 3 });
+  const t = useT();
+  const lang = useLang();
+  const matches = matchCities(query, { partial: false, limit: 3, lang });
   return (
     <div className="text-lg">
       <p className="text-red-500">
-        We couldn&apos;t find &ldquo;{query}&rdquo;.
-        {matches.length > 0 && ' Did you mean:'}
+        {t('weather.notFound', { query })}
+        {matches.length > 0 && ` ${t('weather.didYouMean')}`}
       </p>
       {matches.length > 0 ? (
         <p className="mt-3 flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
@@ -101,20 +108,20 @@ function CityNotFoundMessage({ query, onPick }) {
                 onClick={() => onPick(m.name)}
                 className="min-h-11 px-3 font-bold text-[#0077b6] hover:underline"
               >
-                {m.name}, {m.country}
+                {m.label}, {m.country}
               </button>
             </React.Fragment>
           ))}
         </p>
       ) : (
-        <p className="mt-2 text-base text-gray-500">Check the spelling or try a nearby big city.</p>
+        <p className="mt-2 text-base text-gray-500">{t('weather.checkSpelling')}</p>
       )}
     </div>
   );
 }
 
 const WeatherCard = () => {
-  const { city: savedCity, setCity, locate, geoStatus } = useCity();
+  const { city: savedCity, setCity, forgetCity, locate, geoStatus } = useCity();
   // Pehle render (server + hydration) par saved city abhi maloom nahi → default
   // shehar ka server data (app/page.js) — card foran HTML mein. `ssr-default-city`
   // class: layout.js script ne bataya ke saved shehar koi aur hai → CSS chhupata hai.
@@ -124,7 +131,11 @@ const WeatherCard = () => {
   const [activeTab, setActiveTab] = useState('Temperature');
   // °C/°F + km/h/mph (audit 3.2) — hook early return se PEHLE
   const units = useUnits();
+  const t = useT();
+  const lang = useLang();
   const navLinks = ['Temperature', 'Precipitation', 'Wind'];
+  const notFound = error?.response?.status === 404;
+  useEffect(() => { if (notFound) forgetCity(city); }, [notFound, city, forgetCity]);
 
   // `!city`: Next.js mein city pehle render par null hoti hai (browser
   // ki saved city useEffect mein aati hai). Tab bhi "Loading" hi
@@ -141,7 +152,7 @@ const WeatherCard = () => {
           {error?.response?.status === 404 ? (
             <CityNotFoundMessage query={city} onPick={(name) => setCity(name.toLowerCase())} />
           ) : (
-            <p className="text-lg text-red-500">Could not load weather data.</p>
+            <p className="text-lg text-red-500">{t('weather.loadFailed')}</p>
           )}
         </div>
       </div>
@@ -157,9 +168,10 @@ const WeatherCard = () => {
   const precip = current.precipitation ?? 0;
   // current.is_day bhi Open-Meteo se aata hai — waqt ke andaze se behtar
   const isCurrentlyNight = isNightHour(current.time, current.is_day);
-  const weatherTitle = getWeatherDescription(weatherCode).title;
-  const displayCity = data.city || city;
-  const displayCountry = data.country || '';
+  const weatherTitle = getWeatherDescription(weatherCode, undefined, t).title;
+  // User ki zaban mein (utils/placeLabel): ロンドン, 札幌 (jaisa likha), イギリス
+  const displayCity = cityDisplayName(data.city, lang, city) || city;
+  const displayCountry = data.country ? countryLabel(data.country, lang) : '';
 
   // Ab-se-aage 12 ghantay — reference point = city ka local current time
   const upcoming = getUpcomingHours(hourly, current?.time, 12);
@@ -225,14 +237,14 @@ const WeatherCard = () => {
                 {/* °C / °F toggle (audit 3.2). Pehle dono sirf likhe the magar
                     number hamesha °C ka tha — US user ke liye dhoka. Ab yahi
                     do lafz button hain; chuni hui unit neeli. Size wahi. */}
-                <div className="flex flex-col ml-2 sm:ml-3 text-xl sm:text-2xl text-[#4a607a]" role="group" aria-label="Temperature unit">
+                <div className="flex flex-col ml-2 sm:ml-3 text-xl sm:text-2xl text-[#4a607a]" role="group" aria-label={t('units.tempUnit')}>
                   {['C', 'F'].map((u) => (
                     <button
                       key={u}
                       type="button"
                       onClick={() => units.setUnit(u)}
                       aria-pressed={units.unit === u}
-                      aria-label={u === 'C' ? '°C — show Celsius' : '°F — show Fahrenheit'}
+                      aria-label={u === 'C' ? t('units.showCelsius') : t('units.showFahrenheit')}
                       className={`text-left leading-[inherit] cursor-pointer transition-colors ${units.unit === u ? 'text-[#0077b6]' : 'text-[#5f6878] hover:text-[#4a607a]'}`}
                     >
                       °{u}
@@ -251,11 +263,11 @@ const WeatherCard = () => {
                 className="mt-1 inline-flex items-center gap-1 min-h-8 text-xs font-semibold text-[#0077b6] hover:underline disabled:opacity-60"
               >
                 <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
-                {geoStatus === 'locating' ? 'Finding your location…' : 'Use my location'}
+                {geoStatus === 'locating' ? t('weather.locating') : t('weather.useMyLocation')}
               </button>
               {(geoStatus === 'denied' || geoStatus === 'error') && (
                 <p className="text-xs text-[#4a607a]" role="status">
-                  {geoStatus === 'denied' ? 'Location permission was blocked — search for your city instead.' : 'Could not find your city — search for it instead.'}
+                  {geoStatus === 'denied' ? t('weather.geoDenied') : t('weather.geoError')}
                 </p>
               )}
             </div>
@@ -264,15 +276,15 @@ const WeatherCard = () => {
           {/* flex gap-10 mobile pe 198px bahar nikal raha tha -> grid */}
           <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:flex lg:gap-10 text-xs sm:text-sm font-semibold text-[#4a607a] shrink-0">
             <div className="text-center">
-              <span>Precipitation</span>
+              <span>{t('weather.precipitation')}</span>
               <p className="text-xl sm:text-2xl font-bold text-[#0077b6] mt-1">{precip}%</p>
             </div>
             <div className="text-center">
-              <span>Humidity</span>
+              <span>{t('weather.humidity')}</span>
               <p className="text-xl sm:text-2xl font-bold text-[#0077b6] mt-1">{humidity}%</p>
             </div>
             <div className="text-center">
-              <span>Wind</span>
+              <span>{t('weather.wind')}</span>
               <p className="text-xl sm:text-2xl font-bold text-[#0077b6] mt-1 flex items-baseline justify-center gap-1">
                 {wind}{units.windUnit}
               </p>
@@ -289,7 +301,7 @@ const WeatherCard = () => {
                 activeTab === link ? 'text-[#0077b6]' : ''
               }`}
             >
-              {link}
+              {t(`weather.tabs.${TAB_KEY[link]}`)}
               {activeTab === link && (
                 <span className="absolute bottom-[-1px] left-0 w-full h-[3px] bg-[#0077b6] rounded-t-md" />
               )}
@@ -300,7 +312,7 @@ const WeatherCard = () => {
         <div className="relative h-32 sm:h-40 w-full mb-6 sm:mb-8">
           {!hasChart && (
             <div className="h-full flex items-center justify-center text-sm text-[#4a607a]">
-              Hourly chart is not available right now.
+              {t('weather.chartUnavailable')}
             </div>
           )}
           {hasChart && (

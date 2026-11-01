@@ -16,11 +16,13 @@
 //  mobile par faltu bytes, aur Googlebot ke 84% crawl requests yahi
 //  `?_rsc=` the. Click par page waise hi khulta hai.
 // ─────────────────────────────────────────────────────────────
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import LocaleLink from './LocaleLink';
+import { useBarePathname } from '@/i18n/client';
 
+// i18n: `to` hamesha bina zaban ke ('/blog'); link khud /de/blog banta hai,
+// aur active check bhi bina zaban ke path par (server /en/x = browser /x).
 export default function NavLink({ to, end = false, className, children, prefetch = false, ...rest }) {
-  const pathname = usePathname() || '/';
+  const pathname = useBarePathname();
 
   // `end` = sirf exact match (Home "/" har page par active na ho jaye).
   // Warna "/blog" link "/blog/koi-post" par bhi active rahe.
@@ -32,8 +34,8 @@ export default function NavLink({ to, end = false, className, children, prefetch
   const resolvedChildren = typeof children === 'function' ? children({ isActive }) : children;
 
   return (
-    <Link href={to} prefetch={prefetch} className={resolvedClass} aria-current={isActive ? 'page' : undefined} {...rest}>
+    <LocaleLink href={to} prefetch={prefetch} className={resolvedClass} aria-current={isActive ? 'page' : undefined} {...rest}>
       {resolvedChildren}
-    </Link>
+    </LocaleLink>
   );
 }

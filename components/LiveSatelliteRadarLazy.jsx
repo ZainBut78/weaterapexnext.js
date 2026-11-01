@@ -17,6 +17,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useCity } from '../context/CityContext';
 import { useCurrentWeather, DEFAULT_CITY } from '../hooks/useWeather';
 import { useUnits } from '../context/UnitsContext';
+import { useLang, useT } from '@/i18n/client';
+import { cityDisplayName, countryLabel } from '../utils/placeLabel';
 
 const LeafletMap = dynamic(() => import('./LiveSatelliteRadar'), {
   ssr: false,
@@ -28,6 +30,8 @@ export default function LiveSatelliteRadar() {
   const { data } = useCurrentWeather(savedCity ?? DEFAULT_CITY);
   const ssrDefault = savedCity === null ? ' ssr-default-city' : '';
   const units = useUnits();
+  const t = useT();
+  const lang = useLang();
   const boxRef = useRef(null);
   const [near, setNear] = useState(false);
 
@@ -53,11 +57,11 @@ export default function LiveSatelliteRadar() {
       <div className="max-w-[1000px] mx-auto px-4 font-sans">
         <div className="mb-6">
           <h2 className="text-3xl font-extrabold text-white tracking-tight">
-            Weather Map
+            {t('weather.mapTitle')}
           </h2>
           {data ? (
             <p className={`text-sm text-slate-300 font-medium mt-1${ssrDefault}`}>
-              {data.city}, {data.country} &mdash; {units.temp1(data.current.temperature_2m)}{units.tempSymbol} &bull; Precipitation Radar
+              {cityDisplayName(data.city, lang, savedCity)}, {countryLabel(data.country, lang)} &mdash; {units.fmt(units.temp1(data.current.temperature_2m))}{units.tempSymbol} &bull; {t('weather.radar')}
             </p>
           ) : (
             <div className="h-5 mt-1 w-72 max-w-full bg-slate-800 rounded-lg animate-pulse" aria-hidden="true" />

@@ -191,8 +191,11 @@ test('search from another page: other place → home with that city', async ({ p
 // ── C: trip planner — sirf forecast ke din ───────────────────
 const fmtShort = (iso) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-const chipName = (iso) =>
-  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' });
+// Regex, string nahi: "Sunday, November 1" substring ki tarah "November 15" se bhi
+// milta tha (mahine ki 1 tareekh ko strict-mode fail). Ab tareekh ke baad koi hindsa nahi.
+const chipName = (iso) => new RegExp(`^${
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' })
+}(?!\\d)`);
 const addDays = (iso, n) => { const d = new Date(`${iso}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
 // Browser ka window — app jaisa hi hisaab (utils/forecastWindow.js)

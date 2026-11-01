@@ -1,31 +1,35 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from './LocaleLink';
 import NavLink from './NavLink';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useBarePathname, useLocaleRouter, useT } from '@/i18n/client';
 import { User, LogOut, Menu, X } from 'lucide-react';
 import { useCity } from '../context/CityContext';
 import { useAuth } from '../context/AuthContext';
 import CitySearchBox from './CitySearchBox';
 import { isKnownCity } from '@/data/cities';
 import { cityPath } from '@/data/countries';
-import { exactCity } from '@/utils/fuzzyCity';
+import { canonicalCityName, exactCity } from '@/utils/fuzzyCity';
 
 const Navbar = () => {
   const { setCity } = useCity();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
+  // i18n: path bina zaban ke ('/'), router khud /de/... lagata hai
+  const pathname = useBarePathname();
+  const router = useLocaleRouter();
+  const t = useT();
 
   const navLinks = [
-    { to: '/', label: 'Home', end: true },
-    { to: '/trip-planner', label: 'Trip Planner' },
-    { to: '/events', label: 'Events' },
-    { to: '/climate-guides', label: 'Climate Guides' },
-    { to: '/blog', label: 'Blog' },
-    { to: '/api-docs', label: 'API Docs' },
+    { to: '/', label: t('nav.home'), end: true },
+    { to: '/trip-planner', label: t('nav.tripPlanner') },
+    { to: '/events', label: t('nav.events') },
+    { to: '/climate-guides', label: t('nav.climateGuides') },
+    { to: '/blog', label: t('nav.blog') },
+    // API docs sirf English (owner) — har zaban se bina prefix
+    { to: '/api-docs', label: t('nav.apiDocs'), noLocale: true },
   ];
 
   // Route badalne par mobile menu khud band ho jaye
@@ -45,7 +49,8 @@ const Navbar = () => {
   //    us ka city page; warna city set kar ke home par (pehle yahan sirf
   //    city set hoti thi aur screen par kuch nahi hota tha).
   const handleSearch = (text, item) => {
-    const name = item?.name || text;
+    // "東京" / "Londra" / "Munchen" likha → hamari list ka English naam (weather API usi se)
+    const name = item?.name || canonicalCityName(text);
     setMenuOpen(false);
     if (pathname === '/') {
       setCity(name.toLowerCase());
@@ -98,6 +103,8 @@ const Navbar = () => {
 
         {/* Right Auth Buttons — desktop */}
         <div className="hidden lg:flex items-center gap-6 shrink-0">
+          {/* Sirf tab dikhta hai jab koi doosri zaban ENABLED_LOCALES mein ho */}
+          <LanguageSwitcher />
           {user ? (
             <>
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
@@ -108,26 +115,31 @@ const Navbar = () => {
                 onClick={logout}
                 className="flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-red-500 transition-colors"
               >
-                <LogOut className="w-4 h-4" /> Logout
+                <LogOut className="w-4 h-4" /> {t('nav.logout')}
               </button>
             </>
           ) : (
             <>
               <Link prefetch={false} href="/login" className="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors">
-                Sign In
+                {t('nav.signIn')}
               </Link>
               <Link prefetch={false} href="/signup" className="text-sm font-semibold text-white bg-[#00a8e8] hover:bg-[#0092cd] px-6 py-2.5 rounded-full transition-colors shadow-sm">
-                Sign Up
+                {t('nav.signUp')}
               </Link>
             </>
           )}
+        </div>
+
+        {/* Mobile/tablet: zaban menu khole baghair (WeatherSpark jaisa) */}
+        <div className="lg:hidden ml-auto">
+          <LanguageSwitcher />
         </div>
 
         {/* Hamburger — sirf mobile/tablet */}
         <button
           type="button"
           onClick={() => setMenuOpen((v) => !v)}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={menuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
           className="lg:hidden shrink-0 inline-flex items-center justify-center w-11 h-11 -mr-1 rounded-lg text-[#0077b6] hover:bg-[#f0f5ff] transition-colors"
@@ -157,6 +169,7 @@ const Navbar = () => {
                   key={link.to}
                   to={link.to}
                   end={link.end}
+                  noLocale={link.noLocale}
                   onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center min-h-12 px-2 rounded-lg text-base font-semibold transition-colors ${
@@ -181,7 +194,7 @@ const Navbar = () => {
                     onClick={() => { logout(); setMenuOpen(false); }}
                     className="flex items-center justify-center gap-1.5 min-h-11 px-4 text-sm font-semibold text-gray-600 hover:text-red-500 transition-colors"
                   >
-                    <LogOut className="w-4 h-4" /> Logout
+                    <LogOut className="w-4 h-4" /> {t('nav.logout')}
                   </button>
                 </div>
               ) : (
@@ -192,7 +205,7 @@ const Navbar = () => {
                     onClick={() => setMenuOpen(false)}
                     className="flex-1 inline-flex items-center justify-center min-h-12 rounded-full border border-[#d6e4ff] text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    Sign In
+                    {t('nav.signIn')}
                   </Link>
                   <Link
                     prefetch={false}
@@ -200,7 +213,7 @@ const Navbar = () => {
                     onClick={() => setMenuOpen(false)}
                     className="flex-1 inline-flex items-center justify-center min-h-12 rounded-full text-sm font-semibold text-white bg-[#00a8e8] hover:bg-[#0092cd] transition-colors shadow-sm"
                   >
-                    Sign Up
+                    {t('nav.signUp')}
                   </Link>
                 </div>
               )}
@@ -218,6 +231,7 @@ const Navbar = () => {
               key={link.to}
               to={link.to}
               end={link.end}
+              noLocale={link.noLocale}
               className={({ isActive }) =>
                 `relative py-3 transition-colors hover:text-[#0077b6] ${
                   isActive ? 'text-[#0077b6]' : 'text-[#4a607a]'

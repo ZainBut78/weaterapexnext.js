@@ -115,16 +115,16 @@ export function visitVerdict(row) {
   if (isNum(lo) && lo < 0) { score -= 1; reasons.push({ t: 'frost', text: 'freezing nights', c: lo }); }
 
   if (isNum(rainDays)) {
-    if (rainDays >= 16) { score -= 3; reasons.push({ t: 'rain', text: `rain on most days (about ${rainDays})` }); }
-    else if (rainDays >= 11) { score -= 2; reasons.push({ t: 'rain', text: `frequent rain (about ${rainDays} rainy days)` }); }
-    else if (rainDays >= 6) { score -= 1; reasons.push({ t: 'rain', text: `some rainy days (about ${rainDays})` }); }
-    else { reasons.push({ t: 'dry', text: `mostly dry (about ${rainDays} rainy days)`, good: true }); }
+    if (rainDays >= 16) { score -= 3; reasons.push({ t: 'rain', key: 'rain-most', n: rainDays, text: `rain on most days (about ${rainDays})` }); }
+    else if (rainDays >= 11) { score -= 2; reasons.push({ t: 'rain', key: 'rain-frequent', n: rainDays, text: `frequent rain (about ${rainDays} rainy days)` }); }
+    else if (rainDays >= 6) { score -= 1; reasons.push({ t: 'rain', key: 'rain-some', n: rainDays, text: `some rainy days (about ${rainDays})` }); }
+    else { reasons.push({ t: 'dry', key: 'dry', n: rainDays, text: `mostly dry (about ${rainDays} rainy days)`, good: true }); }
   }
-  if (isNum(rain) && rain > 200) { score -= 1; reasons.push({ t: 'heavy', text: `heavy rainfall (${Math.round(rain)} mm)` }); }
+  if (isNum(rain) && rain > 200) { score -= 1; reasons.push({ t: 'heavy', key: 'heavy', n: Math.round(rain), text: `heavy rainfall (${Math.round(rain)} mm)` }); }
 
   if (isNum(sun)) {
-    if (sun < 3) { score -= 1; reasons.push({ t: 'dull', text: `short sunny spells (${sun} h a day)` }); }
-    else if (sun >= 8) { reasons.push({ t: 'sunny', text: `plenty of sunshine (${sun} h a day)`, good: true }); }
+    if (sun < 3) { score -= 1; reasons.push({ t: 'dull', key: 'dull', n: sun, text: `short sunny spells (${sun} h a day)` }); }
+    else if (sun >= 8) { reasons.push({ t: 'sunny', key: 'sunny', n: sun, text: `plenty of sunshine (${sun} h a day)`, good: true }); }
   }
 
   score = Math.max(1, Math.round(score * 10) / 10);
@@ -237,12 +237,14 @@ export function monthSuits(row, tags, num) {
   out.push({
     key: 'sightseeing', label: 'Sightseeing', ok: sight,
     why: sight ? 'daytime temperatures are fine for walking around' : rain > 50 ? 'rain falls on more than half the days' : t > 32 ? 'midday heat makes long walks hard' : 'it is cold for long walks',
+    whyKey: sight ? 'ok' : rain > 50 ? 'rain' : t > 32 ? 'hot' : 'cold',
   });
   // Parks (backend: 15–26°) — har shehar par laagu
   const parks = t >= 15 && t <= 26 && rain <= 50;
   out.push({
     key: 'parks', label: 'Parks & outdoor', ok: parks,
     why: parks ? 'comfortable for long walks and picnics' : t > 26 ? 'afternoons are too warm to linger outside' : t < 15 ? 'too cool to sit outside for long' : 'rain interrupts outdoor plans',
+    whyKey: parks ? 'ok' : t > 26 ? 'hot' : t < 15 ? 'cold' : 'rain',
   });
   // Content round A2: jo cheez is shehar par laagu hi nahi (samandar /
   // trails nahi) woh row dikhate hi nahi
@@ -251,6 +253,7 @@ export function monthSuits(row, tags, num) {
     out.push({
       key: 'beach', label: 'Beach', ok: beach,
       why: beach ? (t > 32 ? 'hot coastal weather' : 'warm and mostly dry on the coast') : t < 18 ? 'the sea air is too cool' : 'too many rainy days',
+      whyKey: beach ? (t > 32 ? 'hot' : 'ok') : t < 18 ? 'cold' : 'rain',
     });
   }
   if (tags.hiking) {
@@ -258,6 +261,7 @@ export function monthSuits(row, tags, num) {
     out.push({
       key: 'hiking', label: 'Hiking', ok: hike,
       why: hike ? 'mild temperatures for trails' : t < 18 ? 'trails are cool' : t > 28 ? 'too hot for long hikes' : 'wet trails',
+      whyKey: hike ? 'ok' : t < 18 ? 'cold' : t > 28 ? 'hot' : 'rain',
     });
   }
   // Museums kabhi "less ideal" nahi — sirf jab asal mashwara ho (barish,
@@ -266,6 +270,7 @@ export function monthSuits(row, tags, num) {
     out.push({
       key: 'indoor', label: 'Museums & indoor', ok: true,
       why: rain > 50 ? 'with rain on most days, galleries and museums make easy plans' : t > 32 ? 'a cool break during the hottest hours' : 'warm places to spend the coldest part of the day',
+      whyKey: rain > 50 ? 'rain' : t > 32 ? 'hot' : 'cold',
     });
   }
   return out;

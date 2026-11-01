@@ -18,6 +18,15 @@
 //  Sirf canonical + indexable + 200 URLs: login/signup/pricing (noindex),
 //  api-docs, purane /weather/<city> (301), ?param URLs — kuch nahi.
 //  Shehar: registry (static + DB ke mukammal) — adhoore shamil nahi.
+//
+//  ZABANEIN (i18n, Oct 2026) — har zaban ka apna set, isi index mein:
+//   /sitemap/static-de.xml, blog-de, places-de, months-de-1, months-de-2 …
+//  • sirf ENABLED_LOCALES wali zabanein (warna index mein nahi + 404)
+//  • LANG_SITEMAP_PHASE (env): A (default) = home, climate-guides, blog,
+//    mulk + shehar pages · B = A + month pages. English par asar nahi.
+//  • hreflang sitemap mein NAHI (sirf HTML <link>) — ek hi tareeqa.
+//  • lastmod = English wali tareekh ya us zaban ke text ki tareekh (jo nayi).
+//  Google: 50,000 URLs / 50 MB per file — MONTH_CHUNK is se bohat neeche.
 // ─────────────────────────────────────────────────────────────
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -27,6 +36,7 @@ import { getCityRegistry } from './cityRegistry';
 import { COUNTRIES, countryPath } from '@/data/countries';
 import { MONTHS } from '@/utils/climateMath';
 import { SITE_URL } from '@/utils/seo';
+import { DEFAULT_LOCALE, localePath, parseEnabledLocales } from '@/i18n/config';
 
 // Page ki aakhri asal tabdeeli (git log). Template/content badle → yahan bhi.
 const STATIC_PAGES = [
@@ -45,6 +55,15 @@ const cityDate = (c) => c.dataDate || DATA_PERIOD_DATE;
 const MONTH_CHUNK = 1000;
 
 const BLOG_REVALIDATE = 600;
+
+// Doosri zabanon ka text kab bana (page ka content tab badla) — UI (Phase 1) aur
+// climate pages ka text (Phase 3). Text badle to yeh tareekh bhi.
+const LOCALE_UI_DATE = '2026-10-28';
+const LOCALE_CLIMATE_DATE = '2026-10-28';
+const LANG_STATIC = ['/', '/climate-guides'];
+
+const otherLocales = () => parseEnabledLocales(process.env.ENABLED_LOCALES).filter((l) => l !== DEFAULT_LOCALE);
+const langPhase = () => (String(process.env.LANG_SITEMAP_PHASE || 'A').trim().toUpperCase() === 'B' ? 'B' : 'A');
 
 const xmlEscape = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 const abs = (p) => `${SITE_URL}${p === '/' ? '' : p}`;
@@ -66,11 +85,14 @@ export function sitemapIndex(children) {
 export const xmlResponse = (xml) => new Response(xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
 
 // ── data ──
-async function allPosts() {
+async function allPosts(lang = DEFAULT_LOCALE) {
   const posts = [];
   try {
     for (let page = 1; page <= 50; page++) {
-      const data = await serverGet(ENDPOINTS.blog.list, { params: { page }, revalidate: BLOG_REVALIDATE, tags: ['blog'] });
+      const params = lang === DEFAULT_LOCALE ? { page } : { page, lang };
+      const data = await serverGet(ENDPOINTS.blog.list, { params, revalidate: BLOG_REVALIDATE, tags: ['blog'] });
+      // Purana backend `?lang=` nahi samajhta (English bhejta) → doosri zaban = koi post nahi
+      if (lang !== DEFAULT_LOCALE && data?.lang !== lang) break;
       if (!data?.posts?.length) break;
       posts.push(...data.posts);
       if (!data.has_next || data.current_page !== page) break;
@@ -130,32 +152,85 @@ export async function monthEntries() {
   return out;
 }
 
+// ── doosri zabanein ──
+// English entries us zaban ke URL par; lastmod = (English, text ki tareekh) mein nayi
+const toLang = (lang, entries, textDate) => entries.map((e) => ({
+  path: localePath(lang, e.path),
+  lastmod: max(e.lastmod && isoDay(e.lastmod), isoDay(textDate)),
+}));
+
+export async function langStaticEntries(lang) {
+  return LANG_STATIC.map((p) => ({ path: localePath(lang, p), lastmod: LOCALE_UI_DATE }));
+}
+
+/** Us zaban ke published tarjume. Koi nahi → [] (child sitemap nahi banta). */
+export async function langBlogEntries(lang) {
+  const posts = await allPosts(lang);
+  if (!posts.length) return [];
+  const items = posts.map((p) => ({ path: localePath(lang, `/blog/${p.slug}`), lastmod: p.updated_at || p.published_at || null }));
+  const newestPost = items.reduce((a, i) => max(a, i.lastmod && isoDay(i.lastmod)), null);
+  return [{ path: localePath(lang, '/blog'), lastmod: newestPost }, ...items];
+}
+
+export async function langPlaceEntries(lang) {
+  // Mulk + shehar pages (phase A ki list — hub /weather nahi)
+  return toLang(lang, (await placeEntries()).filter((e) => e.path !== '/weather'), LOCALE_CLIMATE_DATE);
+}
+
+export async function langMonthEntries(lang) {
+  return langPhase() === 'B' ? toLang(lang, await monthEntries(), LOCALE_CLIMATE_DATE) : [];
+}
+
+const newest = (entries) => entries.reduce((a, e) => max(a, e.lastmod && isoDay(e.lastmod)), null);
+const chunks = (prefix, entries) => {
+  const out = [];
+  for (let i = 0; i * MONTH_CHUNK < entries.length; i++) {
+    out.push({ name: `${prefix}-${i + 1}`, lastmod: newest(entries.slice(i * MONTH_CHUNK, (i + 1) * MONTH_CHUNK)) });
+  }
+  return out;
+};
+
 /** Child sitemaps ki list (index ke liye) — naam + lastmod (sab se nayi entry) */
 export async function children() {
-  const newest = (entries) => entries.reduce((a, e) => max(a, e.lastmod && isoDay(e.lastmod)), null);
   const [st, bl, pl, mo] = await Promise.all([staticEntries(), blogEntries(), placeEntries(), monthEntries()]);
   const list = [
     { name: 'static', lastmod: newest(st) },
     { name: 'blog', lastmod: newest(bl) },
     { name: 'places', lastmod: newest(pl) },
+    ...chunks('months', mo),
   ];
-  for (let i = 0; i * MONTH_CHUNK < mo.length; i++) {
-    list.push({ name: `months-${i + 1}`, lastmod: newest(mo.slice(i * MONTH_CHUNK, (i + 1) * MONTH_CHUNK)) });
+  // Sirf ENABLED zabanein; khaali set (jaise abhi blog) index mein nahi
+  for (const lang of otherLocales()) {
+    const [lst, lbl, lpl, lmo] = await Promise.all([langStaticEntries(lang), langBlogEntries(lang), langPlaceEntries(lang), langMonthEntries(lang)]);
+    list.push({ name: `static-${lang}`, lastmod: newest(lst) });
+    if (lbl.length) list.push({ name: `blog-${lang}`, lastmod: newest(lbl) });
+    if (lpl.length) list.push({ name: `places-${lang}`, lastmod: newest(lpl) });
+    list.push(...chunks(`months-${lang}`, lmo));
   }
   return list;
 }
 
-/** Ek child sitemap ki entries — naam ghalat → null (404) */
+const part = (all, n) => {
+  const i = Number(n) - 1;
+  const p = all.slice(i * MONTH_CHUNK, (i + 1) * MONTH_CHUNK);
+  return i >= 0 && p.length ? p : null;
+};
+const orNull = (list) => (list.length ? list : null);
+
+/** Ek child sitemap ki entries — naam ghalat / zaban band / khaali → null (404) */
 export async function childEntries(name) {
   if (name === 'static') return staticEntries();
   if (name === 'blog') return blogEntries();
   if (name === 'places') return placeEntries();
   const m = /^months-(\d+)$/.exec(name);
-  if (m) {
-    const i = Number(m[1]) - 1;
-    const all = await monthEntries();
-    const slice = all.slice(i * MONTH_CHUNK, (i + 1) * MONTH_CHUNK);
-    return i >= 0 && slice.length ? slice : null;
-  }
-  return null;
+  if (m) return part(await monthEntries(), m[1]);
+
+  const l = /^(static|blog|places|months)-([a-z]{2})(?:-(\d+))?$/.exec(name);
+  if (!l || !otherLocales().includes(l[2])) return null;
+  const [, kind, lang, n] = l;
+  if (kind === 'months') return n ? part(await langMonthEntries(lang), n) : null;
+  if (n) return null;
+  if (kind === 'static') return langStaticEntries(lang);
+  if (kind === 'blog') return orNull(await langBlogEntries(lang));
+  return orNull(await langPlaceEntries(lang));
 }

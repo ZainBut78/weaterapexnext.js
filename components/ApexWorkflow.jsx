@@ -1,26 +1,10 @@
 import React from 'react';
+import { getT } from '@/i18n/server';
 
-const ApexWorkflow = () => {
-  const steps = [
-    {
-      stepNumber: 1,
-      title: 'Define Parameters',
-      description:
-        'Input your location, specific timeframes, and sensitivity levels for different weather events.',
-    },
-    {
-      stepNumber: 2,
-      title: 'Data Synthesis',
-      description:
-        'Our engines aggregate data from 40,000+ stations and proprietary satellite imagery in real-time.',
-    },
-    {
-      stepNumber: 3,
-      title: 'Actionable Reports',
-      description:
-        'Receive automated PDF summaries or live dashboard alerts customized to your needs.',
-    },
-  ];
+// Server component — text messages `home.workflow` se
+const ApexWorkflow = async () => {
+  const t = await getT();
+  const steps = t.raw('home.workflow.steps').map((s, i) => ({ stepNumber: i + 1, ...s }));
 
   return (
     <div className="w-full bg-[#f8fbff] py-16">
@@ -28,7 +12,7 @@ const ApexWorkflow = () => {
         
         {/* Section Heading */}
         <h2 className="text-4xl md:text-5xl font-extrabold text-[#002244] tracking-tight mb-16">
-          The Apex Workflow
+          {t('home.workflow.title')}
         </h2>
 
         {/* Steps Container */}

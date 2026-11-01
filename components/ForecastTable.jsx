@@ -8,6 +8,8 @@ import { getMeteoconIcon } from '../utils/meteoconsMap';
 import { getWeatherDescription, getNightDescription } from '../utils/weatherDescriptions';
 import { ForecastSkeleton } from './HomeSkeletons';
 import { useUnits } from '../context/UnitsContext';
+import { useLang, useT } from '@/i18n/client';
+import { intlLocale } from '@/i18n/format';
 
 const ForecastTable = () => {
   const { city: savedCity } = useCity();
@@ -15,6 +17,9 @@ const ForecastTable = () => {
   const ssrDefault = savedCity === null ? ' ssr-default-city' : '';
   const { data, isLoading, isError } = useCurrentWeather(city);
   const units = useUnits(); // °C/°F (audit 3.2)
+  const t = useT();
+  const lang = useLang();
+  const loc = intlLocale(lang);   // en = en-US (pehle jaisa)
 
   // `!city`: Next.js mein city pehle render par null hoti hai (browser
   // ki saved city useEffect mein aati hai). Tab bhi "Loading" hi
@@ -43,10 +48,10 @@ const ForecastTable = () => {
     const isToday = dateStr === cityToday;
 
     const dayName = isToday
-      ? 'TODAY'
-      : date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }).toUpperCase();
+      ? t('weather.today')
+      : date.toLocaleDateString(loc, { weekday: 'short', timeZone: 'UTC' }).toLocaleUpperCase(loc);
 
-    const formattedDate = date.toLocaleDateString('en-US', {
+    const formattedDate = date.toLocaleDateString(loc, {
       month: 'short',
       day: 'numeric',
       timeZone: 'UTC',
@@ -58,15 +63,15 @@ const ForecastTable = () => {
     const dailyCode = forecast.weather_code[idx];
     const code = forecast.display_code?.[idx] ?? dailyCode;
     const precip = forecast.precipitation_probability_max[idx];
-    const weatherInfo = getWeatherDescription(code, precip ?? 0);
+    const weatherInfo = getWeatherDescription(code, precip ?? 0, t);
     const iconUrl = getMeteoconIcon(code, false);
     // 1–2 geele ghante (icon dry raha) / thunder 40–60% → saaf alfaaz
     const notes = [];
     if (forecast.shower_risk?.[idx]) {
       const p = forecast.shower_probability?.[idx] ?? precip;
-      notes.push(p > 0 ? `Mostly dry — a passing shower is possible (${p}% chance).` : 'Mostly dry — a passing shower is possible.');
+      notes.push(p > 0 ? t('weather.showerChance', { p }) : t('weather.showerPossible'));
     }
-    if (forecast.thunder_risk?.[idx]) notes.push(`Thunderstorm possible (${forecast.thunder_probability?.[idx]}% chance).`);
+    if (forecast.thunder_risk?.[idx]) notes.push(t('weather.thunderChance', { p: forecast.thunder_probability?.[idx] }));
 
     return {
       day: dayName,
@@ -77,7 +82,7 @@ const ForecastTable = () => {
       title: weatherInfo.title,
       desc: notes.length ? notes.join(' ') : weatherInfo.desc,
       // Raat ka haal pehle jaisa (daily code) — din ka icon sirf din ke ghanton se
-      night: getNightDescription(dailyCode),
+      night: getNightDescription(dailyCode, t),
       precip: precip != null ? `${precip}%` : '—',
       isHighlighted: isToday,
     };
@@ -87,18 +92,18 @@ const ForecastTable = () => {
     <div className="w-full bg-white py-8 border-t border-gray-100">
       <div className={`max-w-[1000px] mx-auto px-4 font-sans${ssrDefault}`}>
         <h2 className="text-3xl font-extrabold text-[#002244] mb-6 tracking-tight">
-          Long-range Forecast
+          {t('weather.forecastTitle')}
         </h2>
 
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {/* Column header sirf desktop par — mobile par har row khud label wali hai */}
           <div className="bg-[#f2f6fd] border-b border-gray-200 px-6 py-3 hidden md:grid grid-cols-12 text-[11px] font-bold text-gray-500 uppercase tracking-wider items-center">
-            <div className="col-span-2">Day</div>
-            <div className="col-span-1 text-center">Cond</div>
-            <div className="col-span-2">Hi / Lo</div>
-            <div className="col-span-4">Description</div>
-            <div className="col-span-2">Night</div>
-            <div className="col-span-1 text-right">Precip</div>
+            <div className="col-span-2">{t('weather.cols.day')}</div>
+            <div className="col-span-1 text-center">{t('weather.cols.cond')}</div>
+            <div className="col-span-2">{t('weather.cols.hiLo')}</div>
+            <div className="col-span-4">{t('weather.cols.description')}</div>
+            <div className="col-span-2">{t('weather.cols.night')}</div>
+            <div className="col-span-1 text-right">{t('weather.cols.precip')}</div>
           </div>
 
           <div className="bg-white divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
@@ -137,7 +142,7 @@ const ForecastTable = () => {
                     </div>
                   </div>
                   <p className="text-xs font-medium text-gray-600 mt-1.5 pl-[128px]">
-                    <span className="text-gray-400">Night: </span>{item.night}
+                    <span className="text-gray-400">{t('weather.nightLabel')}</span>{item.night}
                   </p>
                 </div>
 

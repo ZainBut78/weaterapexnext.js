@@ -30,6 +30,7 @@ import { NextResponse } from 'next/server';
 import { isKnownCity } from './data/cities';
 import { cityPath, getCountry } from './data/countries';
 import { buildRegistry } from './utils/cityRegistryCore';
+import { DEFAULT_LOCALE, localePath, parseEnabledLocales, splitLocale } from './i18n/config';
 
 const API_INTERNAL_URL = (process.env.API_INTERNAL_URL || 'http://127.0.0.1:8000/api').replace(/\/+$/, '');
 const INDEX_TTL_MS = 60 * 60 * 1000;
@@ -52,9 +53,27 @@ async function cityRegistry() {
   return registryCache.reg;
 }
 
+// ── Zabanein (i18n Phase 1, Oct 2026) ──
+// Pages app/[lang]/ mein hain. Neeche ke qawaid bina-prefix hisse par chalte
+// hain aur redirect usi zaban mein (/de/weather/Brisbane → ek hop →
+// /de/weather/australia/brisbane). Phir:
+//   • /en/...  → 308 bina prefix (ek hi hop; target kabhi /en se shuru nahi
+//     hota aur rewrite dobara proxy se nahi guzarta → loop mumkin nahi)
+//   • English (koi prefix nahi) → andar se /en/... par REWRITE (URL wahi)
+//   • /de/... waghera → seedha; ENABLED_LOCALES mein nahi → X-Robots-Tag noindex
+// Root ki non-page routes (og-image; /api, files matcher se pehle hi bahar)
+// [lang] ke bahar hain — un ko chhona nahi.
+const ROOT_ROUTES = ['/og-image'];
+
 export async function proxy(request) {
   const original = request.nextUrl.pathname;
-  let path = original;
+  if (ROOT_ROUTES.some((r) => original === r || original.startsWith(`${r}/`))) return NextResponse.next();
+
+  const explicitEn = /^\/en(?=\/|$)/.test(original);
+  const { lang, path: bare } = explicitEn
+    ? { lang: DEFAULT_LOCALE, path: original.slice(3) || '/' }
+    : splitLocale(original);
+  let path = bare;
   let status = 308;
 
   // 1) trailing slash
@@ -86,14 +105,25 @@ export async function proxy(request) {
     }
   }
 
-  if (path !== original) {
+  const target = localePath(lang, path);
+  if (target !== original) {
     // Saada URL — request.nextUrl.clone() asal URL ka aakhri "/" format
     // karte waqt wapas jod deta tha (/about/ → /about/ loop, test mein pakda).
     const url = new URL(request.url);
-    url.pathname = path;
+    url.pathname = target;
     return NextResponse.redirect(url, status);
   }
-  return NextResponse.next();
+
+  if (lang === DEFAULT_LOCALE) {
+    const url = new URL(request.url);
+    url.pathname = path === '/' ? '/en' : `/en${path}`;
+    return NextResponse.rewrite(url);
+  }
+  const res = NextResponse.next();
+  if (!parseEnabledLocales(process.env.ENABLED_LOCALES).includes(lang)) {
+    res.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  }
+  return res;
 }
 
 export const config = {

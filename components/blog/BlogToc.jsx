@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────
 import { ChevronDown } from 'lucide-react';
 
-export default function BlogToc({ items }) {
+export default function BlogToc({ items, t }) {
   if (!items || items.length < 2) return null;   // 1 heading ka TOC bekaar
 
   const list = (
@@ -21,16 +21,16 @@ export default function BlogToc({ items }) {
   );
 
   return (
-    <nav aria-label="Table of contents" className="mb-8 bg-white border border-gray-100 rounded-3xl shadow-sm">
+    <nav aria-label={t('blog.toc')} className="mb-8 bg-white border border-gray-100 rounded-3xl shadow-sm">
       <details className="blog-details group lg:hidden">
         <summary className="flex items-center justify-between gap-3 min-h-12 px-5 cursor-pointer list-none font-extrabold text-[#002244]">
-          On this page
+          {t('blog.onThisPage')}
           <ChevronDown className="w-5 h-5 text-[#0077b6] transition-transform group-open:rotate-180" aria-hidden="true" />
         </summary>
         <div className="px-5 pb-5">{list}</div>
       </details>
       <div className="hidden lg:block p-6">
-        <p className="font-extrabold text-[#002244] mb-3">On this page</p>
+        <p className="font-extrabold text-[#002244] mb-3">{t('blog.onThisPage')}</p>
         {list}
       </div>
     </nav>

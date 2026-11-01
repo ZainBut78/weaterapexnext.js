@@ -20,6 +20,7 @@ import { buildRegistry } from '@/utils/cityRegistryCore';
 import { MONTHS } from '@/utils/climateMath';
 import { countryPath } from '@/data/countries';
 import { clientIp } from '@/utils/clientIp';
+import { DEFAULT_LOCALE, LOCALES, localePath } from '@/i18n/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,10 +57,12 @@ export async function POST(request) {
   const q = typeof body.q === 'string' ? body.q.trim().slice(0, 100) : '';
   const geoId = body.geoId != null && /^\d{1,12}$/.test(String(body.geoId)) ? Number(body.geoId) : null;
   if (q.length < 2 && !geoId) return reply({ status: 'bad_request' }, 400);
+  // User ki zaban — "Londra" / "東京" jaise naam Django usi zaban mein geocoding se milata hai
+  const lang = LOCALES.includes(body.lang) ? body.lang : DEFAULT_LOCALE;
 
   let res;
   try {
-    res = await serverPost(ENDPOINTS.weather.placesOpen, geoId ? { geo_id: geoId } : { q }, { timeoutMs: OPEN_TIMEOUT_MS });
+    res = await serverPost(ENDPOINTS.weather.placesOpen, geoId ? { geo_id: geoId } : { q, lang }, { timeoutMs: OPEN_TIMEOUT_MS });
   } catch {
     return reply({ status: 'error' }, 503);
   }
@@ -87,8 +90,10 @@ export async function POST(request) {
 
   // Pehle 404 cache hua ho to ab asal page (city + 12 mahine + mulk + /weather)
   const c = reg.get(slug);
-  for (const p of [path, ...MONTHS.map((m) => reg.monthPath(slug, m.slug)), countryPath(c.countrySlug), '/weather']) {
-    revalidatePath(p);
+  // Har zaban ka page bhi (/de/…, /ja/…) — warna wahan purana 404 cache rehta
+  const paths = [path, ...MONTHS.map((m) => reg.monthPath(slug, m.slug)), countryPath(c.countrySlug), '/weather'];
+  for (const lang of LOCALES) {
+    for (const p of paths) revalidatePath(lang === DEFAULT_LOCALE ? p : localePath(lang, p));
   }
   return reply({ status: 'ok', path, created: !!data.created, city: { slug, name: c.name, country: c.country } });
 }

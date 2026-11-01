@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { Droplets, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getMeteoconIcon } from '../../utils/meteoconsMap';
 import { useUnits } from '../../context/UnitsContext';
+import { useT } from '@/i18n/client';
 
 const DATES_DEMO = [
   { label: 'Aug 15 (Selected)', score: 4.0, temp: 23, rain: 22, weather_code: 2, selected: true },
@@ -24,6 +25,7 @@ const scoreColor = (score) => {
 
 const NearbyDatesComparison = ({ dates = DATES_DEMO }) => {
   const units = useUnits(); // °C/°F (audit 3.2)
+  const t = useT();
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
@@ -45,7 +47,7 @@ const NearbyDatesComparison = ({ dates = DATES_DEMO }) => {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-slate-900">Nearby Dates Comparison</h3>
+        <h3 className="text-lg font-bold text-slate-900">{t('events.nearbyTitle')}</h3>
         <div className="flex gap-2">
           {showLeft && (
             <button
@@ -81,17 +83,17 @@ const NearbyDatesComparison = ({ dates = DATES_DEMO }) => {
             >
               {d.best && (
                 <span className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl">
-                  RECOMMENDED
+                  {t('events.recommended')}
                 </span>
               )}
               {!d.best && d.better && (
                 <span className="absolute top-0 right-0 bg-emerald-400 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl">
-                  BETTER OPTION
+                  {t('events.betterOption')}
                 </span>
               )}
               {d.selected && !d.best && (
                 <span className="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl">
-                  SELECTED
+                  {t('events.selected')}
                 </span>
               )}
 

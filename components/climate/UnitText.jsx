@@ -5,6 +5,7 @@
 // (UnitsContext pehle render par hamesha °C deta hai → hydration safe.)
 import { useUnits } from '@/context/UnitsContext';
 import { generateClimateNarrative } from '@/utils/climateNarrative';
+import { useT } from '@/i18n/client';
 
 // Ek temperature, dono units: "21.9°C (71.4°F)". null → "—"
 export function UnitTemp({ c }) {
@@ -26,19 +27,20 @@ export function UnitDelta({ c }) {
   const units = useUnits();
   if (c == null || !Number.isFinite(Number(c))) return <>—</>;
   const d = Math.abs(Number(c));
-  const cTxt = `${Math.round(d * 10) / 10}°C`;
-  const fTxt = `${Math.round(d * 1.8 * 10) / 10}°F`;
+  const cTxt = `${units.fmt(Math.round(d * 10) / 10)}°C`;
+  const fTxt = `${units.fmt(Math.round(d * 1.8 * 10) / 10)}°F`;
   return <>{units.unit === 'F' ? `${fTxt} (${cTxt})` : `${cTxt} (${fTxt})`}</>;
 }
 
 // Nishan ke saath farq: "+4.0°C (+7.2°F)" / "−4.4°C (−7.9°F)"; 0 → "same"
 export function UnitDeltaSigned({ c }) {
   const units = useUnits();
+  const t = useT();
   if (c == null || !Number.isFinite(Number(c))) return <>—</>;
   const d = Math.round(Number(c) * 10) / 10;
-  if (d === 0) return <>same</>;
+  if (d === 0) return <>{t('climate.same')}</>;
   const s = d > 0 ? '+' : '−';
-  const cTxt = `${s}${Math.abs(d)}°C`;
-  const fTxt = `${s}${Math.round(Math.abs(d) * 1.8 * 10) / 10}°F`;
+  const cTxt = `${s}${units.fmt(Math.abs(d))}°C`;
+  const fTxt = `${s}${units.fmt(Math.round(Math.abs(d) * 1.8 * 10) / 10)}°F`;
   return <>{units.unit === 'F' ? `${fTxt} (${cTxt})` : `${cTxt} (${fTxt})`}</>;
 }

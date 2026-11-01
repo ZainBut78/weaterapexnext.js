@@ -18,6 +18,14 @@ export function CityProvider({ children }) {
     setCityState(c);
   };
 
+  // Shehar nahi mila (404) → yaad na rakho; warna har visit par wahi error
+  // (screen par message abhi ke liye rehta hai, agli dafa London)
+  const forgetCity = useCallback((c) => {
+    try {
+      if (localStorage.getItem(STORAGE_KEY) === c) localStorage.removeItem(STORAGE_KEY);
+    } catch { /* private mode */ }
+  }, []);
+
   // SEO/perf fixes (Task 5, Oct 2026): page load par location ki ijazat
   // NAHI maangte (Lighthouse "Requests the geolocation permission on page
   // load" — aur bina pooche popup bura tajurba). Saved city, warna London.
@@ -61,7 +69,7 @@ export function CityProvider({ children }) {
   }, []);
 
   return (
-    <CityContext.Provider value={{ city, setCity, locate, geoStatus }}>
+    <CityContext.Provider value={{ city, setCity, forgetCity, locate, geoStatus }}>
       {children}
     </CityContext.Provider>
   );

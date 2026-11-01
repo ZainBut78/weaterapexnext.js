@@ -14,6 +14,8 @@
 //   • estimate: aakhri din >= UTC aaj + 16 — forecast ke foran baad, koi
 //     khaali din nahi. Backend ka `<= 15` fix PEHLE deploy hona zaroori.
 // ─────────────────────────────────────────────────────────────
+import { intlLocale } from '@/i18n/format';
+
 export const FORECAST_LAST_OFFSET = 15;
 export const ESTIMATE_FIRST_END_OFFSET = 16;
 export const ESTIMATE_MAX_AHEAD_DAYS = 365;
@@ -31,9 +33,10 @@ export function addDays(iso, n) {
 export const daysBetween = (a, b) =>
   Math.round((new Date(`${b}T00:00:00Z`) - new Date(`${a}T00:00:00Z`)) / 86400000);
 
-// "Oct 6" — UTC mein format, taake browser ka timezone din na khiskaye
-export const fmtShort = (iso) =>
-  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+// "Oct 6" — UTC mein format, taake browser ka timezone din na khiskaye.
+// lang (i18n): "6. Okt.", "10月6日" … — en = pehle jaisa (en-US)
+export const fmtShort = (iso, lang = 'en') =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString(intlLocale(lang), { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
 export function forecastWindow(now = new Date()) {
   const start = localIso(now);

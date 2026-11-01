@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Marker, Popup, LayersControl, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useUnits } from '../context/UnitsContext';
+import { useT } from '@/i18n/client';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -27,6 +28,7 @@ function FlyToCity({ position }) {
 // ke qareeb aane par, alag chunk mein mangwata hai). Heading/subtitle wahan.
 export default function LeafletMap({ data }) {
   const units = useUnits(); // °C/°F (audit 3.2)
+  const t = useT();
   const position = [data.latitude, data.longitude];
   return (
     <MapContainer
@@ -39,10 +41,10 @@ export default function LeafletMap({ data }) {
       <FlyToCity position={position} />
 
       <LayersControl position="topright">
-        <LayersControl.BaseLayer name="Dark">
+        <LayersControl.BaseLayer name={t('weather.layerDark')}>
           <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
         </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer checked name="Satellite">
+        <LayersControl.BaseLayer checked name={t('weather.layerSatellite')}>
           <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
         </LayersControl.BaseLayer>
       </LayersControl>
@@ -55,7 +57,7 @@ export default function LeafletMap({ data }) {
       <Marker position={position}>
         <Popup>
           <strong>{data.city}</strong><br />
-          {units.temp1(data.current.temperature_2m)}{units.tempSymbol}
+          {units.fmt(units.temp1(data.current.temperature_2m))}{units.tempSymbol}
         </Popup>
       </Marker>
     </MapContainer>

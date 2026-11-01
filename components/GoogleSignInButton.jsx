@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GOOGLE_CLIENT_ID } from '../config/googleAuth';
+import { useLang, useT } from '@/i18n/client';
+import { INTL_LOCALE } from '@/i18n/config';
 
 const SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 
@@ -71,6 +73,8 @@ export default function GoogleSignInButton({
   text = 'continue_with',
   disabled = false,
 }) {
+  const lang = useLang();
+  const t = useT();
   const wrapRef = useRef(null);
   const hostRef = useRef(null);
   const [width, setWidth] = useState(0);
@@ -133,6 +137,8 @@ export default function GoogleSignInButton({
           shape: 'rectangular',
           logo_alignment: 'left',
           width,
+          // i18n: button ka text page ki zaban mein (English par pehle jaisa — browser se)
+          ...(lang !== 'en' ? { locale: INTL_LOCALE[lang] } : {}),
         });
       })
       .catch((err) => {
@@ -144,7 +150,7 @@ export default function GoogleSignInButton({
     return () => {
       cancelled = true;
     };
-  }, [width, text]);
+  }, [width, text, lang]);
 
   // Client ID set na ho to kuch bhi na dikhao — mara hua button dikhane
   // se behtar hai ke button hi na ho.
@@ -159,7 +165,7 @@ export default function GoogleSignInButton({
       </div>
       {failed && (
         <p className="mt-2 text-center text-xs font-semibold text-gray-500">
-          Google sign-in load nahi ho saki. Ad-blocker band karke dobara koshish karein.
+          {t('auth.googleLoadFailed')}
         </p>
       )}
     </div>

@@ -12,17 +12,22 @@
 //  Agar asli component ki layout badlein to yahan bhi badlein.
 // ─────────────────────────────────────────────────────────────
 
+'use client';
+
+import { useT } from '@/i18n/client';
+
 const bar = 'bg-gray-100 rounded-lg animate-pulse';
 
 // WeatherCard.jsx ka loaded layout (same classes)
 export function WeatherCardSkeleton() {
+  const t = useT();
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div
         className="relative bg-white rounded-3xl shadow-xl p-5 sm:p-7 lg:p-10 max-w-[900px] mx-auto overflow-hidden"
         aria-busy="true"
       >
-        <span className="sr-only">Loading weather data...</span>
+        <span className="sr-only">{t('weather.loadingWeather')}</span>
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 lg:gap-12 mb-6 lg:mb-10">
           <div className="flex items-center gap-4 sm:gap-6 min-w-0">
             {/* icon: w-16/20/24 */}
@@ -96,22 +101,23 @@ export function RadarSkeleton() {
 // max-h-[600px] — backend 15 din bhejta hai, is liye asli dabba bhi
 // hamesha 600px par ruk jata hai.
 export function ForecastSkeleton() {
+  const t = useT();
   return (
     <div className="w-full bg-white py-8 border-t border-gray-100" aria-busy="true">
       <div className="max-w-[1000px] mx-auto px-4 font-sans">
         <h2 className="text-3xl font-extrabold text-[#002244] mb-6 tracking-tight">
-          Long-range Forecast
+          {t('weather.forecastTitle')}
         </h2>
-        <span className="sr-only">Loading forecast...</span>
+        <span className="sr-only">{t('weather.loadingForecast')}</span>
 
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="bg-[#f2f6fd] border-b border-gray-200 px-6 py-3 hidden md:grid grid-cols-12 text-[11px] font-bold text-gray-500 uppercase tracking-wider items-center">
-            <div className="col-span-2">Day</div>
-            <div className="col-span-1 text-center">Cond</div>
-            <div className="col-span-2">Hi / Lo</div>
-            <div className="col-span-4">Description</div>
-            <div className="col-span-2">Night</div>
-            <div className="col-span-1 text-right">Precip</div>
+            <div className="col-span-2">{t('weather.cols.day')}</div>
+            <div className="col-span-1 text-center">{t('weather.cols.cond')}</div>
+            <div className="col-span-2">{t('weather.cols.hiLo')}</div>
+            <div className="col-span-4">{t('weather.cols.description')}</div>
+            <div className="col-span-2">{t('weather.cols.night')}</div>
+            <div className="col-span-1 text-right">{t('weather.cols.precip')}</div>
           </div>
 
           <div className="bg-white divide-y divide-gray-100 max-h-[600px] overflow-hidden">

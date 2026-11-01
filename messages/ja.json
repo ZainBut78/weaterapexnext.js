@@ -1,0 +1,932 @@
+{
+  "meta": {
+    "siteDescription": "旅行や屋外イベントの計画を安心して。日ごとの天気スコア、イベントのリスク分析、世界各地の都市の20年分の気候データを提供します。"
+  },
+  "nav": {
+    "home": "ホーム",
+    "tripPlanner": "旅行プランナー",
+    "events": "イベント",
+    "climateGuides": "気候ガイド",
+    "blog": "ブログ",
+    "apiDocs": "APIドキュメント",
+    "logout": "ログアウト",
+    "signIn": "ログイン",
+    "signUp": "新規登録",
+    "closeMenu": "メニューを閉じる",
+    "openMenu": "メニューを開く"
+  },
+  "langSwitch": {
+    "label": "言語"
+  },
+  "footer": {
+    "tagline": "絶えず動き続ける世界のために、気象情報を再定義。正確なデータを、誰にでもわかりやすく。",
+    "share": "共有",
+    "emailContact": "メールでのお問い合わせ",
+    "websiteLink": "ウェブサイト",
+    "product": "製品",
+    "localForecasts": "地域の天気予報",
+    "historicalData": "過去の気象データ",
+    "apiForDevelopers": "開発者向けAPI",
+    "radar": "レーダー表示",
+    "company": "会社情報",
+    "aboutUs": "会社概要",
+    "careers": "採用情報",
+    "scientificBoard": "科学諮問委員会",
+    "pressRoom": "プレスルーム",
+    "stayInformed": "最新情報を受け取る",
+    "newsletterText": "お住まいの地域の荒天警報をメールでお届けします。",
+    "emailPlaceholder": "メールアドレス",
+    "join": "登録",
+    "copyright": "© 2024 WeatherApex. 現代の旅行者のための正確なデータ。",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "cookies": "Cookie設定"
+  },
+  "notFound": {
+    "title": "ページが見つかりません",
+    "heading": "このページは地図から外れてしまいました",
+    "text": "お探しのページは存在しないか、移動した可能性があります。天気予報のページへ戻りましょう。",
+    "backHome": "ホームへ戻る",
+    "planTrip": "旅行を計画する"
+  },
+  "errors": {
+    "pageTitle": "問題が発生しました",
+    "pageText": "予期しないエラーによりページを読み込めませんでした。再読み込みすると多くの場合解決します。",
+    "reload": "ページを再読み込み",
+    "goHome": "ホームへ",
+    "api": {
+      "generic": "問題が発生しました。もう一度お試しください。",
+      "fields_required": "必須項目をすべて入力してください。",
+      "password_too_short": "パスワードは8文字以上にしてください。",
+      "password_too_common": "このパスワードはよく使われています。より安全なものを選んでください。",
+      "password_entirely_numeric": "数字だけのパスワードは使えません。",
+      "password_too_similar": "パスワードがユーザー名またはメールアドレスに似すぎています。",
+      "password_invalid": "より安全なパスワードを選んでください。",
+      "username_taken": "このユーザー名はすでに使われています。",
+      "otp_invalid": "コードが無効か、有効期限が切れています。新しいコードをリクエストしてください。",
+      "user_not_found": "このアカウントは見つかりませんでした。",
+      "invalid_credentials": "メールアドレス/ユーザー名またはパスワードが正しくありません。",
+      "account_not_verified": "アカウントの確認がまだ完了していません。メールでお送りしたコードを入力してください。",
+      "google_not_configured": "現在、Googleでのログインはご利用いただけません。",
+      "google_invalid_token": "Googleでのログインに失敗しました。もう一度お試しください。",
+      "google_no_email": "Googleアカウントにメールアドレスがありません。",
+      "google_email_unverified": "Googleアカウントのメールアドレスが確認されていません。",
+      "city_required": "都市を入力してください。",
+      "dates_required": "開始日と終了日を選んでください。",
+      "invalid_date": "有効な日付を選んでください。",
+      "end_before_start": "終了日は開始日より後にしてください。",
+      "max_days": "一度に計画できるのは最大{max}日間です。",
+      "city_not_found": "この都市は見つかりませんでした。",
+      "weather_unavailable": "現在、気象データを取得できません。しばらくしてからもう一度お試しください。",
+      "no_cities_for_country": "{country}の都市はまだありません。",
+      "city_date_required": "都市と日付を選んでください。",
+      "invalid_time": "有効な時刻を選んでください。",
+      "date_too_far": "予報は今後{max}日間のみです。",
+      "date_in_past": "過去の日付は選べません。",
+      "time_not_in_forecast": "この時刻の予報はまだありません。",
+      "no_forecast_for_date": "この日付の予報はまだありません。",
+      "rate_limited": "リクエストが多すぎます。少し待ってからもう一度お試しください。"
+    }
+  },
+  "about": {
+    "metaTitle": "会社概要",
+    "metaDescription": "WeatherApexとは何か、そして天気をどのようにスコア化しているか。",
+    "badge": "会社概要",
+    "tagline": "デジタルプロダクトをつくります。自社のものも、お客様のものも。",
+    "intro": "ビジネスとテクノロジーを360°でサポートするコンサルティング会社です。自社のデジタルプロダクトを開発するとともに、要件に沿ったしっかりとしたものを必要とする企業のためにウェブアプリケーションを構築しています。",
+    "startProject": "プロジェクトを始める",
+    "whatWeDo": "事業内容",
+    "whoWeAre": "私たちについて",
+    "whoParagraphs": [
+      "{company}はソフトウェアをつくるコンサルティング会社です。ソフトウェアについてのスライド資料ではなく、実際にリリースされ稼働しているものをつくります。",
+      "私たちの仕事には二つの軸があります。一つは自社のデジタルプロダクトの開発と運営で、WeatherApexはここから生まれました。もう一つはお客様のためのウェブアプリケーション開発で、私たちにとって手っ取り早いテンプレートではなく、お客様の要件に合わせて設計します。",
+      "自社プロダクトを運営していると、他社のための開発の仕方も変わります。遅いクエリ、処理されないエラー、スマホで崩れる画面など、手抜きのツケはすべて自分たちに返ってきます。そのため、受託だけの会社では身につかないほどの慎重さがチームに根づいています。"
+    ],
+    "atAGlance": "概要",
+    "glance": {
+      "founded": "設立",
+      "focus": "専門分野",
+      "focusValue": "ウェブアプリとデジタルプロダクト",
+      "clients": "お客様",
+      "clientsValue": "国内外",
+      "product": "自社プロダクト"
+    },
+    "whatWeDoText": "ウェブ向けに何かをつくりたいとお考えなら、私たちの対応範囲は次のとおりです。",
+    "services": [
+      {
+        "title": "オーダーメイドのウェブアプリケーション",
+        "desc": "テンプレートに押し込むのではなく、要件に合わせて構築します。ダッシュボード、予約システム、社内ツール、顧客ポータルなど、本当に必要なものを。"
+      },
+      {
+        "title": "プロダクトの設計と開発",
+        "desc": "打ち合わせでのアイデアから動くプロダクトまで。範囲の定義、設計、開発、リリースまで一貫して担当し、多くの会社が手放す工程まで伴走します。"
+      },
+      {
+        "title": "APIとバックエンドシステム",
+        "desc": "データパイプライン、外部サービスとの連携、他のチームが活用できるドキュメント付きAPI。見た目だけでなく、正しく動くことが求められる仕事です。"
+      },
+      {
+        "title": "レスポンシブなウェブサイト",
+        "desc": "スマホでもパソコンと同じように快適に使えるサイトやウェブアプリ。訪問者の多くはスマホから来るからです。"
+      },
+      {
+        "title": "UIデザイン",
+        "desc": "ユーザーがやりたいことを軸にレイアウトと導線を設計し、コードを公開する前に実際の画面サイズで検証します。"
+      },
+      {
+        "title": "監査と立て直し",
+        "desc": "誰も触りたがらないコードを引き継いでしまいましたか？セキュリティ、パフォーマンス、正確性を監査し、本当に壊れている部分を修正します。"
+      }
+    ],
+    "values": [
+      {
+        "title": "確かめてから言う",
+        "desc": "「動きます」と言うときは、実際に試しています。報告書の数値は推測ではなく測定に基づいています。"
+      },
+      {
+        "title": "本当の問題を伝える",
+        "desc": "お客様にとって大切なのは、心地よい答えより正直な問題提起です。自分たちのミスであっても、見つけたことは必ずお伝えします。"
+      },
+      {
+        "title": "使う人のためにつくる",
+        "desc": "世界の大半の人は、ミドルクラスのスマホと普通の回線でネットを使っています。私たちはまずその人たちのために設計します。"
+      },
+      {
+        "title": "タイムゾーンを越えて働く",
+        "desc": "世界中のお客様と仕事をしており、私たちではなくお客様のスケジュールに合わせて動きます。"
+      }
+    ],
+    "founders": {
+      "zain": {
+        "role": "創業者・リードエンジニア",
+        "bio": "アーキテクチャ、バックエンドシステム、そして実運用に耐える必要がある部分など、社内の開発全体を統括。WeatherApexをデータベース設計から現在の配信を支えるAPIまで構築しました。",
+        "focus": [
+          "バックエンドアーキテクチャ",
+          "APIとデータ",
+          "プロダクト開発"
+        ]
+      },
+      "sarim": {
+        "role": "共同創業者",
+        "bio": "コンサルティング部門を担当。案件の範囲を定め、要件を実現可能な形に落とし込み、納期とコストについて誠実な進行を守ります。新しいお客様が最初に話す相手です。",
+        "focus": [
+          "顧客戦略",
+          "要件定義と範囲設定",
+          "納品管理"
+        ]
+      }
+    },
+    "disciplines": [
+      {
+        "title": "フロントエンド開発",
+        "desc": "React、レスポンシブUI、アクセシビリティ"
+      },
+      {
+        "title": "バックエンド開発",
+        "desc": "Django、PostgreSQL、API設計"
+      },
+      {
+        "title": "プロダクトデザイン",
+        "desc": "UIデザイン、デザインシステム、プロトタイピング"
+      },
+      {
+        "title": "品質とテスト",
+        "desc": "自動テスト、パフォーマンス、セキュリティレビュー"
+      }
+    ],
+    "ourProduct": "自社プロダクト",
+    "productText1": "多くの天気サービスは「今の天気」を伝えます。WeatherApexは、それがあなたの予定にとって何を意味するかを伝えます。旅行の各日のスコア、屋外イベントのリスク評価、そして世界各地の都市の20年分の気候データです。",
+    "productText2": "これは私たちの仕事の実例でもあります。ドキュメント付きの公開API、実際の予報データ、そしてスマホを第一に考えたインターフェースです。",
+    "tryTripPlanner": "旅行プランナーを試す",
+    "readApiDocs": "APIドキュメントを読む",
+    "leadership": "経営陣",
+    "leadershipText": "実際にあなたとやり取りするメンバーです。",
+    "widerTeam": "チームメンバー",
+    "widerTeamText": "すべてのプロジェクトに携わるエンジニアとデザイナーです。",
+    "howWeWork": "私たちの働き方",
+    "ctaTitle": "つくりたいものはありますか？",
+    "ctaText": "ウェブアプリケーション、企業サイト、社内ツール、温めてきたプロダクトなど、何ができればよいかを教えてください。実現に何が必要かを正直にお伝えします。国内外のお客様と仕事をしています。",
+    "contact": {
+      "email": "メール",
+      "phone": "電話",
+      "location": "所在地",
+      "companyPage": "企業ページ",
+      "soonTitle": "連絡先は近日公開予定です",
+      "soonText": "現在、お問い合わせ窓口を準備中です。それまではサイトのフッターに記載の連絡先からご連絡ください。"
+    }
+  },
+  "common": {
+    "lastUpdated": "最終更新日：{date}",
+    "close": "閉じる",
+    "loading": "読み込み中…",
+    "newTab": "（新しいタブで開きます）"
+  },
+  "pricing": {
+    "title": "料金",
+    "metaDescription": "WeatherApexのプランと料金。",
+    "comingSoon": "料金 — 近日公開"
+  },
+  "privacy": {
+    "title": "プライバシーポリシー",
+    "metaDescription": "WeatherApexにおける個人データの取り扱いについて。",
+    "sections": [
+      {
+        "title": "1. 収集する情報",
+        "content": "登録時にご提供いただく情報（ユーザー名、メールアドレス、パスワード〈ソルト付きハッシュとして保存〉）を収集します。また、アクセスしたエンドポイント、タイムスタンプ、レスポンスのステータスコードを含むAPIの利用ログを記録します。都市の検索内容はサービス改善のため一時的に記録されます。正確な位置情報、閲覧履歴、本人確認書類は収集しません。"
+      },
+      {
+        "title": "2. 情報の利用方法",
+        "content": "メールアドレスは、アカウント認証（ワンタイムコード）、パスワードの再設定、重要なサービスのお知らせに使用します。利用ログは、利用制限の適用、エラーの調査、APIの改善に使用します。個人データを第三者に販売、貸与、共有することはありません。集計・匿名化した統計を透明性レポートとして公開する場合があります。"
+      },
+      {
+        "title": "3. データの保存とセキュリティ",
+        "content": "パスワードはDjangoのPBKDF2アルゴリズムでハッシュ化されます。APIキーはSHA-256ハッシュとして保存されるため、紛失した場合は復元できません。データは安全なデータセンターのPostgreSQLデータベースに保存されます。APIとの通信はすべてHTTPSで行われます。無料利用のログ（IPアドレスに基づく）は30日間保存された後、匿名化されます。"
+      },
+      {
+        "title": "4. Cookie",
+        "content": "ログインに必要な最小限の保存のみを使用します（ブラウザのlocalStorageに保存されるJWTトークン）。トラッキング用、分析用、第三者のCookieは使用しません。ローカルストレージはいつでも削除できます。削除するとログアウトされますが、基本機能はそのまま使えます。フィンガープリンティングやユーザー追跡技術は使用しません。"
+      },
+      {
+        "title": "5. 第三者のデータ",
+        "content": "気象データは、無料のオープンデータ気象APIであるOpen-Meteoから取得しています。Open-MeteoはECMWF、DWDなどの公的な気象モデルを利用しています。第三者のデータの正確性について当社は管理できません。ジオコーディングはOpen-MeteoのジオコーディングAPIで行い、住所データを恒久的に保存することはありません。"
+      },
+      {
+        "title": "6. お客様の権利",
+        "content": "privacy@weatherapex.com までメールをいただければ、いつでもアカウントと関連データの削除を依頼できます。削除により、プロフィール、APIキー、利用ログは30日以内に消去されます。保存されているデータのコピーを請求することもできます。ワンタイムコードの記録は10分後（有効期限切れ）または使用後に自動的に削除されます。"
+      },
+      {
+        "title": "7. 子どものプライバシー",
+        "content": "WeatherApexは13歳未満の子どもを対象としていません。子どもの情報を意図的に収集することはありません。子どもが個人データを提供したと思われる場合は、すぐにご連絡ください。削除いたします。"
+      },
+      {
+        "title": "8. 本ポリシーの変更",
+        "content": "本プライバシーポリシーは定期的に更新されることがあります。重要な変更は登録ユーザーにメールでお知らせします。変更後も本サービスを利用し続けた場合、更新後のポリシーに同意したものとみなされます。"
+      },
+      {
+        "title": "9. お問い合わせ",
+        "content": "プライバシーに関するお問い合わせは、データ保護責任者（privacy@weatherapex.com）までご連絡ください。所在地：WeatherApex HQ, Lahore, Pakistan。"
+      }
+    ]
+  },
+  "terms": {
+    "title": "利用規約",
+    "metaDescription": "WeatherApexの利用規約。",
+    "sections": [
+      {
+        "title": "1. 規約への同意",
+        "content": "WeatherApex（以下「本サービス」）にアクセスまたは利用することで、お客様は本利用規約に同意したものとみなされます。同意いただけない場合は本サービスを利用しないでください。当社は本規約をいつでも変更できるものとし、変更後の継続利用をもって変更に同意したものとみなします。"
+      },
+      {
+        "title": "2. サービスの内容",
+        "content": "WeatherApexは、気象データ、旅行計画のおすすめ、イベントのリスク評価、開発者向けのAPIアクセスを提供します。本サービスは「現状のまま」提供され、正確性、可用性、特定目的への適合性について一切保証しません。"
+      },
+      {
+        "title": "3. ユーザーアカウント",
+        "content": "アカウントの認証情報は、お客様ご自身の責任で管理してください。登録時には正確な情報を提供する必要があります。一人で複数の無料アカウントを保有することはできません。規約に違反したアカウントは予告なく停止される場合があります。"
+      },
+      {
+        "title": "4. APIの利用制限",
+        "content": "無料のAPIアクセスは、APIキー1つにつき合計100回までに制限されています。上限に達するとキーは無効になります。新しいキーを取得するには新規アカウントを登録できます。アカウントの自動作成や利用制限を回避する行為は禁止されており、永久的な利用停止の対象となります。"
+      },
+      {
+        "title": "5. 禁止事項",
+        "content": "お客様は以下を行わないことに同意します。(a) 違法な目的での本サービスの利用、(b) 書面による許可なくセキュリティを侵害したり脆弱性を試したりすること、(c) 明示的な許可なくAPIデータを再配布・再販売すること、(d) 通常のAPI利用の範囲を超えて、自動ツールでデータをスクレイピング・クロール・抽出すること、(e) 他のユーザーの本サービスへのアクセスを妨げること。"
+      },
+      {
+        "title": "6. 知的財産",
+        "content": "WeatherApexの名称、ロゴ、インターフェースのデザインは当社に帰属します。基となる気象データはOpen-Meteoおよびその他の公的な情報源から取得しています。当社のスコアリングアルゴリズム、アクティビティの推奨、都市分析は企業秘密です。"
+      },
+      {
+        "title": "7. 責任の制限",
+        "content": "WeatherApexは、本サービスの利用から生じる間接的、付随的、結果的な損害について責任を負いません。天気予報には本質的に不確実性があります。重要な判断は必ず地元当局の情報で確認してください。当社の責任の総額は、お客様が本サービスに支払った金額（ある場合）を上限とします。"
+      },
+      {
+        "title": "8. 利用停止",
+        "content": "本規約に違反した場合、当社は事前の通知なく、いつでもお客様のアクセスを停止または終了できます。終了と同時にAPIキーは直ちに無効になります。お客様はいつでも本サービスの利用をやめることができます。"
+      },
+      {
+        "title": "9. 準拠法",
+        "content": "本規約はパキスタンの法律に準拠します。紛争はパキスタン・ラホールの裁判所で解決するものとします。"
+      },
+      {
+        "title": "10. お問い合わせ",
+        "content": "本規約に関するご質問は legal@weatherapex.com までお寄せください。5営業日以内の回答を目指しています。"
+      }
+    ]
+  },
+  "auth": {
+    "metaSignInTitle": "ログイン",
+    "metaSignInDescription": "WeatherApexアカウントにログインします。",
+    "metaSignUpTitle": "アカウント作成",
+    "metaSignUpDescription": "無料のWeatherApexアカウントを作成して、旅行を計画し、APIキーを発行しましょう。",
+    "metaResetTitle": "パスワードの再設定",
+    "metaResetDescription": "WeatherApexアカウントのパスワードを再設定します。",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "hidePassword": "パスワードを隠す",
+    "showPassword": "パスワードを表示",
+    "orContinueWith": "または次の方法で続行",
+    "tooMany": {
+      "other": "試行回数が多すぎます。{count}分後にもう一度お試しください。"
+    },
+    "loginFailed": "ログインに失敗しました。もう一度お試しください。",
+    "googleSignInFailed": "Googleでのログインに失敗しました。もう一度お試しください。",
+    "welcomeBack": "おかえりなさい",
+    "signInSubtitle": "アカウントにログイン",
+    "passwordPlaceholder": "パスワードを入力",
+    "forgotPasswordQ": "パスワードをお忘れですか？",
+    "forgotPassword": "パスワードを忘れた場合",
+    "signingIn": "ログイン中…",
+    "signIn": "ログイン",
+    "signUp": "新規登録",
+    "googleHint": "Googleで登録しましたか？「Googleで続行」を使うか、{link}からパスワードを設定してください。",
+    "googleSignInLoad": "Googleログインを読み込めませんでした。接続状況や広告ブロッカーを確認してください。",
+    "noAccount": "アカウントをお持ちでない方",
+    "haveAccount": "すでにアカウントをお持ちの方",
+    "registrationFailed": "登録に失敗しました。もう一度お試しください。",
+    "googleSignUpFailed": "Googleでの登録に失敗しました。もう一度お試しください。",
+    "enterAllDigitsVerification": "確認コードを6桁すべて入力してください。",
+    "verificationFailed": "確認に失敗しました。もう一度お試しください。",
+    "createAccountTitle": "アカウント作成",
+    "getStarted": "WeatherApexを始めましょう",
+    "newPasswordPlaceholder": "パスワードを作成（8文字以上）",
+    "companyOptional": "会社名（任意）",
+    "companyPlaceholder": "会社名",
+    "creatingAccount": "アカウントを作成中…",
+    "createAccount": "アカウントを作成",
+    "googleSignUpLoad": "Google登録を読み込めませんでした。接続状況や広告ブロッカーを確認してください。",
+    "verifyEmailTitle": "メールアドレスの確認",
+    "verifyEmailText": "{email} が新しいアドレスの場合、6桁のコードを送信しました。すでにアカウントをお持ちの場合は、受信トレイのログイン用リンクをご確認ください。",
+    "verificationCode": "確認コード",
+    "digitOf": "6桁中{n}桁目",
+    "verifying": "確認中…",
+    "verifyEmail": "メールアドレスを確認",
+    "backToSignUp": "登録画面に戻る",
+    "sendCodeFailed": "コードを送信できませんでした。もう一度お試しください。",
+    "enterAllDigits": "コードを6桁すべて入力してください。",
+    "resetFailed": "パスワードの再設定に失敗しました。もう一度お試しください。",
+    "passwordUpdated": "パスワードを更新しました",
+    "resetTitle": "パスワードの再設定",
+    "resetIntro": "メールアドレスを入力すると、6桁のコードをお送りします。",
+    "resetSent": "{email} のアカウントが存在する場合、コードを送信しました。コードの有効期限は10分です。",
+    "resetDone": "新しいパスワードでログインできるようになりました。",
+    "sendingCode": "コードを送信中…",
+    "sendCode": "コードを送信",
+    "sixDigitCode": "6桁のコード",
+    "newPassword": "新しいパスワード",
+    "saving": "保存中…",
+    "setNewPassword": "新しいパスワードを設定",
+    "differentEmail": "別のメールアドレスを使う・再送信する",
+    "rememberedIt": "パスワードを思い出しましたか？",
+    "googleLoadFailed": "Googleログインを読み込めませんでした。広告ブロッカーをオフにしてもう一度お試しください。"
+  },
+  "freeLimit": {
+    "features": {
+      "tripPlanner": "旅行プランナー",
+      "eventRisk": "イベントのリスクスコア",
+      "newCity": "新しい都市の検索",
+      "climateHistory": "過去の気候データ",
+      "other": "この機能"
+    },
+    "title": {
+      "other": "本日の無料チェック（{count}回）を使い切りました"
+    },
+    "text": "無料アカウントを作成すると、{feature}を引き続きご利用いただけます。登録は1分ほどで完了します。",
+    "benefits": [
+      "旅行プランとイベントのリスクチェックが無制限",
+      "どの都市でも15日間の詳しい予報",
+      "20年分の気候データ",
+      "ご自身のプロジェクトに使える無料APIキー"
+    ],
+    "createAccount": "無料アカウントを作成",
+    "haveOne": "すでにお持ちですか？",
+    "signIn": "ログイン",
+    "later": "あとで",
+    "noticeText": "無料アカウントを作成して続けましょう。旅行プランとイベントのリスクチェックが無制限、さらに20年分の気候データも使えます。",
+    "haveAccount": "すでにアカウントを持っています"
+  },
+  "cityNeeded": {
+    "that": "その場所",
+    "titleCountry": "{place}は国名です。都市名を入力してください",
+    "titleRegion": "{place}は地域名です。都市名を入力してください",
+    "textCountry": "{place}の天気は都市ごとに異なるため、国全体で一つのスコアを出すと誤解を招きます。",
+    "textRegion": "{place}の天気は都市ごとに異なるため、地域全体で一つのスコアを出すと誤解を招きます。",
+    "pick": "{place}の都市を選んでください：",
+    "enterCity": "代わりに都市名を入力してください。",
+    "wantBest": "{place}のおすすめの都市を比較しますか？",
+    "searchByCountry": "国で検索する"
+  },
+  "search": {
+    "placeholder": "都市名または郵便番号で検索",
+    "suggestions": "都市の候補",
+    "didYouMean": "もしかして…？"
+  },
+  "wx": {
+    "unknown": {
+      "title": "データなし",
+      "desc": "現在、気象データを取得できません。"
+    },
+    "thunder": {
+      "title": "雷雨",
+      "desc": "雷雨のおそれがあります。"
+    },
+    "thunderHail": {
+      "title": "ひょうを伴う雷雨",
+      "desc": "ひょうを伴う雷雨のおそれがあります。"
+    },
+    "heavySnow": {
+      "title": "大雪",
+      "desc": "大雪が予想されます。"
+    },
+    "snowShowers": {
+      "title": "にわか雪",
+      "desc": "ときどき雪が予想されます。"
+    },
+    "snowGrains": {
+      "title": "霧雪",
+      "desc": "細かい雪が予想されます。"
+    },
+    "snow": {
+      "title": "雪",
+      "desc": "雪が予想されます。"
+    },
+    "freezingRain": {
+      "title": "着氷性の雨",
+      "desc": "着氷性の雨。路面凍結に注意。"
+    },
+    "heavyFreezingRain": {
+      "title": "強い着氷性の雨",
+      "desc": "強い着氷性の雨。凍結した路面に注意。"
+    },
+    "freezingDrizzle": {
+      "title": "着氷性の霧雨",
+      "desc": "着氷性の霧雨。路面凍結に注意。"
+    },
+    "violentShowers": {
+      "title": "激しいにわか雨",
+      "desc": "非常に激しいにわか雨が予想されます。"
+    },
+    "heavyShowers": {
+      "title": "強いにわか雨",
+      "desc": "まとまった雨が予想されます。"
+    },
+    "rainShowers": {
+      "title": "にわか雨",
+      "desc": "ときどき雨が予想されます。"
+    },
+    "heavyRain": {
+      "title": "大雨",
+      "desc": "まとまった雨が予想されます。"
+    },
+    "rain": {
+      "title": "雨",
+      "desc": "一日中雨が予想されます。"
+    },
+    "rainMostDay": {
+      "title": "雨",
+      "desc": "一日の大半で雨となりそうです。"
+    },
+    "lightRain": {
+      "title": "小雨",
+      "desc": "ときどき小雨。"
+    },
+    "drizzle": {
+      "title": "霧雨",
+      "desc": "弱い霧雨が予想されます。"
+    },
+    "foggy": {
+      "title": "霧",
+      "desc": "見通しが悪くなりそうです。"
+    },
+    "cloudy": {
+      "title": "くもり",
+      "desc": "どんよりした空が予想されます。"
+    },
+    "partlySunny": {
+      "title": "晴れ時々くもり",
+      "desc": "日差しと雲が入り混じります。"
+    },
+    "sunny": {
+      "title": "晴れ",
+      "desc": "一日中晴れ渡るでしょう。"
+    }
+  },
+  "wxNight": {
+    "unknown": "データなし",
+    "storms": "雷雨の可能性",
+    "heavySnow": "大雪",
+    "snow": "雪",
+    "freezingRain": "着氷性の雨",
+    "freezingDrizzle": "着氷性の霧雨",
+    "showers": "にわか雨",
+    "rainLikely": "雨の可能性大",
+    "drizzle": "霧雨",
+    "foggy": "霧",
+    "overcast": "くもり",
+    "partlyCloudy": "晴れ時々くもり",
+    "clearSky": "快晴"
+  },
+  "units": {
+    "tempUnit": "温度の単位",
+    "showCelsius": "°C — 摂氏で表示",
+    "showFahrenheit": "°F — 華氏で表示"
+  },
+  "weather": {
+    "notFound": "「{query}」が見つかりませんでした。",
+    "didYouMean": "もしかして：",
+    "checkSpelling": "つづりを確認するか、近くの大きな都市で試してください。",
+    "loadFailed": "気象データを読み込めませんでした。",
+    "locating": "現在地を取得中…",
+    "useMyLocation": "現在地を使う",
+    "geoDenied": "位置情報へのアクセスがブロックされました。代わりに都市名で検索してください。",
+    "geoError": "お住まいの都市が見つかりませんでした。代わりに検索してください。",
+    "precipitation": "降水確率",
+    "humidity": "湿度",
+    "wind": "風速",
+    "tabs": {
+      "temperature": "気温",
+      "precipitation": "降水確率",
+      "wind": "風速"
+    },
+    "chartUnavailable": "時間別グラフは現在表示できません。",
+    "forecastTitle": "長期予報",
+    "today": "今日",
+    "cols": {
+      "day": "日付",
+      "cond": "天気",
+      "hiLo": "最高 / 最低",
+      "description": "詳細",
+      "night": "夜",
+      "precip": "降水"
+    },
+    "nightLabel": "夜：",
+    "showerChance": "おおむね晴れ。一時的なにわか雨の可能性があります（確率{p}%）。",
+    "showerPossible": "おおむね晴れ。一時的なにわか雨の可能性があります。",
+    "thunderChance": "雷雨の可能性があります（確率{p}%）。",
+    "loadingWeather": "気象データを読み込み中…",
+    "loadingForecast": "予報を読み込み中…",
+    "iconAlt": "天気アイコン",
+    "mapTitle": "天気マップ",
+    "radar": "降水レーダー",
+    "layerDark": "ダーク",
+    "layerSatellite": "衛星写真"
+  },
+  "home": {
+    "metaTitle": "WeatherApex — 旅行と屋外イベントのための天気情報",
+    "metaImageTitle": "天気予報・旅行計画・気候ガイド",
+    "metaDescription": "旅行や屋外イベントの計画を安心して。日ごとの天気スコア、イベントのリスク分析、世界各地の都市の20年分の気候データを提供します。",
+    "h1": "天気予報・旅行計画・気候ガイド",
+    "featuresSubtitle": "ただの天気予報ではありません。プロ仕様のツール群が、複雑な物流や旅行の計画に役立つ具体的な判断材料を提供します。",
+    "features": [
+      {
+        "title": "旅行の天気プランナー",
+        "description": "ルート全体の天気をシミュレーションし、長距離の移動でも安全で快適な旅を実現します。",
+        "linkText": "詳しく見る"
+      },
+      {
+        "title": "イベントのリスクスコア",
+        "description": "屋外での結婚式やマラソンを計画中ですか？独自のアルゴリズムで、最大6か月前から気象リスクを算出します。",
+        "linkText": "試してみる"
+      },
+      {
+        "title": "過去データの分析",
+        "description": "特定の場所の数十年分の気候パターンを確認し、インフラや農業の意思決定にデータを活かせます。",
+        "linkText": "アーカイブを見る"
+      }
+    ],
+    "workflow": {
+      "title": "WeatherApexのしくみ",
+      "steps": [
+        {
+          "title": "条件を設定",
+          "description": "場所、期間、さまざまな気象現象に対する許容度を入力します。"
+        },
+        {
+          "title": "データを統合",
+          "description": "4万か所以上の観測所のデータと独自の衛星画像をリアルタイムで集約します。"
+        },
+        {
+          "title": "すぐ使えるレポート",
+          "description": "ニーズに合わせたPDFの自動サマリーや、ダッシュボードでのリアルタイム通知を受け取れます。"
+        }
+      ]
+    },
+    "digest": {
+      "title": "気象ダイジェスト",
+      "subtitle": "気候のトレンドと旅のヒントを専門家が解説します。",
+      "viewAll": "すべての記事を見る",
+      "articles": [
+        {
+          "category": "気候トレンド",
+          "title": "2024年、ヨーロッパの冬のパターンに起きている変化",
+          "description": "最新のデータは、中央ヨーロッパ上空の高気圧の配置に根本的な変化が起きていることを示しています。スキーシーズンへの影響は…"
+        },
+        {
+          "category": "テクノロジー",
+          "title": "AIが局地予報をどう変えているか",
+          "description": "局地的な嵐の予測において、機械学習モデルは従来の流体力学シミュレーションを上回る精度を示し始めています…"
+        },
+        {
+          "category": "旅のヒント",
+          "title": "バリ島の雨季を上手に過ごすコツ",
+          "description": "雨で旅を台無しにしないために。インドネシアの微気候データを使って、観光の予定を上手に立てる方法を紹介します…"
+        }
+      ]
+    }
+  },
+  "popular": {
+    "title": "人気の旅行先",
+    "scrollLeft": "旅行先を左へスクロール",
+    "scrollRight": "旅行先を右へスクロール",
+    "showWeatherFor": "天気を表示：",
+    "climateGuide": "気候ガイド →"
+  },
+  "trip": {
+    "metaTitle": "旅行の天気プランナー",
+    "metaDescription": "旅行の各日を雨・風・気温でスコア化し、どの日が何に向いているかがひと目でわかります。",
+    "h1": "旅行プランナー",
+    "intro": "天気をもとに日ごとにスコア化して、旅行に最適な日を見つけましょう",
+    "noImage": "画像はありません",
+    "err": {
+      "city": "都市名を入力してください",
+      "country": "国名を入力してください",
+      "wait": "少し待ってからもう一度お試しください",
+      "tapBoth": "旅行の初日と最終日をタップしてください",
+      "tapLast": "次に旅行の最終日をタップしてください（日帰りの場合は同じ日をもう一度タップ）",
+      "outOfRange": "{from}から{to}までの日付を選んでください。予報はこの期間までです。",
+      "startDate": "開始日を選んでください",
+      "startRange": "{from}から{to}までの開始日を選んでください",
+      "endDate": "終了日を選んでください",
+      "endBeforeStart": "終了日は開始日以降の日付にしてください",
+      "estimateFrom": "推定は{date}以降に終わる旅行が対象です。それより前の日付はリアルタイム予報をご利用ください。",
+      "endMax": "{date}より前の終了日を選んでください",
+      "maxDays": "旅行は最大{max}日まで対応しています（{days}日が選択されています）"
+    },
+    "byCity": "都市で検索",
+    "byCountry": "国で検索",
+    "city": "都市",
+    "country": "国",
+    "cityPlaceholder": "例：ロンドン、東京、ドバイ",
+    "countryPlaceholder": "例：スペイン、イタリア、日本",
+    "tripDates": "旅行日程",
+    "estimate": "推定",
+    "liveForecast": "リアルタイム予報",
+    "estimateNote": "20年分の気候データに基づく推定です（予報ではありません）",
+    "startDate": "開始日",
+    "endDate": "終了日",
+    "estimateHint": "{date}以降に終わる旅行が対象 · 最大20日間",
+    "backToForecast": "リアルタイム予報に戻る",
+    "furtherAhead": "もっと先の予定ですか？",
+    "planTrip": "旅行を計画",
+    "exploreCountry": "国を調べる",
+    "fetchFailed": "データを取得できませんでした",
+    "emptyTitle": "旅行を計画しましょう",
+    "emptyText": "都市で検索すると日ごとのスコアを、国で検索すると都市の比較を表示します",
+    "citiesIn": "{country}の都市",
+    "viewDetails": "詳細を見る →",
+    "clickCity": "都市をクリックすると、日ごとの詳しい旅行プランを表示します",
+    "backToCities": "← すべての都市に戻る",
+    "packing": {
+      "rain": "雨の予報",
+      "sun": "強い紫外線・暑さ",
+      "activity": "屋外アクティビティ",
+      "clothing": "服装",
+      "gear": "必需品"
+    },
+    "shopAmazon": "Amazonで購入",
+    "historicalEstimate": "過去データに基づく推定",
+    "overall": "総合",
+    "bestDay": "ベストな日：",
+    "na": "該当なし",
+    "leastIdeal": "最も不向きな日：",
+    "packingTitle": "おすすめの持ち物",
+    "packingText": "{city}で予想される天気に合わせて厳選したアイテムです。",
+    "showLess": "閉じる",
+    "viewMore": "さらに表示",
+    "tripDays": "旅行の日",
+    "firstDaySuffix": "（初日）",
+    "lastDaySuffix": "（最終日）",
+    "forecastAvailable": {
+      "other": "今後{count}日間の予報があります："
+    },
+    "tapFirst": "初日をタップ",
+    "tapLast": "次に最終日をタップ",
+    "selected": "{range}を選択中",
+    "activities": {
+      "beach_water": "ビーチ・マリンスポーツ",
+      "picnic_park": "ピクニック・公園",
+      "hiking_outdoor": "ハイキング・アウトドア",
+      "indoor_museum": "美術館・屋内",
+      "indoor_sheltered": "風を避けて屋内で",
+      "indoor_midday": "日中の暑さを避ける",
+      "city_sightseeing": "街歩き・観光"
+    },
+    "score": {
+      "excellent": "最高",
+      "good": "良い",
+      "fair": "まずまず",
+      "poor": "不向き"
+    },
+    "scoreRange": {
+      "excellent": "8.5〜10",
+      "good": "7〜8.4",
+      "fair": "5〜6.9",
+      "poor": "5未満"
+    },
+    "parts": {
+      "morning": "午前",
+      "afternoon": "午後",
+      "evening": "夕方"
+    },
+    "partHours": {
+      "morning": "6〜12時",
+      "afternoon": "12〜18時",
+      "evening": "18〜22時"
+    },
+    "reason": {
+      "rainHours": {
+        "other": "日中に約{count}時間の雨が予想されます。屋内での予定がいちばん安心です。"
+      },
+      "rainChanceIndoor": "降水確率{rain}%。屋内での予定がいちばん安心です。",
+      "strongWind": "最大{wind}の強風。風を避けられる場所を選びましょう。",
+      "hotCoast": "海沿いは暑い（{temp}）一日。水辺で過ごすのがおすすめです。",
+      "warmCoast": "海沿いは暖かく、おおむね晴れ。ビーチ日和です。",
+      "veryHot": "とても暑い（{temp}）一日。外出は朝か夕方にして、日中は屋内で過ごしましょう。",
+      "mildTrails": "過ごしやすい気温（{temp}）で、ハイキングにも十分なほど晴れています。",
+      "mildParks": "過ごしやすい気温（{temp}）。公園やピクニックにぴったりです。",
+      "cool": "肌寒い（{temp}）一日。観光には暖かい服装で。",
+      "comfortable": "快適な気温（{temp}）で、街歩きにちょうどよい一日です。",
+      "showerChance": "おおむね晴れ。一時的なにわか雨の可能性があります（確率{p}%）。",
+      "showerPossible": "おおむね晴れ。一時的なにわか雨の可能性があります。",
+      "umbrella": "降水確率{rain}%。傘を持っていきましょう。",
+      "thunder": "雷雨の可能性があります（確率{p}%）。空模様に注意しましょう。",
+      "breezy": "風がやや強く、最大{wind}。"
+    },
+    "showerPossible": "にわか雨の可能性",
+    "thunderPossible": "雷雨の可能性",
+    "duringDay": "一日の天気の移り変わり",
+    "partRain": "降水{p}%",
+    "dayScore": "その日のスコア（10点満点）：",
+    "bestDayPill": "ベストな日",
+    "leastIdealPill": "最も不向き",
+    "bestFor": "おすすめ：",
+    "bestTime": "ベストな時間帯：",
+    "temperature": "気温",
+    "highLow": "最高 {high}° · 最低 {low}°",
+    "rainChance": "降水確率",
+    "wind": "風速"
+  },
+  "events": {
+    "metaTitle": "屋外イベントの天気リスクスコア",
+    "metaDescription": "結婚式、コンサート、マラソンなど屋外イベントの天気リスクを評価し、近くのより良い日程も提案します。",
+    "h1": "屋外イベントの天気リスクスコア",
+    "intro": "安心して計画を。ピンポイントの気象パターンを分析し、屋外イベントの安全性と快適さを評価します。",
+    "dateAt": "{date} {time}",
+    "selectedLabel": "{date}（選択中）",
+    "tomorrowLabel": "明日、{date}",
+    "analyzing": "イベント当日の天気を分析中…",
+    "fetchFailed": "リスクデータを取得できませんでした",
+    "types": {
+      "wedding": "結婚式",
+      "marathon": "マラソン",
+      "concert": "コンサート",
+      "sports": "スポーツ",
+      "festival": "フェスティバル"
+    },
+    "eventType": "イベントの種類",
+    "location": "場所",
+    "locationPlaceholder": "都市名、国名",
+    "date": "日付",
+    "specificTime": "時間を指定する",
+    "checkRisk": "リスクをチェック",
+    "risk": {
+      "low": "リスク低",
+      "moderate": "リスク中",
+      "high": "リスク高"
+    },
+    "editDetails": "詳細を編集",
+    "edit": "編集",
+    "safeToProceed": "開催して問題ありません",
+    "wholeDayCaution": "終日注意",
+    "stat": {
+      "rain": "降水確率",
+      "wind": "風速（{unit}）",
+      "temp": "気温",
+      "humidity": "湿度"
+    },
+    "timelineTitle": "時間帯の分析",
+    "timelineWindow": "天気の影響を最小限に抑えられる、イベントに最適な{count}時間の時間帯が見つかりました。",
+    "timelineAny": "天気の影響を最小限に抑えられる、イベントに最適な時間帯が見つかりました。",
+    "hourWeather": "{hour}の天気",
+    "nearbyTitle": "前後の日程との比較",
+    "recommended": "おすすめ",
+    "betterOption": "より良い選択",
+    "selected": "選択中",
+    "advice": {
+      "low": "屋外での予定をそのまま進めて問題ありません。",
+      "moderate": "多少のリスクがあります。",
+      "rainBackup": "雨に備えて屋内の代替案を検討してください。",
+      "high": "リスクが高いです。日程の変更か屋内への切り替えを強くおすすめします。",
+      "narrowWindow": "注意：一日の大半は条件が悪く、この時間帯は例外的です。イベントの長さがこの時間内に収まるか確認してください。",
+      "dayWarning": "この日は{total}時間中{risky}時間（6〜22時）の条件が悪く、好条件なのはごく短い時間帯だけです。"
+    }
+  },
+  "guides": {
+    "metaTitle": "気候ガイド",
+    "metaDescription": "20年分の過去の気象データに基づく、月ごとの気候ガイド。",
+    "h1": "都市の気候ガイド",
+    "intro": "世界各地の都市の平均気温、降水量、天気の傾向を調べましょう",
+    "status": {
+      "not_found": "「{q}」という都市は見つかりませんでした。国名を加えてお試しください（例：「Santa Fe, USA」）。",
+      "rate_limited": "短時間に検索が集中しています。数分後にもう一度お試しください。",
+      "limit": "本日は新しい都市を多数追加しています。明日もう一度お試しください。",
+      "unsupported": "この場所は見つかりましたが、まだ気候ページを作成できません。",
+      "error": "現在、気候データを読み込めません。1分後にもう一度お試しください。"
+    },
+    "notACity": "{label}は国または地域で、都市ではありません。気候は都市ごとに異なります。代わりに都市を検索してください。",
+    "notACityPick": "{label}は国または地域で、都市ではありません。気候は都市ごとに異なります。代わりに都市を検索してください：",
+    "searchPlaceholder": "都市を検索…",
+    "searchLabel": "都市を検索",
+    "view": "表示",
+    "loadingCity": "{label}の気候データを読み込み中… 新しい都市の場合は数秒かかることがあります。",
+    "moreThanOne": "「{label}」は複数あります。どちらですか？",
+    "people": "人口{n}人",
+    "popular": "人気の旅行先",
+    "filterPlaceholder": "都市を絞り込む…",
+    "noMatch": "「{search}」に一致する都市はありません",
+    "noMatchHint": "上の検索ボックスから、どの都市の気候ガイドでも表示できます。",
+    "planInstead": "代わりに旅行を計画する",
+    "byMonthTitle": "月ごとの天気ガイド",
+    "byMonthText": "月ごとの気温や雨、そしてベストシーズンがわかります。",
+    "browseAll": "すべての国を見る",
+    "cityByMonth": "{city}の月ごとの天気",
+    "cantFind": "お探しの都市が見つかりませんか？",
+    "cantFindText": "上でどの都市でも検索すれば、すぐに気候ガイドを作成します。"
+  },
+  "blog": {
+    "title": "ブログ",
+    "titlePage": "ブログ — {page}ページ",
+    "description": "WeatherApexがお届けする、旅行の天気ガイド、気候の解説、持ち物のアドバイス。",
+    "descriptionPage": "WeatherApexがお届けする、旅行の天気ガイド、気候の解説、持ち物のアドバイス — {page}ページ。",
+    "h1": "WeatherApexブログ",
+    "intro": "気候のインサイト、都市ガイド、専門家による旅のヒント。",
+    "read": "読む",
+    "noPosts": "まだ記事がありません",
+    "checkBack": "新しい記事をお楽しみに。",
+    "previous": "← 前へ",
+    "next": "次へ →",
+    "pageOf": "{page} / {total}ページ",
+    "notFound": "記事が見つかりません",
+    "kicker": "WeatherApexブログ",
+    "back": "ブログに戻る",
+    "gear": "おすすめの持ち物",
+    "viewOnAmazon": "Amazonで見る →",
+    "weatherIn": "{cities}の天気",
+    "cityWeatherLink": "{city}の月ごとの天気と気候",
+    "alsoLike": "こちらもおすすめ",
+    "related": "関連記事",
+    "toc": "目次",
+    "onThisPage": "このページの内容",
+    "faq": "よくある質問",
+    "furtherReading": "あわせて読みたい",
+    "sources": "出典",
+    "categories": {
+      "usa-weather-guides": "アメリカの天気ガイド",
+      "travel-guides": "旅行ガイド",
+      "weather-tips": "天気のヒント"
+    }
+  },
+  "weatherHub": {
+    "crumb": "天気",
+    "metaTitle": "国別・月別の天気 — WeatherApex",
+    "metaImageTitle": "国別・月別の天気",
+    "metaDescription": "{countries}の国と地域、{cities}都市の気候ガイド。月ごとの気温と降水量、ベストシーズンがわかります。",
+    "h1": "国別の天気",
+    "intro": "{countries}の国と地域、{cities}都市の月ごとの天気。20年分の過去の気象データに基づいています。",
+    "regions": {
+      "europe": "ヨーロッパ",
+      "north-america": "北アメリカ",
+      "latin-america": "ラテンアメリカ",
+      "middle-east-africa": "中東・アフリカ",
+      "asia": "アジア",
+      "oceania": "オセアニア"
+    },
+    "regionCount": "{countries}か国 · {cities}都市",
+    "cities": {
+      "other": "{count}都市"
+    }
+  },
+  "climate": {
+    "table": {
+      "month": "月",
+      "avgHigh": "平均最高気温",
+      "avgLow": "平均最低気温",
+      "rainfall": "降水量",
+      "rainyDays": "雨の日数",
+      "sunshine": "日照時間"
+    },
+    "showLess": "閉じる",
+    "fullYear": "1年分を表示",
+    "same": "同じ"
+  }
+}

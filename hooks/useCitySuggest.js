@@ -14,15 +14,18 @@
 // ─────────────────────────────────────────────────────────────
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { fetchCitySuggestions } from '@/services/weatherService';
-import { matchCities, mergeSuggestions, normalizeText } from '@/utils/fuzzyCity';
+import { cityLabel, matchCities, mergeSuggestions, normalizeText } from '@/utils/fuzzyCity';
+import { useLang } from '@/i18n/client';
+import { countryLabel } from '@/utils/placeLabel';
 
 const DEBOUNCE_MS = 300;
 const remoteCache = new Map(); // normalized query → results (tab band hone tak)
 
 export default function useCitySuggest(query, { enabled = true, limit = 8 } = {}) {
+  const lang = useLang();
   const q = normalizeText(query);
-  const active = enabled && q.length >= 2;
-  const local = useMemo(() => (active ? matchCities(query, { limit: 5 }) : []), [active, query]);
+  const active = enabled && q.replace(/ /g, '').length >= 2;
+  const local = useMemo(() => (active ? matchCities(query, { limit: 5, lang }) : []), [active, query, lang]);
   const [remote, setRemote] = useState({ q: '', results: [] });
   const abortRef = useRef(null);
 
@@ -53,13 +56,16 @@ export default function useCitySuggest(query, { enabled = true, limit = 8 } = {}
 
   const items = useMemo(() => {
     if (!active) return [];
-    const remoteNow = remote.q === q ? remote.results : [];
-    return mergeSuggestions(local, remoteNow, limit);
-  }, [active, local, remote, q, limit]);
+    const remoteNow = (remote.q === q ? remote.results : [])
+      .map((s) => ({ ...s, label: cityLabel(s.slug, s.name, lang) }));
+    // `country` dedupe ke liye English hi; dikhane ke liye `countryLabel`
+    return mergeSuggestions(local, remoteNow, limit)
+      .map((s) => ({ ...s, countryLabel: countryLabel(s.country, lang) }));
+  }, [active, local, remote, q, limit, lang]);
 
   // "Did you mean" — sirf jab koi sahi/shuru-wala match na ho, sirf spelling wale
   const didYouMean = local.length > 0 && local.every((s) => s.kind === 'fuzzy')
-    && !items.some((s) => !s.kind && normalizeText(s.name).startsWith(q));
+    && !items.some((s) => !s.kind && (normalizeText(s.name).startsWith(q) || normalizeText(s.label).startsWith(q)));
 
   return { items, didYouMean };
 }

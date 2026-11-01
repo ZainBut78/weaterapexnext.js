@@ -2,15 +2,18 @@
 
 import { CloudRain, Wind, Thermometer, Droplets, CheckCircle2, AlertTriangle, Pencil } from 'lucide-react';
 import { useUnits } from '../../context/UnitsContext';
+import { useT } from '@/i18n/client';
 
+// label: t(`events.risk.${level}`)
 const RISK_CONFIG = {
-  low: { color: '#34D399', bg: 'bg-emerald-50', text: 'text-emerald-600', label: 'LOW RISK' },
-  moderate: { color: '#FB923C', bg: 'bg-orange-50', text: 'text-orange-600', label: 'MODERATE RISK' },
-  high: { color: '#F87171', bg: 'bg-red-50', text: 'text-red-600', label: 'HIGH RISK' },
+  low: { color: '#34D399', bg: 'bg-emerald-50', text: 'text-emerald-600' },
+  moderate: { color: '#FB923C', bg: 'bg-orange-50', text: 'text-orange-600' },
+  high: { color: '#F87171', bg: 'bg-red-50', text: 'text-red-600' },
 };
 
 const RiskResult = ({ data, onEdit }) => {
   const units = useUnits(); // °C/°F + km/h/mph (audit 3.2)
+  const t = useT();
   const {
     eventType = 'Wedding',
     city = 'Barcelona, Spain',
@@ -27,7 +30,8 @@ const RiskResult = ({ data, onEdit }) => {
 
   // riskLevel backend se kuch aur aa jaye to config undefined ho jata tha
   // aur poora component crash kar deta tha. Fallback ab "low" hai.
-  const config = RISK_CONFIG[riskLevel] || RISK_CONFIG.low;
+  const level = RISK_CONFIG[riskLevel] ? riskLevel : 'low';
+  const config = RISK_CONFIG[level];
 
   // riskScore par seedha .toFixed() lagta tha — agar backend null/string
   // bhej de to "toFixed is not a function" se result card blank ho jata.
@@ -63,8 +67,8 @@ const RiskResult = ({ data, onEdit }) => {
           className="flex shrink-0 items-center justify-center gap-1.5 -mr-2 -mt-1 min-h-11 px-2 whitespace-nowrap text-sm font-medium text-blue-600 hover:text-blue-700"
         >
           <Pencil size={14} className="shrink-0" />
-          <span className="hidden sm:inline">Edit Details</span>
-          <span className="sm:hidden">Edit</span>
+          <span className="hidden sm:inline">{t('events.editDetails')}</span>
+          <span className="sm:hidden">{t('events.edit')}</span>
         </button>
       </div>
 
@@ -90,7 +94,7 @@ const RiskResult = ({ data, onEdit }) => {
             </div>
           </div>
           <span className={`mt-4 ${config.bg} ${config.text} text-xs font-bold px-4 py-1.5 rounded-full`}>
-            {config.label}
+            {t(`events.risk.${level}`)}
           </span>
         </div>
 
@@ -99,7 +103,7 @@ const RiskResult = ({ data, onEdit }) => {
           <div className={`flex gap-3 ${config.bg} border-l-4 rounded-r-lg p-4 mb-5`} style={{ borderColor: config.color }}>
             <CheckCircle2 size={20} className={`${config.text} flex-shrink-0 mt-0.5`} />
             <div>
-              <p className={`font-semibold text-sm ${config.text} mb-1`}>Safe to proceed</p>
+              <p className={`font-semibold text-sm ${config.text} mb-1`}>{t('events.safeToProceed')}</p>
               <p className="text-sm text-slate-600">{recommendation}</p>
             </div>
           </div>
@@ -108,17 +112,17 @@ const RiskResult = ({ data, onEdit }) => {
             <div className="flex gap-3 bg-amber-50 border-l-4 rounded-r-lg p-4 mb-5" style={{ borderColor: '#F59E0B' }}>
               <AlertTriangle size={20} className="text-amber-500 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-sm text-amber-700 mb-1">Whole-day caution</p>
+                <p className="font-semibold text-sm text-amber-700 mb-1">{t('events.wholeDayCaution')}</p>
                 <p className="text-sm text-slate-600">{warning}</p>
               </div>
             </div>
           )}
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <StatCard icon={CloudRain} value={`${rainProbability}%`} label="RAIN" color="text-blue-500" />
-            <StatCard icon={Wind} value={units.wind(windKmh)} label={`${units.windUnit.toUpperCase()} WIND`} color="text-slate-500" />
-            <StatCard icon={Thermometer} value={`${units.temp(temperatureC)}°`} label="TEMP" color="text-orange-500" />
-            <StatCard icon={Droplets} value={`${humidityPct}%`} label="HUMIDITY" color="text-blue-400" />
+            <StatCard icon={CloudRain} value={`${rainProbability}%`} label={t('events.stat.rain')} color="text-blue-500" />
+            <StatCard icon={Wind} value={units.wind(windKmh)} label={t('events.stat.wind', { unit: units.windUnit.toUpperCase() })} color="text-slate-500" />
+            <StatCard icon={Thermometer} value={`${units.temp(temperatureC)}°`} label={t('events.stat.temp')} color="text-orange-500" />
+            <StatCard icon={Droplets} value={`${humidityPct}%`} label={t('events.stat.humidity')} color="text-blue-400" />
           </div>
         </div>
       </div>

@@ -7,13 +7,13 @@
 import Link from 'next/link';
 import { ArrowRight, BookOpen, ExternalLink } from 'lucide-react';
 
-export function FurtherReading({ links }) {
+export function FurtherReading({ links, t }) {
   if (!links || links.length === 0) return null;
   return (
     <aside aria-labelledby="further-reading-heading" className="mt-10 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
       <h2 id="further-reading-heading" className="flex items-center gap-2 text-lg font-extrabold text-[#002244] mb-4">
         <BookOpen className="w-5 h-5 text-[#0077b6]" aria-hidden="true" />
-        Further reading
+        {t('blog.furtherReading')}
       </h2>
       <ul className="grid gap-3 sm:grid-cols-2">
         {links.map((l, i) => (
@@ -32,12 +32,12 @@ export function FurtherReading({ links }) {
   );
 }
 
-export function Sources({ sources }) {
+export function Sources({ sources, t }) {
   if (!sources || sources.length === 0) return null;
   return (
     <section aria-labelledby="sources-heading" className="mt-6 px-1">
       <h2 id="sources-heading" className="text-sm font-extrabold text-[#002244] uppercase tracking-wider mb-2">
-        Sources
+        {t('blog.sources')}
       </h2>
       <ol className="list-decimal pl-5 space-y-1 text-sm text-gray-600">
         {sources.map((s, i) => (
@@ -50,7 +50,7 @@ export function Sources({ sources }) {
             >
               {s.name}
               <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-              <span className="sr-only">(opens in a new tab)</span>
+              <span className="sr-only">{t('common.newTab')}</span>
             </a>
           </li>
         ))}

@@ -2,21 +2,38 @@
 //  Local "Did you mean…?" — hamari 160 cities (data/cities.js) se,
 //  ZERO API calls (UX fixes PART B).
 //
-//  • Capital letters aur accents ignore: "zürich" = "zurich".
+//  • Har zaban ka naam: English + data/placeNames (de/it/fr/es/ja) —
+//    "Londra", "Londres", "ロンドン", "München", "東京" sab → wahi shehar.
+//    Result ka `name` hamesha English (backend / URL isi se chalte hain),
+//    `label` user ki zaban mein (dikhane ke liye).
+//  • Capital letters, accents, full-width/half-width, hiragana/katakana,
+//    "・" aur spaces ignore: "zürich" = "zurich", "とうきょう"… "サン・パウロ" = "サンパウロ".
 //  • Damerau-Levenshtein (OSA): ek harf ghalat / kam / zyada / do
-//    harf ulat ("pheonix" → phoenix, "new yrok" → new york) = 1 ghalti.
+//    harf ulat ("pheonix" → phoenix, "new yrok" → new york, "ロソドン" → ロンドン) = 1 ghalti.
 //  • Type karte hue adhoora naam bhi chale: query ko naam ke utne hi
-//    harfon (prefix) se bhi milaya jata hai ("barcel" → Barcelona).
+//    harfon (prefix) se bhi milaya jata hai ("barcel" → Barcelona, "ミュン" → ミュンヘン).
 // ─────────────────────────────────────────────────────────────
-import { CITIES } from '@/data/cities';
+// Relative imports — node --test (tests/unit/fuzzyCity.test.mjs) bhi chala sake
+import { CITIES } from '../data/cities.js';
+import { CITY_NAMES } from '../data/placeNames.js';
+
+// NFD se toot-te nahi — alag se
+const LATIN_FOLD = { ß: 'ss', ø: 'o', æ: 'ae', œ: 'oe', ł: 'l', đ: 'd', ı: 'i', þ: 'th' };
 
 export const normalizeText = (s) =>
   String(s || '')
+    .normalize('NFKC')                                    // ｔｏｋｙｏ → tokyo, ｶﾀｶﾅ → カタカナ
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[̀-ͯ]/g, '')                    // sirf Latin accents (dakuten ゛ bacha rahe)
+    .normalize('NFC')
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/[ßøæœłđıþ]/g, (ch) => LATIN_FOLD[ch])
+    .replace(/[ぁ-ゖ]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) + 0x60))   // hiragana → katakana
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .trim();
+
+// Moqable ki chabi — spaces bhi nahi ("new york" = "newyork", "サン パウロ" = "サンパウロ")
+const compact = (s) => normalizeText(s).replace(/ /g, '');
 
 // Optimal String Alignment distance (Damerau-Levenshtein ki aam qisam)
 export function editDistance(a, b) {
@@ -42,53 +59,99 @@ export function editDistance(a, b) {
   return prev[n];
 }
 
-// Kitni ghaltiyan maaf: chhoti query par kam (warna "par" har cheez se mil jaye)
-const allowedErrors = (len) => (len <= 3 ? 0 : len <= 5 ? 1 : len <= 8 ? 2 : 3);
+// Kitni ghaltiyan maaf: chhoti query par kam (warna "par" har cheez se mil jaye).
+// Kanji ek harf mein poora lafz → aadhi chhoot.
+const KANJI = /[一-鿿]/;
+const allowedErrors = (q) => {
+  const len = KANJI.test(q) ? q.length * 2 : q.length;
+  return len <= 3 ? 0 : len <= 5 ? 1 : len <= 8 ? 2 : 3;
+};
 
-const INDEX = CITIES.map((c) => ({ city: c, norm: normalizeText(c.name), slugNorm: normalizeText(c.slug) }));
+// Kanji naam wale shehar ki kana reading — log "とうきょう" / "トウキョウ" bhi likhte hain
+// (hiragana khud katakana ban jata hai, is liye sirf katakana)
+const KANA_READINGS = {
+  tokyo: ['トウキョウ'], osaka: ['オオサカ'], kyoto: ['キョウト'], beijing: ['ペキン'],
+  shanghai: ['シャンハイ'], guangzhou: ['コウシュウ'], chengdu: ['セイト', 'チェンドゥ'],
+  shenzhen: ['シンセン'], 'hong-kong': ['ホンコン'], busan: ['プサン'], bali: ['バリ'],
+};
 
-const pick = ({ slug, name, country }) => ({ slug, name, country });
+// Har shehar ke saare naam (English, slug, har zaban, kana reading) — ek baar
+const INDEX = CITIES.map((c) => {
+  const keys = new Set([compact(c.name), compact(c.slug)]);
+  for (const n of [...Object.values(CITY_NAMES[c.slug] || {}), ...(KANA_READINGS[c.slug] || [])]) keys.add(compact(n));
+  keys.delete('');
+  return { city: c, keys: [...keys] };
+});
+
+/** Shehar ka naam user ki zaban mein (dikhane ke liye); English / anjaan → asal naam */
+export const cityLabel = (slug, name, lang) => (lang && lang !== 'en' && CITY_NAMES[slug]?.[lang]) || name;
+
+const pick = ({ slug, name, country }, lang) => ({ slug, name, country, label: cityLabel(slug, name, lang) });
+
+// Ek naam (key) se query ka rishta: 0 exact · 1 prefix · 2 fuzzy · null
+function score(q, key, partial, maxErr) {
+  if (key === q) return { rank: 0, dist: 0 };
+  if (partial && key.startsWith(q)) return { rank: 1, dist: 0 };
+  if (!maxErr) return null;
+  let dist = editDistance(q, key);
+  if (partial && q.length >= 4 && key.length > q.length) {
+    dist = Math.min(dist, editDistance(q, key.slice(0, q.length)));
+  }
+  return dist <= maxErr ? { rank: 2, dist } : null;
+}
+
+const KINDS = ['exact', 'prefix', 'fuzzy'];
 
 /**
- * Query se milte shehar, behtareen pehle.
- *   { exact, prefix, fuzzy } har result par `kind` mein.
- *   prefix = naam isi se shuru hota hai (type ho raha hai)
- *   fuzzy  = spelling ki ghalti (yahi "Did you mean")
+ * Query se milte shehar, behtareen pehle (har shehar ek baar, us ke behtareen naam se).
+ *   `kind`: exact | prefix (type ho raha hai) | fuzzy (spelling ki ghalti — "Did you mean")
  * `partial: false` → sirf poore naam se milao (Enter ke baad "not found").
+ * `lang` → `label` us zaban mein.
  */
-export function matchCities(query, { limit = 5, partial = true } = {}) {
-  const q = normalizeText(query);
+export function matchCities(query, { limit = 5, partial = true, lang } = {}) {
+  const q = compact(query);
   if (q.length < 2) return [];
-  const maxErr = allowedErrors(q.length);
+  const maxErr = allowedErrors(q);
   const scored = [];
-  for (const { city, norm, slugNorm } of INDEX) {
-    if (norm === q || slugNorm === q) {
-      scored.push({ ...pick(city), kind: 'exact', rank: 0, dist: 0 });
-      continue;
+  for (const { city, keys } of INDEX) {
+    let best = null;
+    for (const key of keys) {
+      const s = score(q, key, partial, maxErr);
+      if (s && (!best || s.rank < best.rank || (s.rank === best.rank && s.dist < best.dist))) best = s;
+      if (best?.rank === 0) break;
     }
-    if (partial && norm.startsWith(q)) {
-      scored.push({ ...pick(city), kind: 'prefix', rank: 1, dist: 0 });
-      continue;
-    }
-    let dist = editDistance(q, norm);
-    if (partial && q.length >= 4 && norm.length > q.length) {
-      dist = Math.min(dist, editDistance(q, norm.slice(0, q.length)));
-    }
-    if (maxErr > 0 && dist <= maxErr) {
-      scored.push({ ...pick(city), kind: 'fuzzy', rank: 2, dist });
-    }
+    if (best) scored.push({ ...pick(city, lang), kind: KINDS[best.rank], ...best });
   }
   scored.sort((a, b) => a.rank - b.rank || a.dist - b.dist || a.name.length - b.name.length || a.name.localeCompare(b.name));
   // Bilkul sahi naam mil gaya to spelling wale andaze ("zurich" → Munich) nahi
   const hasExact = scored.some((s) => s.kind === 'exact');
-  return (hasExact ? scored.filter((s) => s.kind !== 'fuzzy') : scored).slice(0, limit);
+  return (hasExact ? scored.filter((s) => s.kind !== 'fuzzy') : scored)
+    .slice(0, limit)
+    .map(({ rank, dist, ...rest }) => rest);
 }
 
-/** Bilkul isi naam/slug ka shehar hamari list mein (accent/case ignore) — warna null */
-export function exactCity(query) {
-  const q = normalizeText(query);
-  const hit = INDEX.find((x) => x.norm === q || x.slugNorm === q);
-  return hit ? pick(hit.city) : null;
+/** Bilkul isi naam (kisi bhi zaban mein) / slug ka shehar — warna null */
+export function exactCity(query, lang) {
+  const q = compact(query);
+  if (!q) return null;
+  const hit = INDEX.find((x) => x.keys.includes(q));
+  return hit ? pick(hit.city, lang) : null;
+}
+
+/**
+ * Backend ko bhejne wala naam: hamari list ka shehar kisi bhi zaban / spelling
+ * mein likha ho ("東京", "Londra", "Munchen") → English naam; warna jo likha.
+ * Adhoora naam ("Monaco di Bav", "ばるせ") sirf tab jab sirf EK shehar us se
+ * shuru hota ho. Spelling ki ghalti ("barcelna") yahan khud theek NAHI hoti —
+ * user ne jo likha wahi search hota hai, aur list / "Did you mean" sahi naam
+ * dikhati hai (UX fixes B: koi option chuna nahi → jaisa likha waisa search).
+ */
+export function canonicalCityName(query) {
+  const text = String(query || '').trim();
+  const exact = exactCity(text);
+  if (exact) return exact.name;
+  const close = matchCities(text, { limit: 2 }).filter((m) => m.kind !== 'fuzzy');
+  return close.length === 1 ? close[0].name : text;
 }
 
 /** Local + API suggestions mila kar — local pehle, duplicate (slug ya naam) nahi */

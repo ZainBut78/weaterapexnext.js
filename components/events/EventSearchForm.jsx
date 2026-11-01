@@ -2,17 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Heart, User, Music, Circle, Building2, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { useT } from '@/i18n/client';
+import { canonicalCityName } from '@/utils/fuzzyCity';
 
+// label: t(`events.types.${key}`)
 const EVENT_TYPES = [
-  { key: 'wedding', label: 'Wedding', icon: Heart },
-  { key: 'marathon', label: 'Marathon', icon: User },
-  { key: 'concert', label: 'Concert', icon: Music },
-  { key: 'sports', label: 'Sports', icon: Circle },
-  { key: 'festival', label: 'Festival', icon: Building2 },
+  { key: 'wedding', icon: Heart },
+  { key: 'marathon', icon: User },
+  { key: 'concert', icon: Music },
+  { key: 'sports', icon: Circle },
+  { key: 'festival', icon: Building2 },
 ];
 
 const EventSearchForm = ({ onSubmit }) => {
   const [eventType, setEventType] = useState('wedding');
+  const t = useT();
   const [city, setCity] = useState('');
   const [date, setDate] = useState('');
   const [specificTime, setSpecificTime] = useState(true);
@@ -39,7 +43,7 @@ const EventSearchForm = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit?.({ eventType, city, date, time: specificTime ? time : null });
+    onSubmit?.({ eventType, city: canonicalCityName(city), date, time: specificTime ? time : null });
   };
 
   return (
@@ -48,10 +52,11 @@ const EventSearchForm = ({ onSubmit }) => {
 
         {/* Event Type Selector */}
         <label className="block text-sm font-semibold text-slate-700 mb-3">
-          Event Type
+          {t('events.eventType')}
         </label>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
-          {EVENT_TYPES.map(({ key, label, icon: Icon }) => {
+          {EVENT_TYPES.map(({ key, icon: Icon }) => {
+            const label = t(`events.types.${key}`);
             const isActive = eventType === key;
             return (
               <button
@@ -76,7 +81,7 @@ const EventSearchForm = ({ onSubmit }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Location
+              {t('events.location')}
             </label>
             <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-4 py-3">
               <MapPin size={18} className="text-gray-400 flex-shrink-0" />
@@ -84,7 +89,7 @@ const EventSearchForm = ({ onSubmit }) => {
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="City, Country"
+                placeholder={t('events.locationPlaceholder')}
                 required
                 className="w-full outline-none text-sm text-slate-800 placeholder-gray-400"
               />
@@ -93,7 +98,7 @@ const EventSearchForm = ({ onSubmit }) => {
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Date
+              {t('events.date')}
             </label>
             <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-4 py-3">
               <Calendar size={18} className="text-gray-400 flex-shrink-0" />
@@ -135,7 +140,7 @@ const EventSearchForm = ({ onSubmit }) => {
                     }`}
                 />
               </span>
-              <span className="text-sm font-medium text-slate-700 whitespace-nowrap">Specific time?</span>
+              <span className="text-sm font-medium text-slate-700 whitespace-nowrap">{t('events.specificTime')}</span>
             </button>
             {specificTime && (
               <input
@@ -151,7 +156,7 @@ const EventSearchForm = ({ onSubmit }) => {
             type="submit"
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-6 py-3 rounded-full transition-colors w-full sm:w-auto justify-center"
           >
-            Check Risk Score
+            {t('events.checkRisk')}
             <ArrowRight size={16} />
           </button>
         </div>

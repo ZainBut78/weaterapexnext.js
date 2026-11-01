@@ -1317,3 +1317,119 @@ Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mei
 - `app/api/revalidate/route.js`: `Authorization: Bearer` header naya tareeqa; purana `?secret=` abhi bhi qubool (deploy ke beech purana backend na toote) — istemal par `console.warn` (secret log nahi). Backend ab sirf header bhejta hai; dono deploy ke baad query raasta hata sakte hain.
 - Naya `tests/e2e/revalidate-auth.spec.mjs` (3): ghalat/khaali secret 401, header 200, purana query 200.
 - Tests: build OK · e2e 72 pass, 2 fail (wahi local data — Australia 308, sitemap < 2000), 1 skip.
+
+## 2026-10-28 — i18n Phase 1: zabanon ka framework (de, it, ja, fr, es)
+- Routing: saare pages `app/[lang]/` mein (git mv). `proxy.js`: bina-prefix (English) URL andar se `/en/...` par REWRITE (browser URL wahi); `/en/...` → ek hop 308 bina prefix (loop mumkin nahi); purane qawaid (aakhri "/", lowercase, 1-shehar mulk, purana city URL) zaban ke andar hi redirect. API, sitemap, robots, og-image, icon root par.
+- `ENABLED_LOCALES` (server env, build + runtime): jo zaban is mein nahi → har page noindex (meta + `X-Robots-Tag`), switcher se bahar. Default sirf `en`. Static pages build par bante hain → env badalne ke baad redeploy.
+- `i18n/`: config (locales, `localePath`, `barePath`), server (`getT`, `enabledLocales`, root-params `lang`), client (`I18nProvider`, `useT`, `useLocalePath`, `useLocaleRouter`, `useBarePathname`), `translate.js` (`t`, plurals via Intl.PluralRules, `t.rich`), `format.js` (Intl numbers/dates/months/DisplayNames), `ClientMessages.jsx`, `namespaces.js`.
+- `messages/{en,de,it,ja,fr,es}.json` — ~625 UI strings; `scripts/check-messages.mjs` (keys, placeholders, arrays, plurals) — sab pass. `scripts/i18n-scan.mjs` — hard-coded English dhoondhne ka heuristic.
+- Components: `LocaleLink`, `LanguageSwitcher` (navbar dropdown + mobile menu + footer; sirf enabled zabanein; ek zaban → kuch render nahi). Nav/footer/auth/home/trip planner/events/climate-guides/blog/legal/404/error — sab `t()`. Weather descriptions keys par (`wx`/`wxNight`). Units: non-English mein °C default, decimal comma. Google button locale.
+- `/api-docs` sirf English (`/de/api-docs` 404; nav link bina prefix). Doosri zabanon mein blog list khaali + post 404 (Phase 4 tak), RelatedArticles nahi, travel notes chhupe.
+- `pageMetadata({ lang })`: canonical/og:url apni zaban ka + `og:locale`. JSON-LD breadcrumbs zaban ke URL. `/api/revalidate` har path sab zabanon ke liye.
+- Tests: build OK · e2e 70 pass, 2 fail (local data, pehle jaise) · seo-check sirf local-data fails · hydration errors koi nahi (en + de/ja/fr/es/it) · purane build se English compare: text/title/meta/canonical/JSON-LD bilkul wahi, sirf `og:locale` naya; bina-route 404 ab dynamic (status 404 + noindex wahi — owner ne qubool kiya).
+
+## 2026-10-28 — i18n Phase 3: climate pages 5 zabanon mein (de, it, ja, fr, es)
+- `components/climate/text/{en,de,it,ja,fr,es}.jsx` + `index.js` (`climateText(lang)`): har zaban ki apni file (H1, intro, meta title ≤60, description ≤160, narrative, JSON-LD Dataset name/description + `inLanguage`). English file purane strings hubahu; English month story `MonthStory.jsx` mein hi.
+- `story.jsx` (`makeStory(P)`): month page ki kahani ka mushtarak engine — logic MonthStory.jsx jaisa, har zaban sirf phrases deti hai; variant `pick(seed)` (deterministic).
+- Keywords (Semrush): de «Wetter {Stadt} {Monat}», «Beste Reisezeit {Land}» · it «Meteo {città} {mese}», «Quando andare in/a …» · ja «{場所} {月}の天気と気温», «{場所}のベストシーズン» · fr «Météo {ville} {mois}», «Quand partir à/en/au …» · es «Clima en {ciudad} en {mes}», «Mejor época para viajar a …».
+- Jagahon ke naam/grammar: `data/placeNames.js` (CITY_NAMES, CITY_IN, COUNTRY_GRAMMAR) + `i18n/places.js` (cityName, countryName via Intl.DisplayNames, inCity, inCountry, toCountry) — e.g. „in den USA", «negli Stati Uniti», «au Caire», «al Reino Unido».
+- Data keys: climateMath verdict reasons `key`+`n`, monthSuits `whyKey`; solar/monthNarrative `locale` (24h ghari); elsewhere `countrySlug`. `MonthGuide` mein optional `L.SuitLine` (ja ki punctuation).
+- Tests: build (sab 6 locales enabled) OK · de/it/ja/fr/es city/month/country pages 200, titles/descriptions limits ke andar · English purane build se compare: body text bilkul wahi (sirf `og:locale` + JSON-LD `inLanguage` naye; UK country ka farq purane build ki stale ISR cache).
+
+## 2026-10-28 — hreflang + har zaban ke sitemaps
+- `pageMetadata({ hreflang })` (utils/seo.js `hreflangLinks`): sirf HTML `<link rel="alternate" hreflang>` — khud + har doosri ENABLED aur maujood zaban + `x-default` (= English), ISO 639-1, poore `https://weatherapex.com/...` URLs, reciprocal (har zaban wahi set). Nahi: noindex page (login/signup/pricing/forgot, adhoore climate pages — ab `robots` pageMetadata ke andar), disabled zaban, api-docs (sirf English), blog list page > 1. Blog list/post abhi `['en']` (Phase 4 mein tarjume). Sirf `en` enabled → koi hreflang nahi (output pehle jaisa).
+- `services/sitemap.js`: English children bilkul wahi; har ENABLED zaban ke liye `static-xx`, `blog-xx` (sirf jab tarjume hon), `places-xx` (mulk + shehar), `months-xx-N` (sirf `LANG_SITEMAP_PHASE=B`). Disabled zaban / khaali / ghalat naam → 404. lastmod = English tareekh ya zaban ke text ki tareekh (jo nayi). Sitemap mein xhtml:link nahi; robots.txt mein ek hi `Sitemap:`.
+- Naya `scripts/sitemap-check.mjs` (`npm run sitemap-check`; `BASE`, `LOCALES`, `LANG_SITEMAP_PHASE`): well-formed XML/UTF-8, ≤50k URLs/≤50 MB, absolute URLs, lastmod sahi, priority/changefreq nahi, index mein sirf enabled zabanein; HAR URL: 200, noindex nahi, self-canonical, `<html lang>`, hreflang (self, x-default, sirf enabled, targets 200/indexable/self-canonical, reciprocal).
+- Tests: 6 zabanein enabled, phase A — 14 sitemaps, 1588 URLs, 1618 checks pass, 0 fail.
+
+## 2026-10-28 — i18n Phase 4: blog tarjume (frontend)
+- `services/blogApi.js` (naya): `getBlogList(lang, page)`, `getBlogPost(lang, slug)` (`?lang=`; purana backend jo `lang` na lautaye → koi post nahi, English kabhi /de/... par nahi), `postHreflang()`.
+- `/[lang]/blog`: doosri zaban mein sirf us zaban ke published tarjume; koi na ho → noindex. hreflang (page 1) = backend `languages`. `/[lang]/blog/[slug]`: us zaban ka slug, hreflang = live tarjume (`translations`), canonical/JSON-LD URL zaban ka, breadcrumbs `lang`, shehron ke naam zaban mein, category `blog.categories.*` (map mein nahi → chhupi), RelatedArticles sirf English.
+- `services/sitemap.js`: `blog-xx` sirf jab backend us zaban ke posts de (flag hata, jawab ka `lang` check).
+- `/api/revalidate`: prefix wale paths (`/de/blog/<slug>`, `/de`) sirf wahi; tag `blog:<lang>:<slug>`; hadd 40 paths.
+- Tests: sitemap-check 6 zabanein — 15 sitemaps, 1601 URLs, 0 fail (blog-de ke 6 URLs samet). English blog pages: farq sirf hreflang/og:locale/inLanguage + local data.
+
+## 2026-10-28 — i18n Phase 5: backend errors zaban mein
+- `utils/apiErrors.js` (naya) `apiErrorText()`; `utils/authErrors.js` `lang` param. Doosri zaban: backend `code` → `errors.api.<code>` (+ params), na mile → us zaban ka generic/fallback. English: bilkul pehle wala text (Google sign-in ka purana raasta bhi).
+- Trip planner, events, login, signup, forgot-password. `messages/*.json`: `errors.api.*` (31) + `blog.categories.*` — check-messages pass.
+
+## 2026-10-28 — i18n Phase 6: poora check
+- `scripts/i18n-check.mjs` (`npm run i18n-check`; BASE, LOCALES, LANG_SITEMAP_PHASE, SKIP_SITEMAP): pehle sitemap-check, phir sitemap ke saare URLs + tools/legal/hub + noindex auth pages har enabled zaban mein: status, `<html lang>`, self canonical, noindex sahi, hreflang (self, x-default, reciprocal, sirf enabled, noindex par nahi), non-English page par koi English paragraph nahi, JSON-LD valid + inLanguage. Disabled zaban: noindex + switcher/hreflang mein nahi.
+- Tests: 6 zabanein — 1659 pages, 0 fail. Detector khud jaancha: English pages par hits, German par 0.
+
+## 2026-10-28 — Blog tarjume: units + validator (owner ke naye qaide)
+- Validator (`Apex_Weather/blog/translations.py`): non-English mein °C pehle (°F sirf qausain mein, °C ke baad), barish mm mein (inches akele nahi), meta_description ka pehla temperature °C; numbers English jaise YA sahi conversion (°F→°C, in→mm, data tables jaisi rounding); title/H1 ≤ 70; focus keyword title + pehle paragraph + ek H2 mein; "[IMAGE: …]" placeholder mana. Tests 103 OK.
+- German batch 1 (5 posts) units ke hisaab se theek: Cabo/Turks titles chhote (63/63), meta_description °C se shuru.
+- Local DB: production ke 80 English posts ki copy (sirf local test ke liye, featured image ke baghair) — `import --dry-run` asli chalta hai. Import idempotent (dobara chalane par wahi rows).
+
+### Blog tarjume — progress (language: done / total)
+- de batch 2: 15 / 80 — dry-run 15 ok · i18n-check 6 zabanein: 1686 sitemap URLs + 1744 pages, 0 fail.
+- de batch 3: 25 / 80 — dry-run 25 ok · i18n-check: 1696 sitemap URLs + 1754 pages, 0 fail (pehli run mein 10 hreflang "not reciprocal" — English post ka data 5 min cache; local par revalidate secret nahi. Cache ke baad 0 fail. Production mein import ka signal English page revalidate karta hai.)
+- de batch 4: 35 / 80 — dry-run 35 ok · publish (local) · i18n-check: 1696 sitemap URLs + 1764 pages, 0 fail. Naye: schweiz, warme-reiseziele-im-dezember, australien-und-neuseeland, argentinien, deutschland, reiseziele-im-juli, wohin-im-juli (+ august, kanada, indien). gen_table ab "A / B (C / D)" aur "N days, X h" cells aur `_heads` override bhi samajhta hai.
+- de batch 5: 45 / 80 — dry-run 45 ok · publish (local) · i18n-check: 1706 sitemap URLs + 1774 pages, 0 fail. Naye: barcelona, schottland, reiseziele-im-februar, beste-reiseziele-im-dezember, mexiko, beste-reiseziele-im-november, mexiko-stadt, suedafrika, brasilien, norwegen.
+- de batch 6: 55 / 80 — dry-run 55 ok · publish (local) · i18n-check: 1716 sitemap URLs + 1784 pages, 0 fail. Naye: portugal, australien, chicago, vietnam, cancun, beste-reiseziele-im-oktober, reiseziele-im-fruehling, waermster-ort-der-welt, waermster-ort-in-alaska, waermster-ort-in-kanada. Note: English post warmest-place-in-alaska ki table mein toota link hai (`/weather/united-states/august/august` → hona chahiye `anchorage/august`); German mein theek kiya, English production mein abhi bhi galat hai.
+- de batch 7: 65 / 80 — dry-run 65 ok · publish (local) · i18n-check: 1726 sitemap URLs + 1794 pages, 0 fail. Naye: was-anziehen-in-las-vegas, laufen-bei-10-grad-was-anziehen, was-anziehen-bei-27/21/16/4-grad (°F → °C ke hisaab se slug), thailand, irland, japan, alaska.
+  - English production posts mein kharabi (German mein saaf tarjuma kiya, English abhi bhi kharab): `what-to-wear-in-80-degree-weather` ke content ke aakhir mein raw ```json {…}``` block + andar duplicate FAQ; `best-time-of-year-to-visit-japan` mein "```html" tukda, poora intro+table do baar, ek `<a>` kai paragraphs ko gher raha hai, do links markdown shakal mein `[https://…](https://…)`.
+- de batch 8: 75 / 80 — dry-run 75 ok · publish (local) · i18n-check: 1746 sitemap URLs + 1804 pages, 0 fail. Naye: puerto-rico, island, costa-rica, hawaii, bahamas-wetter-im-januar, key-west-wetter-im-januar, florida-im-februar-waermster-ort, usa-im-februar-waermste-orte, waermste-reiseziele-im-februar, wo-ist-es-im-januar-in-europa-warm.
+  - Sirf °F wale posts ke liye prose mein "84 °F" likh kar `de_units.py` se °C pehle auto-convert kiya (output check kiya). Farq wale numbers (jaise "1,3 °C (2,3 °F)") haath se likhe.
+  - `scripts/i18n-check.mjs`: English-text heuristic ab un `<li>/<p>` ko chhorta hai jin mein sirf ek bahar ka link ho (Quellen list — source ka asli naam English hi rehta hai, sources English post se aate hain). Pehle "The Islands of The Bahamas Official Tourism Website" false positive tha.
+- Agla kaam: de batch 9 — queue line 71–75 (hawaiian-islands-weather-in-january, where-in-europe-is-warm-in-december, where-is-it-warm-in-january, what-to-wear-in-50-degree-weather, hawaii-weather-in-december-what-to-expect-on-your-trip) = 80/80.
+
+- de batch 9 (adhoora, 2026-10-30): 77/80 dry-run ok — hawaiian-islands-weather-in-january, where-in-europe-is-warm-in-december likh diye (abhi publish nahi kiye).
+  ⚠ BUG mila: 25 de files mein table ka <thead><tr></tr> KHAALI hai (headers gayab) — gen_table.py ke HEADS/_heads patch ke baad se. Pehle gen_table fix karo, phir in 25 files par dobara chalao (list: grep empty thead).
+  Agla kaam: thead fix → where-is-it-warm-in-january, what-to-wear-in-50-degree-weather, hawaii-weather-in-december-what-to-expect-on-your-trip → publish → i18n-check.
+- Table header bug FIX (2026-10-30): asli wajah `_heads` patch nahi tha — `gen_table.py` headers sirf `<th scope="col">` se padhta tha, jabke kuch English posts `<th>` (bina scope) likhte hain → khaali `<thead><tr></tr>`. Ab headers `<thead>` ke kisi bhi `<th>` se padhe jaate hain, aur header na mile to script ruk jaati hai. 25 files ke headers English table se bhare (Thailand ki 2nd table: Jahreszeit/Monate/Wetter/Andrang/Budget; Japan: English mein duplicate table → column count se match).
+  - Validator (`blog/translations.py` → `_table_errors`): table ki ginti English jitni (English mein hoobahu duplicate table — same text — ek gini jati hai), har table mein `<thead>` ke `<th>` English jitne aur khaali nahi, har `<tbody>` row mein header jitne cells, rows ki ginti English jitni. Naya test `blog/tests_translation_tables.py` (5 tests) + purane `tests_translations` = 25 OK.
+  - Saboot: fix se pehle dry-run → 52 ok · **25 failed** (sab "no <thead> header cells", list user wali 25 se hoobahu); fix ke baad 77 ok · 0 failed.
+- de batch 9: **de: 80/80** — naye: hawaii-wetter-im-januar, wo-ist-es-im-dezember-in-europa-warm, wo-ist-es-im-januar-warm, was-anziehen-bei-10-grad, hawaii-wetter-im-dezember. Dry-run 80 ok · publish (local) do baar = 80 rows (idempotent) · `/sitemap/blog-de.xml` 81 URLs (80 + /de/blog) · i18n-check: 1746 sitemap URLs + 1809 pages, 0 fail.
+- Agla kaam: Italian (`blog/i18n/it/`), batch 1 (10) — `it_units.py` (de_units jaisa, decimal comma) pehle banana.
+- **it batch 1: 10 / 80** (2026-10-30) — `blog/i18n/it/`: quando-andare-a-cabo-san-lucas, quando-andare-a-saint-lucia, quando-andare-a-turks-e-caicos, meteo-florida-dicembre, dove-fa-caldo-a-dicembre, quando-andare-in-kenya, quando-andare-a-puerto-vallarta, quando-andare-a-tulum, quando-andare-a-panama, quando-andare-alle-bermuda. Dry-run 10 ok (naya table check samet) · publish (local) do baar = 10 rows · `/sitemap/blog-it.xml` 11 URLs · i18n-check: 1819 pages 0 fail; sitemap-check pehli baar `/it/blog` ke purane cached "noindex" (khaali list) ki wajah se 1 fail, dobara chalaya → 1762 URLs · 1796 checks · 0 fail.
+  - Keyword pattern (it): "quando andare a/in/alle <jagah>", "meteo <jagah> <mese>", "dove fa caldo a <mese>". Slugs Italian. Units: `units.py it` (de_units jaisa, generic it/fr/es/ja) — prose mein akela "X °F" → "C °C (X °F)". Table months ab bade harf se (Gennaio).
+  - Queue: `it_queue.txt` (scratchpad) = de wali tarteeb. Agla kaam: it batch 2 — best-time-to-visit-france, best-time-to-visit-buenos-aires, places-to-visit-in-april-usa, places-to-visit-in-november, best-time-to-visit-ireland-and-scotland, best-time-to-visit-england, good-places-to-visit-in-usa-in-november, … (it_queue line 11–20).
+
+## it / ja / fr / es — naya plan (2026-10-31)
+- Batch = 20 posts · har batch ke baad sirf import `--dry-run` · poori i18n-check har zaban ke aakhir mein ek baar · tarjuma seedha English se.
+- **Skip (sirf English, in 4 zabanon mein; German waisa hi):** 16 US-list / °F-sawal posts — weather-in-florida-usa-in-december, places-to-visit-in-april-usa, good-places-to-visit-in-usa-in-november, good-places-to-visit-in-october-in-usa, best-places-to-visit-in-march-usa, best-places-to-visit-in-october-usa, warmest-places-in-the-us-in-february, warmest-place-in-florida-in-february, florida-key-west-weather-in-january, warmest-place-in-alaska, what-to-wear-in-40/50/60/70/80-degree-weather, what-to-wear-running-in-50-degree-weather. Har zaban: **64 posts**.
+  - it ki Florida post (batch 1 mein bani thi) local DB mein draft kar di (delete nahi), JSON `blog/i18n/it` se bahar; `dove-fa-caldo-a-dicembre` se uska link hata diya.
+- Status: **de: done 80/80** · **it: 9/64 done** · ja: planned 0/64 · fr: planned 0/64 · es: planned 0/64
+- **it batch 2 (20 posts): it 29/64** — france, buenos-aires, places-nov, ireland-scotland, england, paris, places-dec, may, september, ecuador, august, india, canada, switzerland, warm-dec, aus-nz, argentina, germany, best-july, good-july. Dry-run 29 ok, local publish.
+  - Andar ke blog links sirf pehle se bani / isi batch ki posts tak; baqi ki jagah weather page link (baad mein zaroorat ho to jod sakte hain).
+  - Note: validator ka number-parser "28 366" (table ke saath wale cells) ko hazaar samajhta hai — aise numbers prose mein bhi likhe.
+- Status: de done 80/80 · **it 29/64** · ja 0/64 · fr 0/64 · es 0/64
+
+- **it batch 3 (adhoora, 2026-10-31): it 44/64** — likhi gayi (dry-run per post chalaya): quando-andare-a-barcellona, quando-andare-in-scozia, dove-andare-a-febbraio, dove-andare-in-vacanza-a-dicembre, quando-andare-in-messico, dove-andare-in-vacanza-a-novembre, quando-andare-a-citta-del-messico, quando-andare-in-sudafrica, quando-andare-in-brasile, quando-andare-in-norvegia, quando-andare-in-portogallo, quando-andare-in-australia, quando-andare-a-chicago, quando-andare-in-vietnam, quando-andare-a-cancun. Abhi publish NAHI kiye.
+  - RUKA: C: drive bhar gaya (0 MB free) — Claude ka temp/scratchpad C: par hai, isliye commands ka output aur scratchpad scripts kaam nahi kar rahe.
+  - Agla kaam: batch 3 ki baqi 5 — best-places-to-visit-in-october (dove-andare-a-ottobre), best-places-to-visit-in-spring (dove-andare-in-primavera), what-is-the-warmest-place-in-the-world (posto-piu-caldo-del-mondo), warmest-place-in-canada (posto-piu-caldo-del-canada), what-to-wear-in-vegas (cosa-indossare-a-las-vegas); phir pura it dry-run (kuch files abhi sirf inhi 5 ke links ki wajah se fail hain), publish; phir batch 4 (queue64 line 50–64).
+- Status: de done 80/80 · it 44/64 (29 published, 15 draft files) · ja 0/64 · fr 0/64 · es 0/64
+- **it batch 3 DONE (2026-10-31): it 49/64** — baqi 5 bhi likh di: dove-andare-a-ottobre, dove-andare-in-primavera, posto-piu-caldo-del-mondo, posto-piu-caldo-del-canada, cosa-indossare-a-las-vegas. Pura it dry-run: 49 ok · 0 failed; local DB mein publish (idempotent).
+  - gen_table fix: sirf-°F wali cells ("85.3°F") ka °C galat ban raha tha ("85.-16 °C") — ab akela °F khud °C mein badalta hai. Sirf posto-piu-caldo-del-mondo par asar tha, table dobara banayi.
+  - Agla: batch 4 (15 posts, queue64 line 50–64: thailand … hawaii-december), phir it i18n-check.
+- Status: de done 80/80 · it 49/64 (49 published locally) · ja 0/64 · fr 0/64 · es 0/64
+- **it DONE (2026-10-31): it: 64/64** — batch 4 (15 posts) likhi: quando-andare-in-thailandia, quando-andare-in-irlanda, quando-andare-in-giappone, quando-andare-in-alaska, quando-andare-a-porto-rico, quando-andare-in-islanda, quando-andare-in-costa-rica, quando-andare-alle-hawaii, meteo-bahamas-a-gennaio, mete-piu-calde-a-febbraio, dove-fa-caldo-in-europa-a-gennaio, meteo-hawaii-a-gennaio, dove-fa-caldo-in-europa-a-dicembre, dove-fa-caldo-a-gennaio, meteo-hawaii-a-dicembre.
+  - Pura it dry-run: 64 ok · 0 failed; local DB mein publish.
+  - Full i18n-check: sitemaps 1850 checks · 0 failed (blog-it.xml = 65 URLs: index + 64); pages 1874 · 0 failed.
+  - gen_table fix: link cells "Honolulu, December" ka mahina ab translate hota hai (sirf meteo-hawaii-a-gennaio par asar tha, theek kar diya).
+  - Hawaii-december ka Florida blog link (it mein skip) → Miami December weather link se badla.
+- Status: de done 80/80 · it done 64/64 · ja 0/64 (agla) · fr 0/64 · es 0/64
+- **ja shuru (2026-10-31): ja 2/64** — batch 1 mein likhi: cabo-san-lucas-ryokou-jiki, st-lucia-ryokou-jiki (dry-run 2 ok · 0 failed, abhi publish nahi). Slug rule: ASCII romaji `<jagah>-ryokou-jiki`; focus keyword `〜のベストシーズン`. Blog links sirf maujood/isi batch ki ja posts par, warna /ja/weather links.
+  - Agla: ja batch 1 ki baqi 18 (queue64 line 3–20: turks-and-caicos se best-places-to-visit-in-august tak).
+- Status: de done 80/80 · it done 64/64 · ja 2/64 · fr 0/64 · es 0/64
+
+## 2026-11-01 — Naye shehron ke naam + English regression + ja jaari
+- **City.names** (backend migration `weather/0009_city_names`): naya shehar banne par `localized_city_names(geo_id)` — Open-Meteo `/get` har zaban (5 calls; ja ka 市/都 hata kar; English jaisa naam save nahi). `/weather/cities/` index mein `names` sirf jab ho. Frontend: registry `names` aage le jati hai; `cityName(lang, city)` (object) → curated naam → backend `names` → English. City/month/country pages, title, H1, meta, breadcrumbs, JSON-LD sab isi se.
+- `manage.py backfill_city_names [--dry-run|--force]`: curated (seed_city_tags + singapore) ke bahar wale; 1 search + 5 calls har shehar; aakhir mein backend cache saaf + Next revalidate (`cities` tag + city paths; REVALIDATE_SECRET chahiye). Local run: 7 shehar, 35 calls.
+- English regression (HEAD vs naya `lookup_place`, 74 queries, DB ke saath aur DB ke baghair): sirf 2 farq — Gand (Gandhinagar → Ghent), Danzig (Danzig ND → Gdańsk); dono purane jawab bina-abaadi wale gaon the.
+- e2e note: ux-fixes 214/303 sirf mahine ki 1 tareekh ko fail (test ka "November 1" "November 15" se bhi match) — code nahi, test ki kamzori.
+- **ja batch 1 (jaari):** likhi + dry-run ok: turks-and-caicos-ryokou-jiki, juunigatsu-atatakai-ryokousaki, kenya-ryokou-jiki, puerto-vallarta-ryokou-jiki, tulum-ryokou-jiki (+ pehle ki cabo, st-lucia) = **ja 7/64**. Helper: scratchpad `tr.sh <lang> <en-slug>` (gen_table + units + dry-run). gen_table: ja "h" → 時間; `_cells` baad mein jodo to bani table dobara banti hai.
+  - Agla: panama, bermuda, france, buenos-aires, places-to-visit-in-november, ireland-and-scotland, england, paris, places-to-visit-in-december, may, september, ecuador, august (queue64 line 8–20).
+- Status: de 80/80 · it 64/64 · ja 7/64 · fr 0/64 · es 0/64
+- **ja batch 1 DONE (2026-11-01): ja 20/64** — queue64 line 1–20. Naye slugs: panama-ryokou-jiki, bermuda-ryokou-jiki, france-ryokou-jiki, buenos-aires-ryokou-jiki, juuichigatsu-ryokousaki (places-nov), ireland-scotland-ryokou-jiki, england-ryokou-jiki, paris-ryokou-jiki, juunigatsu-ryokousaki (places-dec), gogatsu-osusume-ryokousaki (may), kugatsu-osusume-ryokousaki (sep), ecuador-ryokou-jiki, hachigatsu-osusume-ryokousaki (aug). Pura ja dry-run 20 ok · 0 failed; local `--publish` = 20 live; hreflang en/de/it/ja sahi.
+  - Seekh: range "62〜63 °F" units.py mein toot-ta hai — dono taraf °F likho ya °C khud pehle. Skip-list wali "X degree weather" posts ka link hatao to wo number (40/50/60/70/80) text mein °C ke saath zaroor rakho. Sirf-°F table cells ke liye `_cells` mein "91.6": "33.1 (91.6)".
+  - Agla: ja batch 2 = queue64 line 21–40 (india … portugal), phir batch 3 (41–60), batch 4 (61–64), phir ja i18n-check.
+- Status: de 80/80 · it 64/64 · **ja 20/64** · fr 0/64 · es 0/64
+
+## 2026-11-01 — Deploy ki tayyari (tarjume ruk gaye)
+- **Final tarjume: de 80 · it 64 · ja 20 · fr 0 · es 0** (owner: ja batch 2, fr, es abhi nahi).
+- Local checks (ENABLED_LOCALES=en,de,it,ja,fr,es, LANG_SITEMAP_PHASE=A): sitemap-check 1879 URLs · 1915 checks · 0 fail (index mein blog-de/it/ja; blog-fr/es 404; blog-ja = 21 URLs) · i18n-check 1935 pages · 0 fail · unit 22/22 · backend 333 OK · makemigrations --check: no changes · e2e 70 pass / 3 skip / 2 fail (dono local data: sitemap < 2000, Australia hub redirect).
+- e2e `ux-fixes` chipName ab regex `^<date>(?!\d)` (mahine ki 1 tareekh par "November 1" ≠ "November 15").
+- Saaf `npm run build` (bina test env) ✓.

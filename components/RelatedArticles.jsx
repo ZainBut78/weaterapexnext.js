@@ -11,11 +11,13 @@
 //  Design: /blog ke cards jaisa (rounded, photo ya neela gradient +
 //  pehla harf, category, title, excerpt, date · Read →), chhota size.
 // ─────────────────────────────────────────────────────────────
-import Link from 'next/link';
+import Link from './LocaleLink';
+import { currentLang, getT } from '@/i18n/server';
+import { intlLocale } from '@/i18n/format';
 import { ArrowRight, CalendarDays, Newspaper } from 'lucide-react';
 import { getRelatedForCity, getRelatedForPost } from '@/services/blogPosts';
 
-function Card({ post }) {
+function Card({ post, t, lang }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
@@ -47,11 +49,11 @@ function Card({ post }) {
           {post.published_at && (
             <>
               <CalendarDays className="w-3.5 h-3.5" />
-              {new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}
+              {new Date(post.published_at).toLocaleDateString(intlLocale(lang), { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}
             </>
           )}
           <span className="ml-auto inline-flex items-center gap-1 text-[#0077b6]">
-            Read <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+            {t('blog.read')} <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
           </span>
         </div>
       </div>
@@ -67,7 +69,12 @@ function Card({ post }) {
  * @param p.limit   kitne (default 3)
  * @param p.title   heading
  */
-export default async function RelatedArticles({ city, month, exclude, post, limit = 3, title = 'Related articles' }) {
+export default async function RelatedArticles({ city, month, exclude, post, limit = 3, title }) {
+  const lang = await currentLang();
+  // i18n: tarjuma shuda posts Phase 4 mein — tab tak doosri zaban ke page
+  // par English articles NAHI (kuch render nahi)
+  if (lang !== 'en') return null;
+  const t = await getT(lang);
   const posts = post
     ? await getRelatedForPost(post, { limit })
     : await getRelatedForCity(city, { month, exclude, limit });
@@ -77,10 +84,10 @@ export default async function RelatedArticles({ city, month, exclude, post, limi
     <section className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8" aria-labelledby="related-articles-heading">
       <div className="flex items-center gap-2 mb-5">
         <Newspaper className="w-5 h-5 text-[#0077b6]" />
-        <h2 id="related-articles-heading" className="text-xl font-bold text-[#002244]">{title}</h2>
+        <h2 id="related-articles-heading" className="text-xl font-bold text-[#002244]">{title || t('blog.related')}</h2>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((p) => <Card key={p.slug} post={p} />)}
+        {posts.map((p) => <Card key={p.slug} post={p} t={t} lang={lang} />)}
       </div>
     </section>
   );

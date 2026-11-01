@@ -26,7 +26,7 @@
 // hai jab code khud barish/bauchhar ka ho.
 // ══════════════════════════════════════════════════════════════════════
 
-const UNKNOWN = { title: "Not available", desc: "Weather data isn't available right now." };
+const UNKNOWN = 'unknown';
 
 // Number(null) aur Number('') dono 0 dete hain, aur 0 = "clear sky".
 // Yani null aane par site "Sunny" likh deti. Pehle hi reject karo.
@@ -36,72 +36,84 @@ function toCode(value) {
   return Number.isFinite(n) ? n : NaN;
 }
 
-export function getWeatherDescription(code, rainProb) {
+function dayKey(code, rainProb) {
   const c = toCode(code);
   if (!Number.isFinite(c)) return UNKNOWN;
 
   // Toofan — sirf yeh teen codes. Pehle `c >= 95` tha, jis se 999 jaisa
   // anjaan code bhi "Thunderstorms" ban jata tha. Jo cheez hum jaante
   // nahi, us ka dawa bhi nahi karna chahiye.
-  if (c === 95) return { title: "Thunderstorms", desc: "Stormy conditions likely." };
-  if (c === 96 || c === 99) return { title: "Thunderstorms with hail", desc: "Storms with hail likely." };
+  if (c === 95) return 'thunder';
+  if (c === 96 || c === 99) return 'thunderHail';
 
   // Barf (71-77) aur barf ki bauchharein (85, 86)
-  if (c === 75 || c === 86) return { title: "Heavy snow", desc: "Heavy snowfall expected." };
-  if (c === 85) return { title: "Snow showers", desc: "Periods of snow expected." };
-  if (c === 77) return { title: "Snow grains", desc: "Fine snow grains expected." };
-  if (c === 71 || c === 73) return { title: "Snow", desc: "Snowfall expected." };
+  if (c === 75 || c === 86) return 'heavySnow';
+  if (c === 85) return 'snowShowers';
+  if (c === 77) return 'snowGrains';
+  if (c === 71 || c === 73) return 'snow';
 
   // Jamne wali barish — alag se batana zaroori hai, sadak phisalti hai.
-  if (c === 66) return { title: "Freezing rain", desc: "Freezing rain — surfaces may be icy." };
-  if (c === 67) return { title: "Heavy freezing rain", desc: "Heavy freezing rain — icy conditions." };
-  if (c === 56 || c === 57) return { title: "Freezing drizzle", desc: "Freezing drizzle — surfaces may be icy." };
+  if (c === 66) return 'freezingRain';
+  if (c === 67) return 'heavyFreezingRain';
+  if (c === 56 || c === 57) return 'freezingDrizzle';
 
   // Barish ki bauchharein (80-82)
-  if (c === 82) return { title: "Heavy showers", desc: "Violent rain showers expected." };
+  if (c === 82) return 'violentShowers';
   if (c === 80 || c === 81) {
     return rainProb > 70
-      ? { title: "Heavy showers", desc: "Significant rainfall expected." }
-      : { title: "Rain showers", desc: "Periods of rain expected." };
+      ? 'heavyShowers'
+      : 'rainShowers';
   }
 
   // Barish (61-65)
-  if (c === 65) return { title: "Heavy rain", desc: "Significant rainfall expected." };
-  if (c === 63) return { title: "Rain", desc: "Steady rain expected." };
+  if (c === 65) return 'heavyRain';
+  if (c === 63) return 'rain';
   if (c === 61) {
     return rainProb > 70
-      ? { title: "Rain", desc: "Rain likely for much of the day." }
-      : { title: "Light rain", desc: "Occasional light rain." };
+      ? 'rainMostDay'
+      : 'lightRain';
   }
 
   // Boondaback (51-55)
-  if (c >= 51 && c <= 55) return { title: "Drizzle", desc: "Light drizzle expected." };
+  if (c >= 51 && c <= 55) return 'drizzle';
 
   // Dhund
-  if (c === 45 || c === 48) return { title: "Foggy", desc: "Reduced visibility likely." };
+  if (c === 45 || c === 48) return 'foggy';
 
   // Saaf / badal
-  if (c === 3) return { title: "Cloudy", desc: "Overcast conditions expected." };
-  if (c === 1 || c === 2) return { title: "Partly sunny", desc: "Mix of sun and clouds." };
-  if (c === 0) return { title: "Sunny", desc: "Clear skies throughout the day." };
+  if (c === 3) return 'cloudy';
+  if (c === 1 || c === 2) return 'partlySunny';
+  if (c === 0) return 'sunny';
 
   return UNKNOWN;
 }
 
-export function getNightDescription(code) {
+function nightKey(code) {
   const c = toCode(code);
-  if (!Number.isFinite(c)) return "Not available";
-  if (c === 95 || c === 96 || c === 99) return "Storms possible";
-  if (c === 75 || c === 86) return "Heavy snow";
-  if (c === 85 || c === 77 || c === 71 || c === 73) return "Snow";
-  if (c === 66 || c === 67) return "Freezing rain";
-  if (c === 56 || c === 57) return "Freezing drizzle";
-  if (c >= 80 && c <= 82) return "Showers";
-  if (c >= 61 && c <= 65) return "Rain likely";
-  if (c >= 51 && c <= 55) return "Drizzle";
-  if (c === 45 || c === 48) return "Foggy";
-  if (c === 3) return "Overcast";
-  if (c === 1 || c === 2) return "Partly cloudy";
-  if (c === 0) return "Clear sky";
-  return "Not available";
+  if (!Number.isFinite(c)) return 'unknown';
+  if (c === 95 || c === 96 || c === 99) return 'storms';
+  if (c === 75 || c === 86) return 'heavySnow';
+  if (c === 85 || c === 77 || c === 71 || c === 73) return 'snow';
+  if (c === 66 || c === 67) return 'freezingRain';
+  if (c === 56 || c === 57) return 'freezingDrizzle';
+  if (c >= 80 && c <= 82) return 'showers';
+  if (c >= 61 && c <= 65) return 'rainLikely';
+  if (c >= 51 && c <= 55) return 'drizzle';
+  if (c === 45 || c === 48) return 'foggy';
+  if (c === 3) return 'overcast';
+  if (c === 1 || c === 2) return 'partlyCloudy';
+  if (c === 0) return 'clearSky';
+  return 'unknown';
+}
+
+// i18n (Oct 2026): text messages ke `wx` / `wxNight` namespaces mein (layout
+// har page ko deta hai). `t` = useT() / getT() — har caller deta hai.
+// (en.json yahan import NAHI — warna poori file client bundle mein jati.)
+export function getWeatherDescription(code, rainProb, t) {
+  const k = dayKey(code, rainProb);
+  return { key: k, title: t(`wx.${k}.title`), desc: t(`wx.${k}.desc`) };
+}
+
+export function getNightDescription(code, t) {
+  return t(`wxNight.${nightKey(code)}`);
 }

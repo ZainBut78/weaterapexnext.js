@@ -1,32 +1,30 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from './LocaleLink';
+import { getT } from '@/i18n/server';
 import { Route, CalendarDays, History } from 'lucide-react';
 
-const FeaturesSection = () => {
+// Server component — text page ki zaban mein (messages `home.features`)
+const FeaturesSection = async () => {
+  const t = await getT();
+  const text = t.raw('home.features');
   const features = [
     {
       icon: Route,
       iconBg: 'bg-[#00a8e8]',
       iconColor: 'text-white',
-      title: 'Trip Weather Planner',
-      description: 'Simulate weather conditions across your entire route to ensure safety and comfort during long-haul travel.',
-      linkText: 'Learn more',
+      ...text[0],
     },
     {
       icon: CalendarDays,
       iconBg: 'bg-[#00c853]', // Bright green background
       iconColor: 'text-white',
-      title: 'Event Risk Score',
-      description: 'Planning a wedding or outdoor marathon? Our proprietary algorithm calculates meteorological risk up to 6 months in advance.',
-      linkText: 'Try it out',
+      ...text[1],
     },
     {
       icon: History,
       iconBg: 'bg-[#2979ff]', // Different shade of blue for contrast
       iconColor: 'text-white',
-      title: 'Historical Data Analysis',
-      description: 'Access decades of climate patterns for specific locations to make data-backed decisions for infrastructure and agriculture.',
-      linkText: 'View Archive',
+      ...text[2],
     },
   ];
 
@@ -38,12 +36,12 @@ const FeaturesSection = () => {
             "Engineered for Accuracy" tha; owner ne keywords wala text
             chuna (audit 1.3, option 1). Styling wahi. */}
         <h1 className="text-4xl md:text-5xl font-extrabold text-[#002244] tracking-tight mb-4">
-          Weather Forecasts, Trip Planning &amp; Climate Guides
+          {t('home.h1')}
         </h1>
         
         {/* Subtitle */}
         <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-12">
-          More than just a forecast. Our suite of professional tools provides actionable insights for complex logistics and travel planning.
+          {t('home.featuresSubtitle')}
         </p>
 
         {/* 3 Features Cards Grid */}

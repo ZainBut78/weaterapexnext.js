@@ -1,4 +1,7 @@
-import Link from 'next/link';
+'use client';
+
+import Link from './LocaleLink';
+import { useT } from '@/i18n/client';
 import { Sparkles, ArrowRight } from 'lucide-react';
 
 /**
@@ -10,6 +13,7 @@ import { Sparkles, ArrowRight } from 'lucide-react';
  */
 const FreeLimitNotice = ({ data }) => {
   const limit = data?.limit ?? 3;
+  const t = useT();
 
   return (
     <div className="max-w-3xl mx-auto bg-white border border-[#d6e4ff] rounded-2xl overflow-hidden shadow-sm">
@@ -19,11 +23,10 @@ const FreeLimitNotice = ({ data }) => {
         </span>
         <div className="min-w-0">
           <p className="font-bold text-[#002244]">
-            You've used your {limit} free {limit === 1 ? 'check' : 'checks'} today
+            {t('freeLimit.title', { count: limit })}
           </p>
           <p className="text-sm text-slate-600 mt-1">
-            Create a free account to keep going — unlimited trip plans, event
-            risk checks and 20 years of climate history.
+            {t('freeLimit.noticeText')}
           </p>
         </div>
       </div>
@@ -33,13 +36,13 @@ const FreeLimitNotice = ({ data }) => {
           href="/signup"
           className="flex-1 inline-flex items-center justify-center gap-2 min-h-12 rounded-full bg-[#00a8e8] hover:bg-[#0092cd] text-white text-sm font-bold transition-colors"
         >
-          Create free account <ArrowRight className="w-4 h-4" />
+          {t('freeLimit.createAccount')} <ArrowRight className="w-4 h-4" />
         </Link>
         <Link
           href="/login"
           className="flex-1 inline-flex items-center justify-center min-h-12 rounded-full border border-[#d6e4ff] text-sm font-semibold text-slate-700 hover:bg-gray-50 transition-colors"
         >
-          I already have an account
+          {t('freeLimit.haveAccount')}
         </Link>
       </div>
     </div>

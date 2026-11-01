@@ -1,46 +1,18 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from './LocaleLink';
+import { getT } from '@/i18n/server';
 import { ArrowRight } from 'lucide-react';
 
-const Article = () => {
-  const articles = [
-    {
-      category: 'CLIMATE TRENDS',
-      title: 'The Shift in European Winter Patterns 2024',
-      description:
-        'Recent data suggests a fundamental shift in high-pressure systems across Central Europe, affecting ski seasons and...',
-      image:
-        'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
-      author: {
-        name: 'Dr. Sarah Jenkins',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80',
-      },
-    },
-    {
-      category: 'TECHNOLOGY',
-      title: 'How AI is Revolutionizing Local Forecasting',
-      description:
-        'Machine learning models are now outperforming traditional fluid dynamics simulations in predicting localized storm...',
-      image:
-        'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
-      author: {
-        name: 'Mark Thorne',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80',
-      },
-    },
-    {
-      category: 'TRAVEL TIPS',
-      title: 'Mastering the Monsoon Season in Bali',
-      description:
-        "Don't let the rain stop your travel. Learn how to time your excursions perfectly using micro-climate data for Indonesia...",
-      image:
-        'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80',
-      author: {
-        name: 'Elena Rostova',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80',
-      },
-    },
-  ];
+const IMAGES = [
+  { image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80', author: { name: 'Dr. Sarah Jenkins', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80' } },
+  { image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80', author: { name: 'Mark Thorne', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80' } },
+  { image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80', author: { name: 'Elena Rostova', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80' } },
+];
+
+// Server component — category/title/description messages `home.digest.articles` se
+const Article = async () => {
+  const t = await getT();
+  const articles = t.raw('home.digest.articles').map((a, i) => ({ ...a, ...IMAGES[i] }));
 
   return (
     <div className="w-full bg-[#f3f7ff] py-16">
@@ -50,10 +22,10 @@ const Article = () => {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
           <div>
             <h2 className="text-4xl md:text-5xl font-extrabold text-[#002244] tracking-tight mb-2">
-              The Meteorological Digest
+              {t('home.digest.title')}
             </h2>
             <p className="text-lg text-gray-600 font-medium">
-              Expert analysis on climate trends and travel tips.
+              {t('home.digest.subtitle')}
             </p>
           </div>
 
@@ -62,7 +34,7 @@ const Article = () => {
             href="/blog"
             className="text-sm font-bold text-[#0077b6] hover:text-[#005a8d] flex items-center gap-1.5 transition-colors group self-start sm:self-auto"
           >
-            <span>View All Articles</span>
+            <span>{t('home.digest.viewAll')}</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>

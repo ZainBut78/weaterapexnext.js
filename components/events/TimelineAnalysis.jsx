@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getMeteoconIcon } from '../../utils/meteoconsMap';
 import { isNightHour } from '../../utils/isNightHour';
+import { useT } from '@/i18n/client';
 
 const getBarColor = (score) => {
   if (score <= 3) return '#34D399';
@@ -26,6 +27,7 @@ const HOURLY_DEMO = [
 ];
 
 const TimelineAnalysis = ({ hours = HOURLY_DEMO, window: bestWindow = null }) => {
+  const t = useT();
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
@@ -58,7 +60,7 @@ const TimelineAnalysis = ({ hours = HOURLY_DEMO, window: bestWindow = null }) =>
           <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center">
             <Clock size={18} className="text-blue-600" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900">Timeline Analysis</h3>
+          <h3 className="text-lg font-bold text-slate-900">{t('events.timelineTitle')}</h3>
         </div>
         <div className="flex gap-2">
           {showLeft && (
@@ -80,7 +82,9 @@ const TimelineAnalysis = ({ hours = HOURLY_DEMO, window: bestWindow = null }) =>
         </div>
       </div>
       <p className="text-sm text-slate-500 mb-6 ml-12">
-        We found the optimal {bestWindow ? `${bestWindow.endHour - bestWindow.startHour + 1}-hour window` : 'time window'} for your event to minimize weather disruptions.
+        {bestWindow
+          ? t('events.timelineWindow', { count: bestWindow.endHour - bestWindow.startHour + 1 })
+          : t('events.timelineAny')}
       </p>
 
       <div
@@ -109,7 +113,7 @@ const TimelineAnalysis = ({ hours = HOURLY_DEMO, window: bestWindow = null }) =>
               </span>
               <img
                 loading="lazy" decoding="async" src={getMeteoconIcon(h.weather_code, isNight)}
-                alt={`${h.hour} weather`}
+                alt={t('events.hourWeather', { hour: h.hour })}
                 className="w-8 h-8"
               />
               <span className="text-lg font-bold text-slate-900">{h.score.toFixed(1)}</span>

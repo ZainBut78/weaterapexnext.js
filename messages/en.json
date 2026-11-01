@@ -1,0 +1,937 @@
+{
+  "meta": {
+    "siteDescription": "Plan trips and outdoor events with confidence. Day-by-day weather scoring, event risk analysis and 20 years of climate history for cities worldwide."
+  },
+  "nav": {
+    "home": "Home",
+    "tripPlanner": "Trip Planner",
+    "events": "Events",
+    "climateGuides": "Climate Guides",
+    "blog": "Blog",
+    "apiDocs": "API Docs",
+    "logout": "Logout",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu"
+  },
+  "langSwitch": {
+    "label": "Language"
+  },
+  "footer": {
+    "tagline": "Redefining meteorological intelligence for a world in constant motion. Precision data, simplified for everyone.",
+    "share": "Share",
+    "emailContact": "Email Contact",
+    "websiteLink": "Website Link",
+    "product": "Product",
+    "localForecasts": "Local Forecasts",
+    "historicalData": "Historical Data",
+    "apiForDevelopers": "API for Developers",
+    "radar": "Radar Visualization",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "scientificBoard": "Scientific Board",
+    "pressRoom": "Press Room",
+    "stayInformed": "Stay Informed",
+    "newsletterText": "Get localized severe weather alerts directly to your inbox.",
+    "emailPlaceholder": "Email address",
+    "join": "Join",
+    "copyright": "© 2024 WeatherApex. Precision data for the modern traveler.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Settings"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "heading": "This page drifted off the map",
+    "text": "The page you're looking for doesn't exist or has moved. Let's get you back to the forecast.",
+    "backHome": "Back to home",
+    "planTrip": "Plan a trip"
+  },
+  "errors": {
+    "pageTitle": "Something went wrong",
+    "pageText": "An unexpected error stopped this page from loading. Reloading usually fixes it.",
+    "reload": "Reload page",
+    "goHome": "Go to home",
+    "api": {
+      "generic": "Something went wrong. Please try again.",
+      "fields_required": "Please fill in all required fields.",
+      "password_too_short": "Password must be at least 8 characters.",
+      "password_too_common": "This password is too common. Please choose a stronger one.",
+      "password_entirely_numeric": "Your password can’t be only numbers.",
+      "password_too_similar": "Your password is too similar to your username or email.",
+      "password_invalid": "Please choose a stronger password.",
+      "username_taken": "This username is already taken.",
+      "otp_invalid": "The code is invalid or has expired. Please request a new one.",
+      "user_not_found": "We couldn’t find this account.",
+      "invalid_credentials": "Invalid email/username or password.",
+      "account_not_verified": "Your account isn’t verified yet. Please enter the code we emailed you.",
+      "google_not_configured": "Google sign-in isn’t available right now.",
+      "google_invalid_token": "Google sign-in failed. Please try again.",
+      "google_no_email": "Your Google account has no email address.",
+      "google_email_unverified": "Your Google account email isn’t verified.",
+      "city_required": "Please enter a city.",
+      "dates_required": "Please choose a start and end date.",
+      "invalid_date": "Please choose a valid date.",
+      "end_before_start": "The end date must be after the start date.",
+      "max_days": "You can plan up to {max} days at a time.",
+      "city_not_found": "We couldn’t find this city.",
+      "weather_unavailable": "Weather data isn’t available right now. Please try again in a moment.",
+      "no_cities_for_country": "We have no cities for {country} yet.",
+      "city_date_required": "Please choose a city and a date.",
+      "invalid_time": "Please choose a valid time.",
+      "date_too_far": "The forecast only covers the next {max} days.",
+      "date_in_past": "The date can’t be in the past.",
+      "time_not_in_forecast": "No forecast is available for this time yet.",
+      "no_forecast_for_date": "No forecast is available for this date yet.",
+      "rate_limited": "Too many requests. Please wait a moment and try again."
+    }
+  },
+  "about": {
+    "metaTitle": "About",
+    "metaDescription": "What WeatherApex is and how we score weather.",
+    "badge": "About us",
+    "tagline": "We build digital products — ours, and yours.",
+    "intro": "A 360° business and technology consultancy. We build our own digital products, and we build web applications for companies who need something made properly to their own requirements.",
+    "startProject": "Start a project",
+    "whatWeDo": "What we do",
+    "whoWeAre": "Who we are",
+    "whoParagraphs": [
+      "{company} is a consultancy that builds software. Not slide decks about software — the actual thing, shipped and running.",
+      "We work in two directions. We build and run our own digital products, which is where WeatherApex comes from. And we build web applications for clients, designed around their requirements rather than around whatever template was quickest for us.",
+      "Running our own products changes how we build for other people. We carry the cost of every shortcut ourselves — the slow query, the unhandled error, the interface that breaks on a phone. That tends to make a team careful in ways a purely client-facing shop never has to be."
+    ],
+    "atAGlance": "At a glance",
+    "glance": {
+      "founded": "Founded",
+      "focus": "Focus",
+      "focusValue": "Web apps & digital products",
+      "clients": "Clients",
+      "clientsValue": "Local and international",
+      "product": "Our product"
+    },
+    "whatWeDoText": "If you need something built for the web, this is the range we work across.",
+    "services": [
+      {
+        "title": "Custom web applications",
+        "desc": "Built to your requirement, not squeezed into a template. Dashboards, booking systems, internal tools, customer portals — whatever the business actually needs."
+      },
+      {
+        "title": "Product design & build",
+        "desc": "From an idea on a call to a working product: scope, design, build, launch. We stay through the parts most agencies hand off."
+      },
+      {
+        "title": "APIs & backend systems",
+        "desc": "Data pipelines, third-party integrations, documented APIs that other teams can build on. The kind of work that has to be right, not just look right."
+      },
+      {
+        "title": "Responsive websites",
+        "desc": "Marketing sites and web apps that work as well on a phone as on a desktop — because that is where most of your visitors actually are."
+      },
+      {
+        "title": "Interface design",
+        "desc": "Layouts and flows designed around what the user is trying to get done, then tested at real screen sizes before a line of code ships."
+      },
+      {
+        "title": "Audits & rescue work",
+        "desc": "Inherited a codebase that nobody wants to touch? We audit security, performance and correctness, then fix what is genuinely broken."
+      }
+    ],
+    "values": [
+      {
+        "title": "Verify, then claim",
+        "desc": "If we say a thing works, it is because we tested it. Numbers in our reports come from measurements, not estimates."
+      },
+      {
+        "title": "Say what is actually wrong",
+        "desc": "A client is better served by an honest problem than a comfortable answer. We flag what we find, including when it is our own mistake."
+      },
+      {
+        "title": "Build for the person using it",
+        "desc": "Most of the world browses on a mid-range phone on an ordinary connection. That is who we design for first."
+      },
+      {
+        "title": "Work across time zones",
+        "desc": "We work with clients internationally and organise around their schedule, not ours."
+      }
+    ],
+    "founders": {
+      "zain": {
+        "role": "Founder & Lead Engineer",
+        "bio": "Leads engineering across the company — architecture, backend systems and the parts of a product that have to hold up under real use. Built WeatherApex from the database schema to the API that now serves it.",
+        "focus": [
+          "Backend architecture",
+          "APIs & data",
+          "Product engineering"
+        ]
+      },
+      "sarim": {
+        "role": "Co-Founder",
+        "bio": "Runs the consulting side — scoping client work, shaping requirements into something buildable, and keeping delivery honest about time and cost. The first person a new client talks to.",
+        "focus": [
+          "Client strategy",
+          "Requirements & scope",
+          "Delivery"
+        ]
+      }
+    },
+    "disciplines": [
+      {
+        "title": "Frontend engineering",
+        "desc": "React, responsive interfaces, accessibility"
+      },
+      {
+        "title": "Backend engineering",
+        "desc": "Django, PostgreSQL, API design"
+      },
+      {
+        "title": "Product design",
+        "desc": "Interface design, design systems, prototyping"
+      },
+      {
+        "title": "Quality & testing",
+        "desc": "Automated testing, performance, security review"
+      }
+    ],
+    "ourProduct": "Our product",
+    "productText1": "Most weather services tell you what the weather is. WeatherApex tells you what it means for your plans — a score for every day of a trip, a risk rating for an outdoor event, and twenty years of climate history for cities worldwide.",
+    "productText2": "It is also a working reference for what we build: a documented public API, real forecast data, and an interface designed for a phone first.",
+    "tryTripPlanner": "Try the Trip Planner",
+    "readApiDocs": "Read the API docs",
+    "leadership": "Leadership",
+    "leadershipText": "The people you will actually be dealing with.",
+    "widerTeam": "The wider team",
+    "widerTeamText": "Engineers and designers working across every project we take on.",
+    "howWeWork": "How we work",
+    "ctaTitle": "Have something you need built?",
+    "ctaText": "Web application, company website, an internal tool, or a product you have been meaning to start — tell us what it needs to do and we will tell you honestly what it takes to build. We work with clients locally and internationally.",
+    "contact": {
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Where we are",
+      "companyPage": "Company page",
+      "soonTitle": "Contact details coming soon",
+      "soonText": "We are finalising our contact channels. In the meantime, you can reach us through the details listed in the site footer."
+    }
+  },
+  "common": {
+    "lastUpdated": "Last updated: {date}",
+    "close": "Close",
+    "loading": "Loading...",
+    "newTab": "(opens in a new tab)"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "metaDescription": "WeatherApex plans and pricing.",
+    "comingSoon": "Pricing — Coming Soon"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "metaDescription": "How WeatherApex handles your data.",
+    "sections": [
+      {
+        "title": "1. Information We Collect",
+        "content": "We collect information you provide during registration: username, email address, and password (stored as a salted hash). We also collect API usage logs including endpoint accessed, timestamp, and response status code. City search queries are logged temporarily for service improvement. We do NOT collect precise location data, browsing history, or personal identification documents."
+      },
+      {
+        "title": "2. How We Use Your Information",
+        "content": "Your email is used for account verification (OTP), password resets, and critical service notifications. Usage logs are used to enforce rate limits, diagnose errors, and improve our API. We do not sell, rent, or share your personal data with third parties. Aggregated, anonymized statistics may be used for public transparency reports."
+      },
+      {
+        "title": "3. Data Storage & Security",
+        "content": "Passwords are hashed using Django's PBKDF2 algorithm. API keys are stored as SHA-256 hashes — we cannot recover your key if lost. Data is stored on PostgreSQL databases hosted in secure data centers. We use HTTPS for all API communications. Free usage logs (IP-based) are retained for 30 days and then anonymized."
+      },
+      {
+        "title": "4. Cookies",
+        "content": "We use essential cookies for authentication (JWT tokens stored in localStorage on the client side). No tracking cookies, analytics cookies, or third-party cookies are used. You can clear your local storage at any time — this will log you out but won't affect core functionality. We do not use fingerprinting or any user-tracking technologies."
+      },
+      {
+        "title": "5. Third-Party Data",
+        "content": "Weather data is sourced from Open-Meteo, a free open-data weather API. Open-Meteo uses ECMWF, DWD, and other public meteorological models. We do not control the accuracy of third-party data sources. Geocoding is performed via Open-Meteo's geocoding API — no address data is stored permanently."
+      },
+      {
+        "title": "6. Your Rights",
+        "content": "You may request deletion of your account and associated data at any time by emailing privacy@weatherapex.com. Account deletion removes your user profile, API keys, and usage logs within 30 days. You may request a copy of your stored data. OTP records are automatically deleted after 10 minutes (expiry) or upon use."
+      },
+      {
+        "title": "7. Children's Privacy",
+        "content": "WeatherApex is not directed at children under 13. We do not knowingly collect information from children. If you believe a child has provided us with personal data, contact us immediately and we will delete it."
+      },
+      {
+        "title": "8. Changes to This Policy",
+        "content": "We may update this privacy policy periodically. Material changes will be announced via email to registered users. Continued use of the Service after changes constitutes acceptance of the updated policy."
+      },
+      {
+        "title": "9. Contact",
+        "content": "For privacy-related inquiries, contact our Data Protection Officer at privacy@weatherapex.com. Physical address: WeatherApex HQ, Lahore, Pakistan."
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "metaDescription": "WeatherApex terms of service.",
+    "sections": [
+      {
+        "title": "1. Acceptance of Terms",
+        "content": "By accessing or using WeatherApex (\"the Service\"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service. We reserve the right to update these terms at any time; continued use constitutes acceptance of changes."
+      },
+      {
+        "title": "2. Description of Service",
+        "content": "WeatherApex provides weather data, trip planning recommendations, event risk scoring, and API access for developers. The Service is provided \"as is\" and we make no guarantees about accuracy, availability, or fitness for a particular purpose."
+      },
+      {
+        "title": "3. User Accounts",
+        "content": "You are responsible for maintaining the confidentiality of your account credentials. You must provide accurate information during registration. One person may not maintain multiple free accounts. Accounts found to be in violation may be suspended without notice."
+      },
+      {
+        "title": "4. API Usage Limits",
+        "content": "Free API access is limited to 100 total calls per API key. Once exhausted, the key will be deactivated. You may register a new account to obtain a new key. Automated account creation or any attempt to circumvent rate limits is prohibited and will result in permanent ban."
+      },
+      {
+        "title": "5. Acceptable Use",
+        "content": "You agree not to: (a) use the Service for any unlawful purpose; (b) attempt to breach security or test vulnerabilities without written authorization; (c) redistribute or resell API data without explicit permission; (d) use automated tools to scrape, crawl, or extract data beyond normal API usage; (e) interfere with other users' access to the Service."
+      },
+      {
+        "title": "6. Intellectual Property",
+        "content": "The WeatherApex name, logo, and interface design are proprietary. The underlying weather data is sourced from Open-Meteo and other public sources. Our scoring algorithms, activity recommendations, and city intelligence layers are trade secrets."
+      },
+      {
+        "title": "7. Limitation of Liability",
+        "content": "WeatherApex shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service. Weather forecasts are inherently uncertain — always verify critical decisions with local authorities. Our total liability is limited to the amount you paid for the Service (if any)."
+      },
+      {
+        "title": "8. Termination",
+        "content": "We may suspend or terminate your access at any time for violation of these terms, without prior notice. Upon termination, your API keys will be revoked immediately. You may stop using the Service at any time."
+      },
+      {
+        "title": "9. Governing Law",
+        "content": "These terms are governed by the laws of Pakistan. Any disputes shall be resolved in the courts of Lahore, Pakistan."
+      },
+      {
+        "title": "10. Contact",
+        "content": "For questions about these terms, contact us at legal@weatherapex.com. We aim to respond within 5 business days."
+      }
+    ]
+  },
+  "auth": {
+    "metaSignInTitle": "Sign in",
+    "metaSignInDescription": "Sign in to your WeatherApex account.",
+    "metaSignUpTitle": "Create an account",
+    "metaSignUpDescription": "Create a free WeatherApex account to plan trips and generate an API key.",
+    "metaResetTitle": "Reset your password",
+    "metaResetDescription": "Reset the password of your WeatherApex account.",
+    "email": "Email",
+    "password": "Password",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "orContinueWith": "or continue with",
+    "tooMany": {
+      "one": "Too many attempts, try again in {count} minute.",
+      "other": "Too many attempts, try again in {count} minutes."
+    },
+    "loginFailed": "Login failed. Please try again.",
+    "googleSignInFailed": "Google sign-in failed. Please try again.",
+    "welcomeBack": "Welcome back",
+    "signInSubtitle": "Sign in to your account",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPasswordQ": "Forgot password?",
+    "forgotPassword": "Forgot password",
+    "signingIn": "Signing in...",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "googleHint": "Signed up with Google? Use Continue with Google, or set a password via {link}.",
+    "googleSignInLoad": "Google sign-in could not load. Check your connection or ad-blocker.",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "registrationFailed": "Registration failed. Please try again.",
+    "googleSignUpFailed": "Google sign-up failed. Please try again.",
+    "enterAllDigitsVerification": "Please enter all 6 digits of the verification code.",
+    "verificationFailed": "Verification failed. Please try again.",
+    "createAccountTitle": "Create account",
+    "getStarted": "Get started with WeatherApex",
+    "newPasswordPlaceholder": "Create a password (min 8 chars)",
+    "companyOptional": "Company name (optional)",
+    "companyPlaceholder": "Your company",
+    "creatingAccount": "Creating account...",
+    "createAccount": "Create Account",
+    "googleSignUpLoad": "Google sign-up could not load. Check your connection or ad-blocker.",
+    "verifyEmailTitle": "Verify your email",
+    "verifyEmailText": "If {email} is new, we sent a 6-digit code. Already have an account? Check your inbox for a sign-in link.",
+    "verificationCode": "Verification code",
+    "digitOf": "Digit {n} of 6",
+    "verifying": "Verifying...",
+    "verifyEmail": "Verify Email",
+    "backToSignUp": "Back to sign up",
+    "sendCodeFailed": "Could not send the code. Please try again.",
+    "enterAllDigits": "Please enter all 6 digits of the code.",
+    "resetFailed": "Password reset failed. Please try again.",
+    "passwordUpdated": "Password updated",
+    "resetTitle": "Reset your password",
+    "resetIntro": "Enter your email and we will send you a 6-digit code.",
+    "resetSent": "If an account exists for {email}, we sent a code. It expires in 10 minutes.",
+    "resetDone": "You can now sign in with your new password.",
+    "sendingCode": "Sending code...",
+    "sendCode": "Send code",
+    "sixDigitCode": "6-digit code",
+    "newPassword": "New password",
+    "saving": "Saving...",
+    "setNewPassword": "Set new password",
+    "differentEmail": "Use a different email or resend",
+    "rememberedIt": "Remembered it?",
+    "googleLoadFailed": "Google sign-in load nahi ho saki. Ad-blocker band karke dobara koshish karein."
+  },
+  "freeLimit": {
+    "features": {
+      "tripPlanner": "Trip Planner",
+      "eventRisk": "Event Risk Score",
+      "newCity": "new city lookups",
+      "climateHistory": "climate history",
+      "other": "this feature"
+    },
+    "title": {
+      "one": "You've used your {count} free check today",
+      "other": "You've used your {count} free checks today"
+    },
+    "text": "Create a free account to keep using {feature} — it takes about a minute.",
+    "benefits": [
+      "Unlimited trip plans and event risk checks",
+      "Full 15-day forecasts for any city",
+      "20 years of climate history",
+      "A free API key for your own projects"
+    ],
+    "createAccount": "Create free account",
+    "haveOne": "Already have one?",
+    "signIn": "Sign in",
+    "later": "Maybe later",
+    "noticeText": "Create a free account to keep going — unlimited trip plans, event risk checks and 20 years of climate history.",
+    "haveAccount": "I already have an account"
+  },
+  "cityNeeded": {
+    "that": "That",
+    "titleCountry": "{place} is a country — we need a city",
+    "titleRegion": "{place} is a region — we need a city",
+    "textCountry": "Weather is different in every city within {place}, so one score for the whole country would be misleading.",
+    "textRegion": "Weather is different in every city within {place}, so one score for the whole region would be misleading.",
+    "pick": "Pick a city in {place}:",
+    "enterCity": "Please enter a city name instead.",
+    "wantBest": "Want the best cities across {place} instead?",
+    "searchByCountry": "Search by country instead"
+  },
+  "search": {
+    "placeholder": "Search city or zip code",
+    "suggestions": "City suggestions",
+    "didYouMean": "Did you mean…?"
+  },
+  "wx": {
+    "unknown": {
+      "title": "Not available",
+      "desc": "Weather data isn't available right now."
+    },
+    "thunder": {
+      "title": "Thunderstorms",
+      "desc": "Stormy conditions likely."
+    },
+    "thunderHail": {
+      "title": "Thunderstorms with hail",
+      "desc": "Storms with hail likely."
+    },
+    "heavySnow": {
+      "title": "Heavy snow",
+      "desc": "Heavy snowfall expected."
+    },
+    "snowShowers": {
+      "title": "Snow showers",
+      "desc": "Periods of snow expected."
+    },
+    "snowGrains": {
+      "title": "Snow grains",
+      "desc": "Fine snow grains expected."
+    },
+    "snow": {
+      "title": "Snow",
+      "desc": "Snowfall expected."
+    },
+    "freezingRain": {
+      "title": "Freezing rain",
+      "desc": "Freezing rain — surfaces may be icy."
+    },
+    "heavyFreezingRain": {
+      "title": "Heavy freezing rain",
+      "desc": "Heavy freezing rain — icy conditions."
+    },
+    "freezingDrizzle": {
+      "title": "Freezing drizzle",
+      "desc": "Freezing drizzle — surfaces may be icy."
+    },
+    "violentShowers": {
+      "title": "Heavy showers",
+      "desc": "Violent rain showers expected."
+    },
+    "heavyShowers": {
+      "title": "Heavy showers",
+      "desc": "Significant rainfall expected."
+    },
+    "rainShowers": {
+      "title": "Rain showers",
+      "desc": "Periods of rain expected."
+    },
+    "heavyRain": {
+      "title": "Heavy rain",
+      "desc": "Significant rainfall expected."
+    },
+    "rain": {
+      "title": "Rain",
+      "desc": "Steady rain expected."
+    },
+    "rainMostDay": {
+      "title": "Rain",
+      "desc": "Rain likely for much of the day."
+    },
+    "lightRain": {
+      "title": "Light rain",
+      "desc": "Occasional light rain."
+    },
+    "drizzle": {
+      "title": "Drizzle",
+      "desc": "Light drizzle expected."
+    },
+    "foggy": {
+      "title": "Foggy",
+      "desc": "Reduced visibility likely."
+    },
+    "cloudy": {
+      "title": "Cloudy",
+      "desc": "Overcast conditions expected."
+    },
+    "partlySunny": {
+      "title": "Partly sunny",
+      "desc": "Mix of sun and clouds."
+    },
+    "sunny": {
+      "title": "Sunny",
+      "desc": "Clear skies throughout the day."
+    }
+  },
+  "wxNight": {
+    "unknown": "Not available",
+    "storms": "Storms possible",
+    "heavySnow": "Heavy snow",
+    "snow": "Snow",
+    "freezingRain": "Freezing rain",
+    "freezingDrizzle": "Freezing drizzle",
+    "showers": "Showers",
+    "rainLikely": "Rain likely",
+    "drizzle": "Drizzle",
+    "foggy": "Foggy",
+    "overcast": "Overcast",
+    "partlyCloudy": "Partly cloudy",
+    "clearSky": "Clear sky"
+  },
+  "units": {
+    "tempUnit": "Temperature unit",
+    "showCelsius": "°C — show Celsius",
+    "showFahrenheit": "°F — show Fahrenheit"
+  },
+  "weather": {
+    "notFound": "We couldn't find “{query}”.",
+    "didYouMean": "Did you mean:",
+    "checkSpelling": "Check the spelling or try a nearby big city.",
+    "loadFailed": "Could not load weather data.",
+    "locating": "Finding your location…",
+    "useMyLocation": "Use my location",
+    "geoDenied": "Location permission was blocked — search for your city instead.",
+    "geoError": "Could not find your city — search for it instead.",
+    "precipitation": "Precipitation",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "tabs": {
+      "temperature": "Temperature",
+      "precipitation": "Precipitation",
+      "wind": "Wind"
+    },
+    "chartUnavailable": "Hourly chart is not available right now.",
+    "forecastTitle": "Long-range Forecast",
+    "today": "TODAY",
+    "cols": {
+      "day": "Day",
+      "cond": "Cond",
+      "hiLo": "Hi / Lo",
+      "description": "Description",
+      "night": "Night",
+      "precip": "Precip"
+    },
+    "nightLabel": "Night: ",
+    "showerChance": "Mostly dry — a passing shower is possible ({p}% chance).",
+    "showerPossible": "Mostly dry — a passing shower is possible.",
+    "thunderChance": "Thunderstorm possible ({p}% chance).",
+    "loadingWeather": "Loading weather data...",
+    "loadingForecast": "Loading forecast...",
+    "iconAlt": "weather icon",
+    "mapTitle": "Weather Map",
+    "radar": "Precipitation Radar",
+    "layerDark": "Dark",
+    "layerSatellite": "Satellite"
+  },
+  "home": {
+    "metaTitle": "WeatherApex — Weather intelligence for trips & outdoor events",
+    "metaImageTitle": "Weather Forecasts, Trip Planning & Climate Guides",
+    "metaDescription": "Plan trips and outdoor events with confidence. Day-by-day weather scoring, event risk analysis and 20 years of climate history for cities worldwide.",
+    "h1": "Weather Forecasts, Trip Planning & Climate Guides",
+    "featuresSubtitle": "More than just a forecast. Our suite of professional tools provides actionable insights for complex logistics and travel planning.",
+    "features": [
+      {
+        "title": "Trip Weather Planner",
+        "description": "Simulate weather conditions across your entire route to ensure safety and comfort during long-haul travel.",
+        "linkText": "Learn more"
+      },
+      {
+        "title": "Event Risk Score",
+        "description": "Planning a wedding or outdoor marathon? Our proprietary algorithm calculates meteorological risk up to 6 months in advance.",
+        "linkText": "Try it out"
+      },
+      {
+        "title": "Historical Data Analysis",
+        "description": "Access decades of climate patterns for specific locations to make data-backed decisions for infrastructure and agriculture.",
+        "linkText": "View Archive"
+      }
+    ],
+    "workflow": {
+      "title": "The Apex Workflow",
+      "steps": [
+        {
+          "title": "Define Parameters",
+          "description": "Input your location, specific timeframes, and sensitivity levels for different weather events."
+        },
+        {
+          "title": "Data Synthesis",
+          "description": "Our engines aggregate data from 40,000+ stations and proprietary satellite imagery in real-time."
+        },
+        {
+          "title": "Actionable Reports",
+          "description": "Receive automated PDF summaries or live dashboard alerts customized to your needs."
+        }
+      ]
+    },
+    "digest": {
+      "title": "The Meteorological Digest",
+      "subtitle": "Expert analysis on climate trends and travel tips.",
+      "viewAll": "View All Articles",
+      "articles": [
+        {
+          "category": "CLIMATE TRENDS",
+          "title": "The Shift in European Winter Patterns 2024",
+          "description": "Recent data suggests a fundamental shift in high-pressure systems across Central Europe, affecting ski seasons and..."
+        },
+        {
+          "category": "TECHNOLOGY",
+          "title": "How AI is Revolutionizing Local Forecasting",
+          "description": "Machine learning models are now outperforming traditional fluid dynamics simulations in predicting localized storm..."
+        },
+        {
+          "category": "TRAVEL TIPS",
+          "title": "Mastering the Monsoon Season in Bali",
+          "description": "Don't let the rain stop your travel. Learn how to time your excursions perfectly using micro-climate data for Indonesia..."
+        }
+      ]
+    }
+  },
+  "popular": {
+    "title": "Popular Destinations",
+    "scrollLeft": "Scroll destinations left",
+    "scrollRight": "Scroll destinations right",
+    "showWeatherFor": "Show weather for ",
+    "climateGuide": "Climate guide →"
+  },
+  "trip": {
+    "metaTitle": "Trip Weather Planner",
+    "metaDescription": "Score every day of your trip on rain, wind and temperature, and see which day is best for what.",
+    "h1": "Trip Planner",
+    "intro": "Find the best days to travel with weather-based day scoring",
+    "noImage": "No image available",
+    "err": {
+      "city": "Please enter a city name",
+      "country": "Please enter a country name",
+      "wait": "Please wait a moment and try again",
+      "tapBoth": "Please tap your first and last trip day",
+      "tapLast": "Now tap your last trip day (tap the same day again for a one-day trip)",
+      "outOfRange": "Please choose dates between {from} and {to} — that's as far as the forecast goes.",
+      "startDate": "Please select a start date",
+      "startRange": "Please choose a start date between {from} and {to}",
+      "endDate": "Please select an end date",
+      "endBeforeStart": "End date must be on or after the start date",
+      "estimateFrom": "Estimates are for trips ending {date} or later — for earlier dates use the live forecast.",
+      "endMax": "Please choose an end date before {date}",
+      "maxDays": "Trips up to {max} days are supported (you selected {days})"
+    },
+    "byCity": "Search by City",
+    "byCountry": "Search by Country",
+    "city": "City",
+    "country": "Country",
+    "cityPlaceholder": "e.g. London, Tokyo, Dubai",
+    "countryPlaceholder": "e.g. Spain, Italy, Japan",
+    "tripDates": "Trip dates",
+    "estimate": "Estimate",
+    "liveForecast": "Live forecast",
+    "estimateNote": "Estimate based on 20 years of climate data — not a forecast",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "estimateHint": "For trips ending {date} or later · up to 20 days",
+    "backToForecast": "Back to the live forecast",
+    "furtherAhead": "Planning further ahead?",
+    "planTrip": "Plan Trip",
+    "exploreCountry": "Explore Country",
+    "fetchFailed": "Could not fetch data",
+    "emptyTitle": "Plan Your Trip",
+    "emptyText": "Search by city to get per-day scores, or by country to compare cities",
+    "citiesIn": "Cities in {country}",
+    "viewDetails": "View details →",
+    "clickCity": "Click any city to see its detailed day-by-day trip plan",
+    "backToCities": "← Back to all cities",
+    "packing": {
+      "rain": "Rain Expected",
+      "sun": "High UV / Heat",
+      "activity": "Outdoor Activity",
+      "clothing": "Clothing",
+      "gear": "Essential Gear"
+    },
+    "shopAmazon": "Shop on Amazon",
+    "historicalEstimate": "Historical estimate",
+    "overall": "Overall",
+    "bestDay": "Best Day:",
+    "na": "N/A",
+    "leastIdeal": "Least ideal:",
+    "packingTitle": "Packing Recommendations",
+    "packingText": "Curated gear for your predicted weather conditions in {city}.",
+    "showLess": "Show Less",
+    "viewMore": "View More Products",
+    "tripDays": "Trip days",
+    "firstDaySuffix": ", first day",
+    "lastDaySuffix": ", last day",
+    "forecastAvailable": {
+      "one": "Forecast available for the next {count} day:",
+      "other": "Forecast available for the next {count} days:"
+    },
+    "tapFirst": "Tap your first day",
+    "tapLast": "Now tap your last day",
+    "selected": "{range} selected",
+    "activities": {
+      "beach_water": "Beach / Water Sports",
+      "picnic_park": "Picnic / Park",
+      "hiking_outdoor": "Hiking / Outdoor",
+      "indoor_museum": "Museum / Indoor",
+      "indoor_sheltered": "Sheltered Indoor",
+      "indoor_midday": "Avoid Midday Heat",
+      "city_sightseeing": "City Sightseeing"
+    },
+    "score": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "scoreRange": {
+      "excellent": "8.5–10",
+      "good": "7–8.4",
+      "fair": "5–6.9",
+      "poor": "below 5"
+    },
+    "parts": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "partHours": {
+      "morning": "6am–12pm",
+      "afternoon": "12–6pm",
+      "evening": "6–10pm"
+    },
+    "reason": {
+      "rainHours": {
+        "one": "Rain expected for about {count} daytime hour — indoor plans are the safest bet.",
+        "other": "Rain expected for about {count} daytime hours — indoor plans are the safest bet."
+      },
+      "rainChanceIndoor": "{rain}% chance of rain — indoor plans are the safest bet.",
+      "strongWind": "Strong wind up to {wind} — choose sheltered spots.",
+      "hotCoast": "Hot ({temp}) on the coast — best spent by the water.",
+      "warmCoast": "Warm and mostly dry on the coast — good for the beach.",
+      "veryHot": "Very hot ({temp}) — go out early or late, stay indoors at midday.",
+      "mildTrails": "Mild ({temp}) and dry enough for trails.",
+      "mildParks": "Mild ({temp}) — comfortable for parks and picnics.",
+      "cool": "Cool ({temp}) — dress warmly for sightseeing.",
+      "comfortable": "Comfortable ({temp}) for walking around the city.",
+      "showerChance": "Mostly dry — a passing shower is possible ({p}% chance).",
+      "showerPossible": "Mostly dry — a passing shower is possible.",
+      "umbrella": "{rain}% rain chance — pack an umbrella.",
+      "thunder": "A thunderstorm is possible ({p}% chance) — keep an eye on the sky.",
+      "breezy": "Breezy, up to {wind}."
+    },
+    "showerPossible": "Shower possible",
+    "thunderPossible": "Thunderstorm possible",
+    "duringDay": "Weather during the day",
+    "partRain": "{p}% rain",
+    "dayScore": "Day score (out of 10):",
+    "bestDayPill": "Best day",
+    "leastIdealPill": "Least ideal",
+    "bestFor": "Best for:",
+    "bestTime": "Best time:",
+    "temperature": "Temperature",
+    "highLow": "High {high}° · Low {low}°",
+    "rainChance": "Rain chance",
+    "wind": "Wind"
+  },
+  "events": {
+    "metaTitle": "Outdoor Event Risk Score",
+    "metaDescription": "Weather risk scoring for weddings, concerts, marathons and other outdoor events, with better nearby dates.",
+    "h1": "Outdoor Event Risk Score",
+    "intro": "Plan with confidence. We analyze hyper-local weather patterns to evaluate the safety and comfort of your outdoor events.",
+    "dateAt": "{date} at {time}",
+    "selectedLabel": "{date} (Selected)",
+    "tomorrowLabel": "Tomorrow, {date}",
+    "analyzing": "Analyzing weather for your event...",
+    "fetchFailed": "Could not fetch risk data",
+    "types": {
+      "wedding": "Wedding",
+      "marathon": "Marathon",
+      "concert": "Concert",
+      "sports": "Sports",
+      "festival": "Festival"
+    },
+    "eventType": "Event Type",
+    "location": "Location",
+    "locationPlaceholder": "City, Country",
+    "date": "Date",
+    "specificTime": "Specific time?",
+    "checkRisk": "Check Risk Score",
+    "risk": {
+      "low": "LOW RISK",
+      "moderate": "MODERATE RISK",
+      "high": "HIGH RISK"
+    },
+    "editDetails": "Edit Details",
+    "edit": "Edit",
+    "safeToProceed": "Safe to proceed",
+    "wholeDayCaution": "Whole-day caution",
+    "stat": {
+      "rain": "RAIN",
+      "wind": "{unit} WIND",
+      "temp": "TEMP",
+      "humidity": "HUMIDITY"
+    },
+    "timelineTitle": "Timeline Analysis",
+    "timelineWindow": "We found the optimal {count}-hour window for your event to minimize weather disruptions.",
+    "timelineAny": "We found the optimal time window for your event to minimize weather disruptions.",
+    "hourWeather": "{hour} weather",
+    "nearbyTitle": "Nearby Dates Comparison",
+    "recommended": "RECOMMENDED",
+    "betterOption": "BETTER OPTION",
+    "selected": "SELECTED",
+    "advice": {
+      "low": "Safe to proceed with outdoor plans.",
+      "moderate": "Some risk present.",
+      "rainBackup": "Consider a backup indoor plan for rain.",
+      "high": "High risk — strongly consider rescheduling or indoor backup.",
+      "narrowWindow": "Note: most of the day has poor conditions — this window is a narrow exception. Consider whether your event duration fits within it.",
+      "dayWarning": "This day has poor conditions for {risky} of {total} hours (6 AM-10 PM). Only a narrow window is favorable."
+    }
+  },
+  "guides": {
+    "metaTitle": "Climate Guides",
+    "metaDescription": "Month-by-month climate guides built on 20 years of historical weather data.",
+    "h1": "City Climate Guides",
+    "intro": "Explore average temperatures, rainfall, and weather patterns for cities around the world",
+    "status": {
+      "not_found": "We couldn't find a city called “{q}”. Try adding the country, e.g. “Santa Fe, USA”.",
+      "rate_limited": "Too many searches in a short time — please try again in a few minutes.",
+      "limit": "We are adding a lot of new cities today — please try again tomorrow.",
+      "unsupported": "We found this place but can’t build a climate page for it yet.",
+      "error": "Climate data could not be loaded right now — please try again in a minute."
+    },
+    "notACity": "{label} is a country or region, not a city — climate differs from city to city. Search for a city instead.",
+    "notACityPick": "{label} is a country or region, not a city — climate differs from city to city. Search for a city instead:",
+    "searchPlaceholder": "Search any city...",
+    "searchLabel": "Search any city",
+    "view": "View",
+    "loadingCity": "Loading climate data for {label}… a new city can take a few seconds.",
+    "moreThanOne": "There is more than one “{label}”. Which one?",
+    "people": "{n} people",
+    "popular": "Popular Destinations",
+    "filterPlaceholder": "Filter cities...",
+    "noMatch": "No cities match \"{search}\"",
+    "noMatchHint": "Try the search box above to view any city's climate guide.",
+    "planInstead": "Plan a trip instead",
+    "byMonthTitle": "Month-by-Month Weather Guides",
+    "byMonthText": "What each month is like — temperatures, rain and the best time to visit.",
+    "browseAll": "Browse all countries",
+    "cityByMonth": "{city} by month",
+    "cantFind": "Can't find your city?",
+    "cantFindText": "Search any city above and we'll generate its climate guide instantly."
+  },
+  "blog": {
+    "title": "Blog",
+    "titlePage": "Blog — Page {page}",
+    "description": "Travel weather guides, climate breakdowns and packing advice from WeatherApex.",
+    "descriptionPage": "Travel weather guides, climate breakdowns and packing advice from WeatherApex — page {page}.",
+    "h1": "The WeatherApex Blog",
+    "intro": "Climate insights, city guides, and expert travel tips.",
+    "read": "Read",
+    "noPosts": "No posts yet",
+    "checkBack": "Check back soon for new articles.",
+    "previous": "← Previous",
+    "next": "Next →",
+    "pageOf": "Page {page} of {total}",
+    "notFound": "Post not found",
+    "kicker": "WeatherApex Blog",
+    "back": "Back to Blog",
+    "gear": "Recommended Gear",
+    "viewOnAmazon": "View on Amazon →",
+    "weatherIn": "Weather in {cities}",
+    "cityWeatherLink": "{city} weather by month & climate",
+    "alsoLike": "You may also like",
+    "related": "Related articles",
+    "toc": "Table of contents",
+    "onThisPage": "On this page",
+    "faq": "Frequently asked questions",
+    "furtherReading": "Further reading",
+    "sources": "Sources",
+    "categories": {
+      "usa-weather-guides": "USA Weather Guides",
+      "travel-guides": "Travel Guides",
+      "weather-tips": "Weather Tips"
+    }
+  },
+  "weatherHub": {
+    "crumb": "Weather",
+    "metaTitle": "Weather by Country & Month — WeatherApex",
+    "metaImageTitle": "Weather by Country & Month",
+    "metaDescription": "Climate guides for {cities} cities in {countries} countries and territories — month-by-month temperatures, rainfall and the best time to visit.",
+    "h1": "Weather by Country",
+    "intro": "Month-by-month weather for {cities} cities in {countries} countries and territories, built on 20 years of historical weather data.",
+    "regions": {
+      "europe": "Europe",
+      "north-america": "North America",
+      "latin-america": "Latin America",
+      "middle-east-africa": "Middle East & Africa",
+      "asia": "Asia",
+      "oceania": "Oceania"
+    },
+    "regionCount": "{countries} countries · {cities} cities",
+    "cities": {
+      "one": "{count} cities",
+      "other": "{count} cities"
+    }
+  },
+  "climate": {
+    "table": {
+      "month": "Month",
+      "avgHigh": "Avg High",
+      "avgLow": "Avg Low",
+      "rainfall": "Rainfall",
+      "rainyDays": "Rainy Days",
+      "sunshine": "Sunshine"
+    },
+    "showLess": "Show Less",
+    "fullYear": "View Full Year",
+    "same": "same"
+  }
+}

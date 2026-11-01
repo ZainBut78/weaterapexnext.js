@@ -6,6 +6,7 @@
 //  FAQ schema kabhi nahi (Google ne 2023 mein band kar diya).
 // ─────────────────────────────────────────────────────────────
 import { SITE_NAME, SITE_URL } from '@/utils/seo';
+import { localePath } from '@/i18n/config';
 
 export default function JsonLd({ data }) {
   return (
@@ -34,13 +35,14 @@ export const AUTHOR = {
   url: SITE_URL,
 };
 
-export const breadcrumbs = (items) => ({
+// lang (i18n): item URL us zaban ka (/de/...); en → pehle jaisa
+export const breadcrumbs = (items, lang = 'en') => ({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: items.map((it, i) => ({
     '@type': 'ListItem',
     position: i + 1,
     name: it.name,
-    item: `${SITE_URL}${it.path === '/' ? '' : it.path}`,
+    item: `${SITE_URL}${it.path === '/' && lang === 'en' ? '' : localePath(lang, it.path)}`,
   })),
 });

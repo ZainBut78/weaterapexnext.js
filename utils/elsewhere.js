@@ -50,7 +50,7 @@ export function pickElsewhere({ city, row, summary, hrefFor, max = 5, cities = C
     const warmer = wantWarmer && m.avg_high - hi >= 3 && m.avg_high < 32;
     const drier = wantDrier && isNum(m.rainy_days) && row.rainy_days - m.rainy_days >= 4 && Math.abs(m.avg_high - hi) <= 6;
     if (!warmer && !drier) continue;
-    cands.push({ slug: c.slug, name: c.name, country: c.country, href: hrefFor(c.slug), row: m, warmer, drier, km: km(city, c) });
+    cands.push({ slug: c.slug, name: c.name, names: c.names, country: c.country, countrySlug: c.countrySlug, href: hrefFor(c.slug), row: m, warmer, drier, km: km(city, c) });
   }
   cands.sort((a, b) => a.km - b.km || a.slug.localeCompare(b.slug));
 

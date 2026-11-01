@@ -6,12 +6,12 @@
 // ─────────────────────────────────────────────────────────────
 import { ChevronDown } from 'lucide-react';
 
-export default function BlogFaq({ faqs }) {
+export default function BlogFaq({ faqs, t }) {
   if (!faqs || faqs.length === 0) return null;
   return (
     <section aria-labelledby="blog-faq-heading" className="mt-10 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
       <h2 id="blog-faq-heading" className="text-lg font-extrabold text-[#002244] mb-2">
-        Frequently asked questions
+        {t('blog.faq')}
       </h2>
       <div className="divide-y divide-gray-100">
         {faqs.map((f, i) => (

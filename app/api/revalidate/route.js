@@ -17,11 +17,15 @@
 // ─────────────────────────────────────────────────────────────
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { timingSafeEqual } from 'node:crypto';
+import { LOCALES } from '@/i18n/config';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_TAG = /^(blog(:[a-z0-9-]+)?|cities)$/;   // cities = history_complete index (1 h cache)
-const ALLOWED = /^\/(blog(\/[a-z0-9-]+)?|weather(\/[a-z0-9-]+){0,3}|sitemap\.xml|sitemap\/[a-z0-9-]+\.xml|)$/;
+// blog:<slug> · blog:<lang>:<slug> (tarjuma, Phase 4) · blog · cities (history_complete index, 1 h)
+const ALLOWED_TAG = /^(blog(:([a-z]{2}:)?[a-z0-9-]+)?|cities)$/;
+// Zaban ka prefix (/de/blog/<slug>) bhi — tarjume ka slug alag hota hai
+const ALLOWED = /^(\/(blog(\/[a-z0-9-]+)?|weather(\/[a-z0-9-]+){0,3}|sitemap\.xml|sitemap\/[a-z0-9-]+\.xml|)|\/(de|it|ja|fr|es)(\/(blog(\/[a-z0-9-]+)?|weather(\/[a-z0-9-]+){0,3}))?)$/;
+const PREFIXED = /^\/(de|it|ja|fr|es)(?=\/|$)/;
 
 function authorized(request) {
   const secret = process.env.REVALIDATE_SECRET || '';
@@ -50,7 +54,8 @@ export async function POST(request) {
     // body nahi — query se
   }
   const sp = new URL(request.url).searchParams;
-  const clean = (list) => [...new Set(list.map((x) => String(x).trim()))].slice(0, 20);
+  // 40: English post + 5 tarjumon ke paths/lists/sitemaps ek hi call mein (Phase 4)
+  const clean = (list) => [...new Set(list.map((x) => String(x).trim()))].slice(0, 40);
   paths = clean([...paths, ...sp.getAll('path')]);
   tags = clean([...tags, ...sp.getAll('tag')]);
   const bad = [...paths.filter((p) => !ALLOWED.test(p)), ...tags.filter((t) => !ALLOWED_TAG.test(t))];
@@ -58,6 +63,13 @@ export async function POST(request) {
     return Response.json({ revalidated: false, error: 'invalid paths/tags', bad }, { status: 400 });
   }
   for (const t of tags) revalidateTag(t, { expire: 0 });
-  for (const p of paths) revalidatePath(p);
+  // i18n (Oct 2026): pages app/[lang]/ mein — English bhi andar se /en/...
+  // Bina prefix path (/blog/x) → har zaban ka path. Prefix wala (/de/blog/y,
+  // blog tarjuma) → sirf wahi. Sitemaps root par hain (zaban nahi).
+  for (const p of paths) {
+    if (p.startsWith('/sitemap')) { revalidatePath(p); continue; }
+    if (PREFIXED.test(p)) { revalidatePath(p); continue; }
+    for (const l of LOCALES) revalidatePath(p === '/' ? `/${l}` : `/${l}${p}`);
+  }
   return Response.json({ revalidated: true, paths, tags, now: Date.now() });
 }

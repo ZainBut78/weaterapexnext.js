@@ -88,6 +88,8 @@ export function buildRegistry(rows) {
         slug: r.slug, name: r.name, country: country.name, countrySlug: country.slug,
         lat: r.lat, lon: r.lon, tz: null,
         tags: { coastal: !!r.is_coastal, hiking: !!r.has_hiking_trails }, isStatic: false,
+        // Doosri zabanon ke naam (backend, Nov 2026) — i18n/places cityName(lang, city)
+        ...(r.names && typeof r.names === 'object' ? { names: r.names } : {}),
         dataDate: r.climate_updated_at || null,
         months: r.history_complete === true ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : monthsOf(r),
       });

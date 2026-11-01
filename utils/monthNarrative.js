@@ -159,11 +159,12 @@ export function sunShare(row, daylight) {
 }
 
 /** Sab facts ek jagah */
-export function monthFacts(monthly, monthNum, city) {
+// locale (i18n): daylight ke waqt us zaban mein; en → null (pehle jaisa)
+export function monthFacts(monthly, monthNum, city, locale = null) {
   const row = rowFor(monthly, monthNum);
   const nextNum = monthNum === 12 ? 1 : monthNum + 1;
   const prevNum = monthNum === 1 ? 12 : monthNum - 1;
-  const daylight = monthDaylight(city, monthNum);
+  const daylight = monthDaylight(city, monthNum, 2025, locale);
   const rows = (monthly || []).filter((m) => isNum(m.avg_high));
   const highs = rows.map((m) => m.avg_high);
   return {

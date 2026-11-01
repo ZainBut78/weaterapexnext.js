@@ -12,8 +12,13 @@
 //      2) warna browser language 'en-US' → °F (US visitors)
 //      3) warna °C
 //  • °F ke saath hawa mph, °C ke saath km/h (owner, round 3).
+//  • i18n (Oct 2026): English ke ilawa har zaban mein °C pehle — browser
+//    'en-US' hone par bhi khud °F nahi (user khud chune to chune). Numbers
+//    zaban ki shakal mein (fmt / tempDual1): de/it/fr/es → 21,9.
 // ─────────────────────────────────────────────────────────────
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useLang } from '@/i18n/client';
+import { intlLocale } from '@/i18n/format';
 
 const STORAGE_KEY = 'weatherApex_units';
 const UnitsContext = createContext(null);
@@ -23,6 +28,7 @@ const toMph = (kmh) => kmh / 1.609344;
 
 export function UnitsProvider({ children }) {
   const [unit, setUnitState] = useState('C');
+  const pageLang = useLang();
 
   useEffect(() => {
     let saved = null;
@@ -31,9 +37,10 @@ export function UnitsProvider({ children }) {
       setUnitState(saved);
       return;
     }
+    if (pageLang !== 'en') return;          // °C pehle (owner, i18n)
     const lang = (navigator.languages && navigator.languages[0]) || navigator.language || '';
     if (/^en-US$/i.test(lang)) setUnitState('F');
-  }, []);
+  }, [pageLang]);
 
   const setUnit = useCallback((u) => {
     setUnitState(u);
@@ -42,9 +49,13 @@ export function UnitsProvider({ children }) {
 
   const value = useMemo(() => {
     const isF = unit === 'F';
+    const nf = new Intl.NumberFormat(intlLocale(pageLang), { maximumFractionDigits: 1 });
+    // Display number zaban ki shakal mein (21.9 → "21,9"); null → null
+    const fmt = (n) => (n == null ? null : nf.format(n));
     return {
       unit,
       setUnit,
+      fmt,
       tempSymbol: isF ? '°F' : '°C',
       windUnit: isF ? 'mph' : 'km/h',
       // °C (backend) → dikhane wali unit, gol number. null/undefined → null
@@ -57,14 +68,14 @@ export function UnitsProvider({ children }) {
       tempDual1: (c) => {
         if (c == null || !Number.isFinite(Number(c))) return null;
         const r1 = (v) => Math.round(v * 10) / 10;
-        const cTxt = `${r1(Number(c))}°C`;
-        const fTxt = `${r1(toF(Number(c)))}°F`;
+        const cTxt = `${fmt(r1(Number(c)))}°C`;
+        const fTxt = `${fmt(r1(toF(Number(c))))}°F`;
         return isF ? `${fTxt} (${cTxt})` : `${cTxt} (${fTxt})`;
       },
       // km/h (backend) → km/h ya mph, gol number
       wind: (kmh) => (kmh == null || !Number.isFinite(Number(kmh)) ? null : Math.round(isF ? toMph(Number(kmh)) : Number(kmh))),
     };
-  }, [unit, setUnit]);
+  }, [unit, setUnit, pageLang]);
 
   return <UnitsContext.Provider value={value}>{children}</UnitsContext.Provider>;
 }
