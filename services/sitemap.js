@@ -82,7 +82,11 @@ export function sitemapIndex(children) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</sitemapindex>\n`;
 }
 
-export const xmlResponse = (xml) => new Response(xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
+// Cache-Control saaf likha (Nov 2026): routes dynamic hain — Hostinger CDN / proxy
+// .xml ko apne andaze se cache na kare (tarjuma publish ke baad purana index)
+export const xmlResponse = (xml) => new Response(xml, {
+  headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=0, must-revalidate' },
+});
 
 // ── data ──
 async function allPosts(lang = DEFAULT_LOCALE) {
@@ -104,13 +108,21 @@ async function allPosts(lang = DEFAULT_LOCALE) {
 }
 
 const NOTE_DATE = /reviewed (\d{4}-\d{2}-\d{2})/;
-async function noteDate(citySlug, monthSlug) {
+// Notes sirf deploy par badalte hain — sitemap routes ab har request par bante
+// hain (route cache nahi), is liye har file process mein ek hi dafa parhi jaye
+const noteDates = new Map();
+async function readNoteDate(citySlug, monthSlug) {
   try {
     const head = (await fs.readFile(path.join(process.cwd(), 'content', 'guides', citySlug, `${monthSlug}.md`), 'utf8')).slice(0, 300);
     return head.match(NOTE_DATE)?.[1] || null;
   } catch {
     return null;
   }
+}
+function noteDate(citySlug, monthSlug) {
+  const key = `${citySlug}/${monthSlug}`;
+  if (!noteDates.has(key)) noteDates.set(key, readNoteDate(citySlug, monthSlug));
+  return noteDates.get(key);
 }
 
 const max = (a, b) => (!a ? b : !b ? a : (a > b ? a : b));

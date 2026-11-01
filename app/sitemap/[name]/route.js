@@ -1,12 +1,9 @@
 // /sitemap/<name>.xml — child sitemaps (static, blog, places, months-N).
 // Ghalat naam → 404. Qawaid: services/sitemap.js.
+// Nov 2026: index jaisa — route cache nahi, sirf data fetch cache (tags).
 import { childEntries, urlset, xmlResponse } from '@/services/sitemap';
 
-export const revalidate = 600;
-
-export async function generateStaticParams() {
-  return [];
-}
+export const dynamic = 'force-dynamic';
 
 export async function GET(_request, { params }) {
   const { name } = await params;

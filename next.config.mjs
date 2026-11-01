@@ -20,6 +20,13 @@ const nextConfig = {
   // ISR pages ki stale-while-revalidate 1 saal ki jagah zyada se zyada 2 din
   // (sab se lamba page revalidate 1 din). SEO fixes Oct 2026.
   expireTime: 172800,
+  // Metadata (title, canonical, hreflang) HAMESHA pehle HTML ke <head> mein (Nov 2026).
+  // Default mein Next aam browsers / curl / SEO tools ke liye metadata "stream" karta
+  // hai: data der se aaye (naye tarjume ki pehli, bina cache request) to tags shell
+  // ke baad <body> mein jate hain — live par naye /de/blog/... ki pehli request bina
+  // hreflang dikhi. /.*/ = har user agent ke liye blocking. Hamare pages ka metadata
+  // wahi data hai jis ka page khud intezar karta hai — TTFB par asar nahi.
+  htmlLimitedBots: /.*/,
   // `X-Powered-By: Next.js` header band — framework ka naam na bataye (security report #11)
   poweredByHeader: false,
   // inlineCss NAAPA aur BAND rakha (Oct 2026): CSS <style> mein HTML + RSC
