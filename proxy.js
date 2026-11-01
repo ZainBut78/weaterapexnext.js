@@ -19,6 +19,11 @@
 //      (/weather/australia) shehar nahi → 200, bilkul waise.
 //   5) DB ka koi aur shehar (search se add hua, Oct 2026): /weather/tulum →
 //      /weather/mexico/tulum (308, registry se — warna 404 tha)
+//   6) Purana duplicate blog slug (Search Console 404, Nov 2026, owner):
+//      /blog/<slug>-<number> → /blog/<slug> **301** — sirf jab <slug> live post
+//      ho aur asal URL khud live NA ho (backend se poochte hain, 10 min memory).
+//      Warna 404 bilkul waise. Har zaban: /de/blog/<slug>-2 → /de/blog/<slug>
+//      sirf jab us zaban ka tarjuma <slug> published ho.
 //  Misal: /weather/Brisbane/ → ek hi hop (301) → /weather/australia/brisbane
 //
 //  Lowercase redirect page.js mein kyun nahi: city pages ISR hain; page se
@@ -30,6 +35,7 @@ import { NextResponse } from 'next/server';
 import { isKnownCity } from './data/cities';
 import { cityPath, getCountry } from './data/countries';
 import { buildRegistry } from './utils/cityRegistryCore';
+import { duplicateBlogBase } from './utils/blogDuplicate';
 import { DEFAULT_LOCALE, localePath, parseEnabledLocales, splitLocale } from './i18n/config';
 
 const API_INTERNAL_URL = (process.env.API_INTERNAL_URL || 'http://127.0.0.1:8000/api').replace(/\/+$/, '');
@@ -51,6 +57,32 @@ async function cityRegistry() {
     registryCache = { at: Date.now() - INDEX_TTL_MS + 60 * 1000, reg: registryCache.reg || buildRegistry(null) };
   }
   return registryCache.reg;
+}
+
+// Blog post (us zaban mein) live hai? (rule 6) — {"lang:slug": {at, live}};
+// backend na mile → false (404 hi rahe)
+const POST_TTL_MS = 10 * 60 * 1000;
+const postLive = new Map();
+
+async function blogPostLive(slug, lang) {
+  const key = `${lang}:${slug}`;
+  const hit = postLive.get(key);
+  if (hit && Date.now() - hit.at < POST_TTL_MS) return hit.live;
+  const en = lang === DEFAULT_LOCALE;
+  let live = false;
+  try {
+    const res = await fetch(`${API_INTERNAL_URL}/blog/posts/${slug}/${en ? '' : `?lang=${lang}`}`, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(3000),
+    });
+    // Tarjuma: jawab usi zaban ka ho (services/blogApi.js jaisa — warna English post)
+    live = res.ok && (en || (await res.json())?.lang === lang);
+  } catch {
+    return false;   // cache nahi — agli dafa dobara
+  }
+  if (postLive.size > 500) postLive.clear();
+  postLive.set(key, { at: Date.now(), live });
+  return live;
 }
 
 // ── Zabanein (i18n Phase 1, Oct 2026) ──
@@ -103,6 +135,13 @@ export async function proxy(request) {
         if (target) path = target;
       }
     }
+  }
+
+  // 6) purana duplicate blog slug → asal post (301)
+  const base = duplicateBlogBase(path);
+  if (base && !(await blogPostLive(path.slice('/blog/'.length), lang)) && (await blogPostLive(base, lang))) {
+    path = `/blog/${base}`;
+    status = 301;
   }
 
   const target = localePath(lang, path);
