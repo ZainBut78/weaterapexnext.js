@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { clearStoredSession, isSessionDead, SESSION_EXPIRED_EVENT } from '@/utils/authSession';
 
 const AuthContext = createContext(null);
 
@@ -29,6 +30,11 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
+    // Access aur refresh dono expire: navbar logged-in na dikhaye
+    if (isSessionDead(token, localStorage.getItem('refresh_token'))) {
+      clearStoredSession();
+      return;
+    }
 
     const name = cleanName(localStorage.getItem('username'));
     if (name) {
@@ -38,6 +44,13 @@ export function AuthProvider({ children }) {
     // Purani kharab value (jaise "undefined") saaf karo, session rakho.
     localStorage.removeItem('username');
     setUser(FALLBACK_NAME);
+  }, []);
+
+  // apiClient ne session saaf kiya (refresh rad / token_not_valid) → navbar foran
+  useEffect(() => {
+    const onExpired = () => setUser(null);
+    window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
   }, []);
 
   const login = (username, accessToken, refreshToken) => {

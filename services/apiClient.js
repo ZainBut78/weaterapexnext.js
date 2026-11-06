@@ -1,12 +1,22 @@
 import axios from 'axios';
-import { API_BASE_URL, ENDPOINTS } from '../config/endpoints';
+import { API_BASE_URL, ENDPOINTS } from '../config/endpoints.js';
+import { clearStoredSession, isJwtExpired, isPublicAuthUrl } from '../utils/authSession.js';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+apiClient.interceptors.request.use(async (config) => {
+  // Public auth (login, OTP, forgot password...) par token kabhi nahi: purana token
+  // Django 401 kar deta tha aur "Could not send the code" aata tha
+  if (isPublicAuthUrl(config.url)) {
+    delete config.headers.Authorization;
+    return config;
+  }
+  let token = localStorage.getItem('access_token');
+  // Website endpoints expire token ko chupchap anonymous maante hain (401 nahi aata),
+  // is liye yahin dekhte hain: naya lao, ya mara hua session saaf karo
+  if (token && isJwtExpired(token)) token = await freshAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -31,28 +41,7 @@ apiClient.interceptors.request.use((config) => {
 // ROTATE_REFRESH_TOKENS=True hone ki wajah se baqi 4 invalid ho jati.
 // ──────────────────────────────────────────────────────────────────────
 
-// In endpoints par 401 ka matlab "ghalat password / ghalat OTP" hai,
-// expired token nahi — in par refresh nahi karna.
-const NO_REFRESH = [
-  ENDPOINTS.auth?.login,
-  ENDPOINTS.auth?.register,
-  ENDPOINTS.auth?.verifyOtp,
-  ENDPOINTS.auth?.resendOtp,
-  ENDPOINTS.auth?.refresh,
-  ENDPOINTS.auth?.forgotPassword,
-  ENDPOINTS.auth?.resetPassword,
-  ENDPOINTS.auth?.googleLogin,
-].filter(Boolean);
-
-const isAuthEndpoint = (url = '') => NO_REFRESH.some((p) => url.includes(p));
-
 let refreshPromise = null;
-
-const clearSession = () => {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  localStorage.removeItem('username');
-};
 
 const runRefresh = () => {
   const refreshToken = localStorage.getItem('refresh_token');
@@ -73,6 +62,31 @@ const runRefresh = () => {
       return access;
     });
 };
+
+const sharedRefresh = () => {
+  if (!refreshPromise) {
+    refreshPromise = runRefresh().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
+};
+
+// Expire access token ki jagah naya. Refresh bhi mar chuka / server ne mana kiya →
+// session saaf, null. Network ghalti → tokens rehne do (kharab wifi logout na kare).
+async function freshAccessToken() {
+  const refresh = localStorage.getItem('refresh_token');
+  if (!refresh || isJwtExpired(refresh)) {
+    clearStoredSession();
+    return null;
+  }
+  try {
+    return await sharedRefresh();
+  } catch (err) {
+    if (err?.response) clearStoredSession();
+    return null;
+  }
+}
 
 apiClient.interceptors.response.use(
   (res) => res,
@@ -99,29 +113,25 @@ apiClient.interceptors.response.use(
       }
     }
 
-    if (
-      status !== 401 ||
-      config._retried ||
-      isAuthEndpoint(config.url) ||
-      !localStorage.getItem('refresh_token')
-    ) {
+    if (status !== 401 || isPublicAuthUrl(config.url)) {
+      return Promise.reject(err);
+    }
+
+    // Protected call par token rad, aur refresh ka raasta nahi: dead tokens saaf
+    if (config._retried || !localStorage.getItem('refresh_token')) {
+      clearStoredSession();
       return Promise.reject(err);
     }
 
     config._retried = true;
 
-    if (!refreshPromise) {
-      refreshPromise = runRefresh().finally(() => {
-        refreshPromise = null;
-      });
-    }
-
     try {
-      const access = await refreshPromise;
+      const access = await sharedRefresh();
       config.headers = { ...(config.headers || {}), Authorization: `Bearer ${access}` };
       return apiClient(config);
-    } catch {
-      clearSession();
+    } catch (refreshErr) {
+      if (!refreshErr?.response) return Promise.reject(err);   // network: session rehne do
+      clearStoredSession();
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
         window.location.assign('/login');
       }
