@@ -133,6 +133,7 @@ const nextConfig = {
     const target = process.env.API_PROXY_TARGET;
     if (!target) return indexNow;
     const base = target.replace(/\/+$/, '');
+    // /api/site/* (BFF) yahin chalta hai: rewrites dynamic routes se pehle lagte hain
     return [
       ...indexNow,
       // PEHLA rule: jo URL "/" par khatam ho, us ka "/" aage bhi jaye.
@@ -142,12 +143,12 @@ const nextConfig = {
       // (APPEND_SLASH) "/" laga kar wapas redirect karta, browser phir
       // yahin aata, proxy phir "/" hata deta... → ERR_TOO_MANY_REDIRECTS.
       {
-        source: '/api/:path*/',
-        destination: `${base}/api/:path*/`,
+        source: '/api/:path((?!site/).*)/',
+        destination: `${base}/api/:path/`,
       },
       {
-        source: '/api/:path*',
-        destination: `${base}/api/:path*`,
+        source: '/api/:path((?!site/).*)',
+        destination: `${base}/api/:path`,
       },
     ];
   },

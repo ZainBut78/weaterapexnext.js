@@ -58,6 +58,8 @@ const FreeLimitModal = () => {
   if (!info) return null;
 
   const limit = info.limit ?? 3;
+  // Logged-in user ki rozana hadd: signup ki dawat nahi, plans ka link
+  const daily = info.code === 'user_daily_limit';
   const feature = t(`freeLimit.features.${FEATURE_KEY[info.feature] || 'other'}`);
 
   return (
@@ -84,14 +86,24 @@ const FreeLimitModal = () => {
             <Sparkles className="w-7 h-7 text-white" />
           </div>
           <h2 id="free-limit-title" className="text-xl sm:text-2xl font-extrabold text-white leading-tight">
-            {t('freeLimit.title', { count: limit })}
+            {daily ? t('freeLimit.dailyTitle', { count: limit }) : t('freeLimit.title', { count: limit })}
           </h2>
           <p className="text-sm text-white/80 mt-2">
-            {t('freeLimit.text', { feature })}
+            {daily ? t('freeLimit.dailyText', { feature }) : t('freeLimit.text', { feature })}
           </p>
         </div>
 
         <div className="px-6 py-6">
+          {daily ? (
+            <Link
+              href="/pricing"
+              onClick={() => setInfo(null)}
+              className="flex items-center justify-center w-full min-h-12 rounded-full bg-[#00a8e8] hover:bg-[#0092cd] text-white text-sm font-bold transition-colors"
+            >
+              {t('freeLimit.seePlans')}
+            </Link>
+          ) : (
+          <>
           <ul className="space-y-3 mb-6">
             {t.raw('freeLimit.benefits').map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-slate-700">
@@ -121,6 +133,8 @@ const FreeLimitModal = () => {
               {t('freeLimit.signIn')}
             </Link>
           </p>
+          </>
+          )}
 
           <button
             type="button"

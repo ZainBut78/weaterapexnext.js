@@ -17,7 +17,7 @@ const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
  */
 export async function mockCurrentWeather(page, opts = {}) {
   const calls = [];
-  await page.route('**/api/weather/current/**', async (route) => {
+  await page.route('**/api/site/weather/current/**', async (route) => {
     const url = new URL(route.request().url());
     const city = (url.searchParams.get('city') || 'london').toLowerCase();
     calls.push(city);

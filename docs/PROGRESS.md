@@ -1441,3 +1441,22 @@ Masla: Tulum, Nairobi, Lima… search karne par 404 (DB mein nahi; mulk list mei
 - **Shehron ke naam:** `weather/city_names.py` — `CITY_NAME_OVERRIDES` (puerto-vallarta, panama-city, cabo-san-lucas, murree; override jeet-ta hai, English jaisa = key nahi) + rad: abbreviation (Pto, Sta., St., Cd. …) ya mulk ka naam. Naya shehar + backfill dono mein. `backfill_city_names` bina `--force`: koi network nahi, sirf override + saafai; naya `--only slug,slug`; revalidate 30 paths fi call. Admin: City form mein 5 zabanon ke khane, save par cities cache + Next revalidate.
 - **CacheKeyWarning:** geocode key `geocode:v2:<lang>:<sha256>`; blog related key bhi hash.
 - Local checks: backend 350 OK (17 naye) · makemigrations: no changes · unit 22/22 · sitemap-check 1915 · 0 fail · i18n-check 1936 · 0 fail · e2e 70 pass / 3 skip / 2 fail (wahi local data: sitemap < 2000, Australia hub). Publish flow local: ja unpublish → publish → pehli request par hreflang `<head>` mein, index mein blog-ja foran.
+
+## 2026-11-06 — Free API band: BFF + website API gate
+
+Bahar walon ke liye data ka ek hi raasta: `/api/v1` (X-API-Key + plan quota).
+
+- **BFF:** browser ka data `/api/site/...` (`app/api/site/[...path]/route.js`, qawaid `utils/siteBff.js`). Sirf 5 raaste, sirf unke params. Internal key server par; browser ki IP `X-Site-Client-IP` mein. Weather (5 min) aur city search (10 min) cache.
+- **Gate:** `weathervibe/site_api_gate.py`. `SITE_API_REQUIRE_INTERNAL_KEY=False` sirf log (`site_api_gate would_block`), `True` par 403. Khule raaste: auth, v1, affiliate, schema/docs.
+- **Daily quota:** logged-in user par trip planner, recommend, event risk (har feature alag). Ginti `SiteUserUsage` (DB).
+
+| Env | Kahan | Default |
+|---|---|---|
+| `SITE_API_REQUIRE_INTERNAL_KEY` | Backend | `False` |
+| `SITE_USER_DAILY_LIMIT_FREE` | Backend | `20` |
+| `SITE_USER_DAILY_LIMIT_STARTER`, `_PRO`, `_BUSINESS` | Backend | Plan ka `daily_calls` |
+| `SITE_BFF_WEATHER_PER_MINUTE` | Hostinger | `120` |
+| `SITE_BFF_SEARCH_PER_MINUTE` | Hostinger | `120` |
+| `SITE_BFF_FEATURE_PER_MINUTE` | Hostinger | `30` |
+
+Deploy order: backend (flag OFF), phir frontend, logs dekhein, phir flag ON. Backend pehle zaroori hai: warna Django `X-Site-Client-IP` nahi maanta aur saare anon users Next server ki ek IP par 3/din mein phans jate hain. Wapas: flag `False`.

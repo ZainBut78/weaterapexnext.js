@@ -92,7 +92,12 @@
       "otp_expired": "This code has expired. Please request a new one.",
       "otp_attempts_exhausted": "Too many wrong attempts. Please request a new code.",
       "email_unavailable": "We couldn't send email right now. Please try again in a minute.",
-      "reset_link_invalid": "This reset link is invalid or has expired. Please request a new one."
+      "reset_link_invalid": "This reset link is invalid or has expired. Please request a new one.",
+      "user_daily_limit": {
+        "one": "You've used today's {count} check. It resets tomorrow.",
+        "other": "You've used today's {count} checks. They reset tomorrow."
+      },
+      "backend_unavailable": "Service temporarily unavailable. Please try again."
     }
   },
   "about": {
@@ -415,7 +420,7 @@
     },
     "text": "Create a free account to keep using {feature} — it takes about a minute.",
     "benefits": [
-      "Unlimited trip plans and event risk checks",
+      "More trip plans and event risk checks every day",
       "Full 15-day forecasts for any city",
       "20 years of climate history",
       "A free API key for your own projects"
@@ -424,8 +429,15 @@
     "haveOne": "Already have one?",
     "signIn": "Sign in",
     "later": "Maybe later",
-    "noticeText": "Create a free account to keep going — unlimited trip plans, event risk checks and 20 years of climate history.",
-    "haveAccount": "I already have an account"
+    "noticeText": "Create a free account to keep going: more trip plans and event risk checks every day, and 20 years of climate history.",
+    "haveAccount": "I already have an account",
+    "dailyTitle": {
+      "one": "You've used today's {count} check",
+      "other": "You've used today's {count} checks"
+    },
+    "dailyText": "Your {feature} limit resets tomorrow. Upgrade your plan for more.",
+    "dailyNotice": "Your limit for this feature resets tomorrow. Upgrade your plan for more.",
+    "seePlans": "See plans"
   },
   "cityNeeded": {
     "that": "That",

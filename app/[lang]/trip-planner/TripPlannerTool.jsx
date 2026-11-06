@@ -292,7 +292,7 @@ function TripPlannerTool({ intro }) {
   // Isay laal "error" banane ka koi faida nahi — user ko rasta dena hai.
   const errKind = error?.response?.data?.kind;
   const needsCity = errKind === 'country' || errKind === 'region';
-  const freeLimit = error?.response?.data?.code === 'free_limit_reached';
+  const freeLimit = ['free_limit_reached', 'user_daily_limit'].includes(error?.response?.data?.code);
 
   // Searched (pehle se validate shuda) tareekhein hi dobara — form mein
   // baad mein chhedi gayi tareekh bina check ke backend tak na jaye

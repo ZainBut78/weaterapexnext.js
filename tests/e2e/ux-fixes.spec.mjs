@@ -16,7 +16,7 @@ test.beforeEach(async ({ page }) => {
 /** Suggestions API ka mock — har call gin'ta hai */
 async function mockCitySearch(page, results = []) {
   const calls = [];
-  await page.route('**/api/trips/plan/cities/search/**', (route) => {
+  await page.route('**/api/site/trips/plan/cities/search/**', (route) => {
     calls.push(new URL(route.request().url()).searchParams.get('q'));
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ results }) });
   });
@@ -217,7 +217,7 @@ for (const vp of [PHONE, DESKTOP]) {
   test(`trip planner: only forecast days are pickable, today → today+15 works (${vp.width}px)`, async ({ page }) => {
     await mockCitySearch(page);
     const planCalls = [];
-    await page.route(/\/api\/trips\/plan\/\?/, (route) => {
+    await page.route(/\/api\/site\/trips\/plan\/\?/, (route) => {
       const u = new URL(route.request().url());
       const start = u.searchParams.get('start');
       const end = u.searchParams.get('end');
@@ -261,7 +261,7 @@ for (const vp of [PHONE, DESKTOP]) {
 test('trip planner: "Planning further ahead?" uses clearly-labelled estimates, blocks forecast-range ends', async ({ page }) => {
   await mockCitySearch(page);
   const planCalls = [];
-  await page.route(/\/api\/trips\/plan\/\?/, (route) => {
+  await page.route(/\/api\/site\/trips\/plan\/\?/, (route) => {
     const u = new URL(route.request().url());
     planCalls.push({ start: u.searchParams.get('start'), end: u.searchParams.get('end') });
     return route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":"test"}' });
@@ -305,7 +305,7 @@ test('trip planner: country mode has only the forecast chips', async ({ page }) 
 
 test('trip planner: city field suggests the right spelling, 404 shows "Did you mean"', async ({ page }) => {
   await mockCitySearch(page);
-  await page.route(/\/api\/trips\/plan\/\?/, (route) =>
+  await page.route(/\/api\/site\/trips\/plan\/\?/, (route) =>
     route.fulfill({ status: 404, contentType: 'application/json', body: '{"error":"City not found"}' }));
   await page.setViewportSize(PHONE);
   await page.goto('/trip-planner');

@@ -92,7 +92,12 @@
       "otp_expired": "Dieser Code ist abgelaufen. Bitte fordern Sie einen neuen an.",
       "otp_attempts_exhausted": "Zu viele falsche Versuche. Bitte fordern Sie einen neuen Code an.",
       "email_unavailable": "Die E-Mail kann gerade nicht gesendet werden. Bitte versuchen Sie es in einer Minute erneut.",
-      "reset_link_invalid": "Dieser Link ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen an."
+      "reset_link_invalid": "Dieser Link ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen an.",
+      "user_daily_limit": {
+        "one": "Sie haben heute {count} Abfrage genutzt. Morgen geht es weiter.",
+        "other": "Sie haben heute {count} Abfragen genutzt. Morgen geht es weiter."
+      },
+      "backend_unavailable": "Der Dienst ist vorübergehend nicht verfügbar. Bitte versuchen Sie es erneut."
     }
   },
   "about": {
@@ -415,7 +420,7 @@
     },
     "text": "Erstellen Sie ein kostenloses Konto, um {feature} weiter zu nutzen – das dauert etwa eine Minute.",
     "benefits": [
-      "Unbegrenzt Reisepläne und Event-Risiko-Checks",
+      "Mehr Reisepläne und Event-Risiko-Checks pro Tag",
       "Vollständige 15-Tage-Vorhersagen für jede Stadt",
       "20 Jahre Klimahistorie",
       "Ein kostenloser API-Schlüssel für eigene Projekte"
@@ -424,8 +429,15 @@
     "haveOne": "Sie haben schon eins?",
     "signIn": "Anmelden",
     "later": "Vielleicht später",
-    "noticeText": "Erstellen Sie ein kostenloses Konto und machen Sie weiter – unbegrenzt Reisepläne, Event-Risiko-Checks und 20 Jahre Klimahistorie.",
-    "haveAccount": "Ich habe bereits ein Konto"
+    "noticeText": "Erstellen Sie ein kostenloses Konto und machen Sie weiter: mehr Reisepläne und Event-Risiko-Checks pro Tag sowie 20 Jahre Klimadaten.",
+    "haveAccount": "Ich habe bereits ein Konto",
+    "dailyTitle": {
+      "one": "Sie haben heute {count} Abfrage genutzt",
+      "other": "Sie haben heute {count} Abfragen genutzt"
+    },
+    "dailyText": "Ihr Limit für {feature} wird morgen zurückgesetzt. Mit einem höheren Tarif erhalten Sie mehr.",
+    "dailyNotice": "Ihr Limit für diese Funktion wird morgen zurückgesetzt. Mit einem höheren Tarif erhalten Sie mehr.",
+    "seePlans": "Tarife ansehen"
   },
   "cityNeeded": {
     "that": "Dieser Ort",

@@ -229,8 +229,8 @@ for (const vp of [MOBILE, DESKTOP]) {
   test(`Trip Planner day cards render (option 2) at ${vp.width}px`, async ({ page }, testInfo) => {
     const start = new Date(Date.now() + 2 * 86400000);
     const fx = tripFixture(start.toISOString().slice(0, 10));
-    await page.route('**/api/trips/plan/cities/search/**', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
-    await page.route(/\/api\/trips\/plan\/\?/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fx) }));
+    await page.route('**/api/site/trips/plan/cities/search/**', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+    await page.route(/\/api\/site\/trips\/plan\/\?/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fx) }));
     await page.setViewportSize(vp);
     await page.goto('/trip-planner');
     await page.getByPlaceholder(/e\.g\. London/).fill('Barcelona');

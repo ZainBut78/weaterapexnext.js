@@ -92,7 +92,12 @@
       "otp_expired": "Questo codice è scaduto. Richiedine uno nuovo.",
       "otp_attempts_exhausted": "Troppi tentativi errati. Richiedi un nuovo codice.",
       "email_unavailable": "Al momento non possiamo inviare email. Riprova tra un minuto.",
-      "reset_link_invalid": "Questo link non è valido o è scaduto. Richiedine uno nuovo."
+      "reset_link_invalid": "Questo link non è valido o è scaduto. Richiedine uno nuovo.",
+      "user_daily_limit": {
+        "one": "Hai usato {count} controllo di oggi. Si azzera domani.",
+        "other": "Hai usato i {count} controlli di oggi. Si azzerano domani."
+      },
+      "backend_unavailable": "Servizio temporaneamente non disponibile. Riprova."
     }
   },
   "about": {
@@ -415,7 +420,7 @@
     },
     "text": "Crea un account gratuito per continuare a usare {feature}: ci vuole circa un minuto.",
     "benefits": [
-      "Piani di viaggio e controlli del rischio eventi illimitati",
+      "Più piani di viaggio e controlli del rischio ogni giorno",
       "Previsioni complete a 15 giorni per qualsiasi città",
       "20 anni di storico climatico",
       "Una chiave API gratuita per i tuoi progetti"
@@ -424,8 +429,15 @@
     "haveOne": "Ne hai già uno?",
     "signIn": "Accedi",
     "later": "Magari più tardi",
-    "noticeText": "Crea un account gratuito per continuare: piani di viaggio illimitati, controlli del rischio eventi e 20 anni di storico climatico.",
-    "haveAccount": "Ho già un account"
+    "noticeText": "Crea un account gratuito per continuare: più piani di viaggio e controlli del rischio ogni giorno, e 20 anni di dati climatici.",
+    "haveAccount": "Ho già un account",
+    "dailyTitle": {
+      "one": "Hai usato {count} controllo di oggi",
+      "other": "Hai usato i {count} controlli di oggi"
+    },
+    "dailyText": "Il limite per {feature} si azzera domani. Passa a un piano superiore per averne di più.",
+    "dailyNotice": "Il limite per questa funzione si azzera domani. Passa a un piano superiore per averne di più.",
+    "seePlans": "Vedi i piani"
   },
   "cityNeeded": {
     "that": "Questo luogo",

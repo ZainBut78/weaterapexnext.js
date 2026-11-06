@@ -92,7 +92,12 @@
       "otp_expired": "Este código ha caducado. Solicita uno nuevo.",
       "otp_attempts_exhausted": "Demasiados intentos incorrectos. Solicita un código nuevo.",
       "email_unavailable": "Ahora mismo no podemos enviar correos. Inténtalo de nuevo en un minuto.",
-      "reset_link_invalid": "Este enlace no es válido o ha caducado. Solicita uno nuevo."
+      "reset_link_invalid": "Este enlace no es válido o ha caducado. Solicita uno nuevo.",
+      "user_daily_limit": {
+        "one": "Has usado {count} consulta de hoy. Se restablece mañana.",
+        "other": "Has usado las {count} consultas de hoy. Se restablecen mañana."
+      },
+      "backend_unavailable": "Servicio no disponible temporalmente. Inténtalo de nuevo."
     }
   },
   "about": {
@@ -415,7 +420,7 @@
     },
     "text": "Crea una cuenta gratuita para seguir usando {feature}: se tarda alrededor de un minuto.",
     "benefits": [
-      "Planes de viaje y consultas de riesgo de eventos ilimitados",
+      "Más planes de viaje y consultas de riesgo cada día",
       "Previsiones completas de 15 días para cualquier ciudad",
       "20 años de historial climático",
       "Una clave de API gratuita para tus propios proyectos"
@@ -424,8 +429,15 @@
     "haveOne": "¿Ya tienes una?",
     "signIn": "Inicia sesión",
     "later": "Quizá más tarde",
-    "noticeText": "Crea una cuenta gratuita para continuar: planes de viaje y consultas de riesgo ilimitados, y 20 años de historial climático.",
-    "haveAccount": "Ya tengo una cuenta"
+    "noticeText": "Crea una cuenta gratuita para continuar: más planes de viaje y consultas de riesgo cada día, y 20 años de datos climáticos.",
+    "haveAccount": "Ya tengo una cuenta",
+    "dailyTitle": {
+      "one": "Has usado {count} consulta de hoy",
+      "other": "Has usado las {count} consultas de hoy"
+    },
+    "dailyText": "Tu límite de {feature} se restablece mañana. Mejora tu plan para tener más.",
+    "dailyNotice": "Tu límite de esta función se restablece mañana. Mejora tu plan para tener más.",
+    "seePlans": "Ver planes"
   },
   "cityNeeded": {
     "that": "Ese lugar",

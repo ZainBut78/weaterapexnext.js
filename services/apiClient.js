@@ -82,7 +82,7 @@ apiClient.interceptors.response.use(
 
     if (status === 429) {
       const data = err.response?.data || {};
-      if (data.code === 'free_limit_reached') {
+      if (data.code === 'free_limit_reached' || data.code === 'user_daily_limit') {
         // Yeh "site kharab hai" wali error NAHI hai — user ki aaj ki
         // free calls khatam hui hain. Pehle sirf ek laal box dikhta tha
         // ("Could not fetch data"), jis se user ko lagta tha kuch toot

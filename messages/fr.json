@@ -92,7 +92,12 @@
       "otp_expired": "Ce code a expiré. Veuillez en demander un nouveau.",
       "otp_attempts_exhausted": "Trop d'essais incorrects. Veuillez demander un nouveau code.",
       "email_unavailable": "Impossible d'envoyer des e-mails pour le moment. Veuillez réessayer dans une minute.",
-      "reset_link_invalid": "Ce lien est invalide ou a expiré. Veuillez en demander un nouveau."
+      "reset_link_invalid": "Ce lien est invalide ou a expiré. Veuillez en demander un nouveau.",
+      "user_daily_limit": {
+        "one": "Vous avez utilisé {count} vérification aujourd'hui. Réinitialisation demain.",
+        "other": "Vous avez utilisé vos {count} vérifications du jour. Réinitialisation demain."
+      },
+      "backend_unavailable": "Service temporairement indisponible. Veuillez réessayer."
     }
   },
   "about": {
@@ -415,7 +420,7 @@
     },
     "text": "Créez un compte gratuit pour continuer à utiliser {feature} : cela prend environ une minute.",
     "benefits": [
-      "Plans de voyage et vérifications de risque illimités",
+      "Plus de plans de voyage et de vérifications de risque chaque jour",
       "Prévisions complètes sur 15 jours pour toutes les villes",
       "20 ans d'historique climatique",
       "Une clé API gratuite pour vos propres projets"
@@ -424,8 +429,15 @@
     "haveOne": "Vous en avez déjà un ?",
     "signIn": "Se connecter",
     "later": "Plus tard",
-    "noticeText": "Créez un compte gratuit pour continuer : plans de voyage et vérifications de risque illimités, plus 20 ans d'historique climatique.",
-    "haveAccount": "J'ai déjà un compte"
+    "noticeText": "Créez un compte gratuit pour continuer : plus de plans de voyage et de vérifications de risque chaque jour, et 20 ans de données climatiques.",
+    "haveAccount": "J'ai déjà un compte",
+    "dailyTitle": {
+      "one": "Vous avez utilisé {count} vérification aujourd'hui",
+      "other": "Vous avez utilisé vos {count} vérifications du jour"
+    },
+    "dailyText": "Votre limite pour {feature} sera réinitialisée demain. Passez à une offre supérieure pour en avoir plus.",
+    "dailyNotice": "Votre limite pour cette fonction sera réinitialisée demain. Passez à une offre supérieure pour en avoir plus.",
+    "seePlans": "Voir les offres"
   },
   "cityNeeded": {
     "that": "Ce lieu",

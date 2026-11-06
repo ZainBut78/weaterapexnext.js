@@ -14,6 +14,7 @@ import { Sparkles, ArrowRight } from 'lucide-react';
 const FreeLimitNotice = ({ data }) => {
   const limit = data?.limit ?? 3;
   const t = useT();
+  const daily = data?.code === 'user_daily_limit';
 
   return (
     <div className="max-w-3xl mx-auto bg-white border border-[#d6e4ff] rounded-2xl overflow-hidden shadow-sm">
@@ -23,15 +24,24 @@ const FreeLimitNotice = ({ data }) => {
         </span>
         <div className="min-w-0">
           <p className="font-bold text-[#002244]">
-            {t('freeLimit.title', { count: limit })}
+            {daily ? t('freeLimit.dailyTitle', { count: limit }) : t('freeLimit.title', { count: limit })}
           </p>
           <p className="text-sm text-slate-600 mt-1">
-            {t('freeLimit.noticeText')}
+            {daily ? t('freeLimit.dailyNotice') : t('freeLimit.noticeText')}
           </p>
         </div>
       </div>
 
       <div className="px-5 py-5 sm:px-6 flex flex-col sm:flex-row gap-3">
+        {daily ? (
+          <Link
+            href="/pricing"
+            className="flex-1 inline-flex items-center justify-center gap-2 min-h-12 rounded-full bg-[#00a8e8] hover:bg-[#0092cd] text-white text-sm font-bold transition-colors"
+          >
+            {t('freeLimit.seePlans')} <ArrowRight className="w-4 h-4" />
+          </Link>
+        ) : (
+        <>
         <Link
           href="/signup"
           className="flex-1 inline-flex items-center justify-center gap-2 min-h-12 rounded-full bg-[#00a8e8] hover:bg-[#0092cd] text-white text-sm font-bold transition-colors"
@@ -44,6 +54,8 @@ const FreeLimitNotice = ({ data }) => {
         >
           {t('freeLimit.haveAccount')}
         </Link>
+        </>
+        )}
       </div>
     </div>
   );

@@ -71,8 +71,9 @@ async function blogPostLive(slug, lang) {
   const en = lang === DEFAULT_LOCALE;
   let live = false;
   try {
+    const key = process.env.BACKEND_INTERNAL_KEY;
     const res = await fetch(`${API_INTERNAL_URL}/blog/posts/${slug}/${en ? '' : `?lang=${lang}`}`, {
-      headers: { Accept: 'application/json' },
+      headers: key ? { Accept: 'application/json', 'X-Internal-Key': key } : { Accept: 'application/json' },
       signal: AbortSignal.timeout(3000),
     });
     // Tarjuma: jawab usi zaban ka ho (services/blogApi.js jaisa — warna English post)

@@ -155,7 +155,7 @@ const EventRiskTool = ({ intro }) => {
   const errKind = error?.response?.data?.kind;
   const needsCity = errKind === 'country' || errKind === 'region';
   // Free calls khatam — yeh "error" nahi, signup ki dawat hai
-  const freeLimit = error?.response?.data?.code === 'free_limit_reached';
+  const freeLimit = ['free_limit_reached', 'user_daily_limit'].includes(error?.response?.data?.code);
 
   return (
     <>

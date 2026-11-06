@@ -14,6 +14,10 @@
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
+// Browser ka data (weather, trip planner, event risk) apne hi domain ke BFF se:
+// app/api/site. Django ko seedha sirf auth calls jati hain.
+export const SITE_API_BASE = '/api/site';
+
 const BLOG_LIST = '/blog/posts/';
 const API_KEYS_REVOKE = '/auth/keys/';
 
