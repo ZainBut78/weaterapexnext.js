@@ -1,15 +1,18 @@
 'use client';
 
 // Password bhool gaye (hardening, Oct 2026) — 2 qadam, login/signup jaisa design:
-//  1) email → backend 6-digit code bhejta hai (email ho ya na ho, jawab ek jaisa)
-//  2) code + naya password → "Sign in" par wapas
+//  1) email → backend link + 6-digit code bhejta hai (email ho ya na ho, jawab ek jaisa)
+//  2) code + naya password → "Sign in" par wapas (ya email ka link: /reset-password)
+// Resend countdown + code expiry: useOtpSession (refresh ke baad bhi wahi).
 // 429 (cooldown / rate limit) → "Too many attempts, try again in X minutes".
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from '@/components/LocaleLink';
 import { useLang, useT } from '@/i18n/client';
 import { Cloud, Mail, Lock, Eye, EyeOff, KeyRound, ArrowLeft } from 'lucide-react';
 import { requestPasswordReset, resetPassword } from '@/services/authService';
 import { authErrorMessage } from '@/utils/authErrors';
+import OtpStatus from '@/components/OtpStatus';
+import { useOtpSession } from '@/hooks/useOtpSession';
 
 const INPUT = 'w-full pl-11 pr-4 py-3 bg-[#f0f5ff] text-gray-700 placeholder-gray-400 text-sm rounded-xl border border-[#d6e4ff] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all';
 const BUTTON = 'w-full py-3 bg-[#0077b6] hover:bg-[#005a8d] disabled:bg-[#0077b6]/60 text-white text-sm font-bold rounded-xl transition-colors shadow-sm';
@@ -22,15 +25,27 @@ export default function ForgotPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const t = useT();
   const lang = useLang();
+  const otpSession = useOtpSession('reset');
+  const { session, ready } = otpSession;
+
+  // Refresh ke baad wapas code wali screen par
+  useEffect(() => {
+    if (ready && session) {
+      setEmail(session.email);
+      setStep('reset');
+    }
+  }, [ready, session]);
 
   const handleEmail = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await requestPasswordReset(email.trim());
+      const res = await requestPasswordReset(email.trim());
+      otpSession.start(email.trim(), res);
       setStep('reset');
     } catch (err) {
       setError(authErrorMessage(err, t('auth.sendCodeFailed'), t, lang));
@@ -49,11 +64,28 @@ export default function ForgotPassword() {
     setLoading(true);
     try {
       await resetPassword({ email: email.trim(), otp: code, new_password: password });
+      otpSession.clear();
       setStep('done');
     } catch (err) {
       setError(authErrorMessage(err, t('auth.resetFailed'), t, lang));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setError('');
+    setResending(true);
+    try {
+      const res = await requestPasswordReset(email.trim());
+      otpSession.start(email.trim(), res);
+      setCode('');
+    } catch (err) {
+      const wait = Number(err?.response?.data?.retry_after);
+      if (err?.response?.status === 429 && wait) otpSession.waitFor(wait);
+      setError(authErrorMessage(err, t('auth.sendCodeFailed'), t, lang));
+    } finally {
+      setResending(false);
     }
   };
 
@@ -80,7 +112,7 @@ export default function ForgotPassword() {
             <p className="text-sm text-gray-500 mt-1">
               {step === 'email' && t('auth.resetIntro')}
               {step === 'reset' && (
-                <>{t.rich('auth.resetSent', { email: <span className="font-semibold text-gray-700">{email.trim()}</span> })}</>
+                <>{t.rich('auth.resetSent', { email: <span className="font-semibold text-gray-700">{email.trim()}</span> })} {t('auth.resetLinkHint')}</>
               )}
               {step === 'done' && t('auth.resetDone')}
             </p>
@@ -127,6 +159,7 @@ export default function ForgotPassword() {
                     onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="123456"
                     autoComplete="one-time-code"
+                    autoFocus
                     className={INPUT}
                     required
                   />
@@ -160,10 +193,17 @@ export default function ForgotPassword() {
               <button type="submit" disabled={loading} className={BUTTON}>
                 {loading ? t('auth.saving') : t('auth.setNewPassword')}
               </button>
+              <OtpStatus
+                resendIn={otpSession.resendIn}
+                expiresIn={otpSession.expiresIn}
+                resending={resending}
+                deliveryFailed={otpSession.deliveryFailed}
+                onResend={handleResend}
+              />
               <div className="text-center">
                 <button
                   type="button"
-                  onClick={() => { setStep('email'); setError(''); setCode(''); }}
+                  onClick={() => { otpSession.clear(); setStep('email'); setError(''); setCode(''); }}
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:text-[#005a8d] transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> {t('auth.differentEmail')}

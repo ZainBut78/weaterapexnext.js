@@ -63,7 +63,10 @@
       "password_too_similar": "La password è troppo simile al nome utente o all'email.",
       "password_invalid": "Scegli una password più sicura.",
       "username_taken": "Questo nome utente è già in uso.",
-      "otp_invalid": "Il codice non è valido o è scaduto. Richiedine uno nuovo.",
+      "otp_invalid": {
+        "one": "Codice errato. Ti resta {count} tentativo.",
+        "other": "Codice errato. Ti restano {count} tentativi."
+      },
       "user_not_found": "Non abbiamo trovato questo account.",
       "invalid_credentials": "Email/nome utente o password non corretti.",
       "account_not_verified": "Il tuo account non è ancora verificato. Inserisci il codice che ti abbiamo inviato via email.",
@@ -85,7 +88,11 @@
       "date_in_past": "La data non può essere nel passato.",
       "time_not_in_forecast": "Non c'è ancora una previsione per questo orario.",
       "no_forecast_for_date": "Non c'è ancora una previsione per questa data.",
-      "rate_limited": "Troppe richieste. Attendi un momento e riprova."
+      "rate_limited": "Troppe richieste. Attendi un momento e riprova.",
+      "otp_expired": "Questo codice è scaduto. Richiedine uno nuovo.",
+      "otp_attempts_exhausted": "Troppi tentativi errati. Richiedi un nuovo codice.",
+      "email_unavailable": "Al momento non possiamo inviare email. Riprova tra un minuto.",
+      "reset_link_invalid": "Questo link non è valido o è scaduto. Richiedine uno nuovo."
     }
   },
   "about": {
@@ -379,7 +386,20 @@
     "setNewPassword": "Imposta nuova password",
     "differentEmail": "Usa un'altra e-mail o invia di nuovo",
     "rememberedIt": "Te la sei ricordata?",
-    "googleLoadFailed": "Impossibile caricare l'accesso con Google. Disattiva il blocco annunci e riprova."
+    "googleLoadFailed": "Impossibile caricare l'accesso con Google. Disattiva il blocco annunci e riprova.",
+    "codeSentTo": "Codice inviato a {email}",
+    "codeExpiresIn": "Il codice scade tra {time}",
+    "codeExpired": "Questo codice è scaduto. Richiedine uno nuovo.",
+    "resendIn": "Invia di nuovo il codice tra {time}",
+    "resendCode": "Invia di nuovo il codice",
+    "resending": "Invio in corso…",
+    "emailSendFailed": "Non è stato possibile inviare l'email. Riprova tra un minuto.",
+    "resetLinkHint": "Puoi anche usare il link in quell'email.",
+    "newPasswordTitle": "Scegli una nuova password",
+    "newPasswordIntro": "Inserisci una nuova password per il tuo account.",
+    "linkInvalidTitle": "Link non valido",
+    "linkInvalid": "Questo link non è valido o è scaduto.",
+    "requestNewLink": "Richiedi un nuovo link"
   },
   "freeLimit": {
     "features": {

@@ -63,7 +63,9 @@
       "password_too_similar": "パスワードがユーザー名またはメールアドレスに似すぎています。",
       "password_invalid": "より安全なパスワードを選んでください。",
       "username_taken": "このユーザー名はすでに使われています。",
-      "otp_invalid": "コードが無効か、有効期限が切れています。新しいコードをリクエストしてください。",
+      "otp_invalid": {
+        "other": "コードが正しくありません。残り {count} 回です。"
+      },
       "user_not_found": "このアカウントは見つかりませんでした。",
       "invalid_credentials": "メールアドレス/ユーザー名またはパスワードが正しくありません。",
       "account_not_verified": "アカウントの確認がまだ完了していません。メールでお送りしたコードを入力してください。",
@@ -85,7 +87,11 @@
       "date_in_past": "過去の日付は選べません。",
       "time_not_in_forecast": "この時刻の予報はまだありません。",
       "no_forecast_for_date": "この日付の予報はまだありません。",
-      "rate_limited": "リクエストが多すぎます。少し待ってからもう一度お試しください。"
+      "rate_limited": "リクエストが多すぎます。少し待ってからもう一度お試しください。",
+      "otp_expired": "このコードは期限切れです。新しいコードをリクエストしてください。",
+      "otp_attempts_exhausted": "誤った入力が多すぎます。新しいコードをリクエストしてください。",
+      "email_unavailable": "現在メールを送信できません。1分後にもう一度お試しください。",
+      "reset_link_invalid": "このリンクは無効か、期限切れです。新しいリンクをリクエストしてください。"
     }
   },
   "about": {
@@ -378,7 +384,20 @@
     "setNewPassword": "新しいパスワードを設定",
     "differentEmail": "別のメールアドレスを使う・再送信する",
     "rememberedIt": "パスワードを思い出しましたか？",
-    "googleLoadFailed": "Googleログインを読み込めませんでした。広告ブロッカーをオフにしてもう一度お試しください。"
+    "googleLoadFailed": "Googleログインを読み込めませんでした。広告ブロッカーをオフにしてもう一度お試しください。",
+    "codeSentTo": "{email} にコードを送信しました",
+    "codeExpiresIn": "コードの有効期限: あと {time}",
+    "codeExpired": "このコードは期限切れです。新しいコードをリクエストしてください。",
+    "resendIn": "{time} 後にコードを再送信できます",
+    "resendCode": "コードを再送信",
+    "resending": "送信中…",
+    "emailSendFailed": "メールを送信できませんでした。1分後にもう一度お試しください。",
+    "resetLinkHint": "メール内のリンクからも手続きできます。",
+    "newPasswordTitle": "新しいパスワードを設定",
+    "newPasswordIntro": "アカウントの新しいパスワードを入力してください。",
+    "linkInvalidTitle": "リンクが無効です",
+    "linkInvalid": "このリンクは無効か、期限切れです。",
+    "requestNewLink": "新しいリンクをリクエスト"
   },
   "freeLimit": {
     "features": {

@@ -37,6 +37,7 @@ const NO_REFRESH = [
   ENDPOINTS.auth?.login,
   ENDPOINTS.auth?.register,
   ENDPOINTS.auth?.verifyOtp,
+  ENDPOINTS.auth?.resendOtp,
   ENDPOINTS.auth?.refresh,
   ENDPOINTS.auth?.forgotPassword,
   ENDPOINTS.auth?.resetPassword,

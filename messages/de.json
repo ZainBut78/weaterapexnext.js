@@ -63,7 +63,10 @@
       "password_too_similar": "Das Passwort ähnelt zu sehr Ihrem Benutzernamen oder Ihrer E-Mail-Adresse.",
       "password_invalid": "Bitte wählen Sie ein sichereres Passwort.",
       "username_taken": "Dieser Benutzername ist bereits vergeben.",
-      "otp_invalid": "Der Code ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen an.",
+      "otp_invalid": {
+        "one": "Falscher Code. Noch {count} Versuch.",
+        "other": "Falscher Code. Noch {count} Versuche."
+      },
       "user_not_found": "Dieses Konto wurde nicht gefunden.",
       "invalid_credentials": "E-Mail/Benutzername oder Passwort ist falsch.",
       "account_not_verified": "Ihr Konto ist noch nicht bestätigt. Bitte geben Sie den Code aus unserer E-Mail ein.",
@@ -85,7 +88,11 @@
       "date_in_past": "Das Datum darf nicht in der Vergangenheit liegen.",
       "time_not_in_forecast": "Für diese Uhrzeit gibt es noch keine Vorhersage.",
       "no_forecast_for_date": "Für dieses Datum gibt es noch keine Vorhersage.",
-      "rate_limited": "Zu viele Anfragen. Bitte warten Sie kurz und versuchen Sie es erneut."
+      "rate_limited": "Zu viele Anfragen. Bitte warten Sie kurz und versuchen Sie es erneut.",
+      "otp_expired": "Dieser Code ist abgelaufen. Bitte fordern Sie einen neuen an.",
+      "otp_attempts_exhausted": "Zu viele falsche Versuche. Bitte fordern Sie einen neuen Code an.",
+      "email_unavailable": "Die E-Mail kann gerade nicht gesendet werden. Bitte versuchen Sie es in einer Minute erneut.",
+      "reset_link_invalid": "Dieser Link ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen an."
     }
   },
   "about": {
@@ -379,7 +386,20 @@
     "setNewPassword": "Neues Passwort festlegen",
     "differentEmail": "Andere E-Mail verwenden oder erneut senden",
     "rememberedIt": "Doch wieder eingefallen?",
-    "googleLoadFailed": "Die Google-Anmeldung konnte nicht geladen werden. Deaktivieren Sie Ihren Werbeblocker und versuchen Sie es erneut."
+    "googleLoadFailed": "Die Google-Anmeldung konnte nicht geladen werden. Deaktivieren Sie Ihren Werbeblocker und versuchen Sie es erneut.",
+    "codeSentTo": "Code gesendet an {email}",
+    "codeExpiresIn": "Code läuft ab in {time}",
+    "codeExpired": "Dieser Code ist abgelaufen. Bitte fordern Sie einen neuen an.",
+    "resendIn": "Code erneut senden in {time}",
+    "resendCode": "Code erneut senden",
+    "resending": "Wird gesendet…",
+    "emailSendFailed": "Die E-Mail konnte nicht gesendet werden. Bitte versuchen Sie es in einer Minute erneut.",
+    "resetLinkHint": "Sie können auch den Link in dieser E-Mail verwenden.",
+    "newPasswordTitle": "Neues Passwort wählen",
+    "newPasswordIntro": "Geben Sie ein neues Passwort für Ihr Konto ein.",
+    "linkInvalidTitle": "Link ungültig",
+    "linkInvalid": "Dieser Link ist ungültig oder abgelaufen.",
+    "requestNewLink": "Neuen Link anfordern"
   },
   "freeLimit": {
     "features": {

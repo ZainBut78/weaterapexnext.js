@@ -63,7 +63,10 @@
       "password_too_similar": "Your password is too similar to your username or email.",
       "password_invalid": "Please choose a stronger password.",
       "username_taken": "This username is already taken.",
-      "otp_invalid": "The code is invalid or has expired. Please request a new one.",
+      "otp_invalid": {
+        "one": "Wrong code. {count} attempt left.",
+        "other": "Wrong code. {count} attempts left."
+      },
       "user_not_found": "We couldn’t find this account.",
       "invalid_credentials": "Invalid email/username or password.",
       "account_not_verified": "Your account isn’t verified yet. Please enter the code we emailed you.",
@@ -85,7 +88,11 @@
       "date_in_past": "The date can’t be in the past.",
       "time_not_in_forecast": "No forecast is available for this time yet.",
       "no_forecast_for_date": "No forecast is available for this date yet.",
-      "rate_limited": "Too many requests. Please wait a moment and try again."
+      "rate_limited": "Too many requests. Please wait a moment and try again.",
+      "otp_expired": "This code has expired. Please request a new one.",
+      "otp_attempts_exhausted": "Too many wrong attempts. Please request a new code.",
+      "email_unavailable": "We couldn't send email right now. Please try again in a minute.",
+      "reset_link_invalid": "This reset link is invalid or has expired. Please request a new one."
     }
   },
   "about": {
@@ -379,7 +386,20 @@
     "setNewPassword": "Set new password",
     "differentEmail": "Use a different email or resend",
     "rememberedIt": "Remembered it?",
-    "googleLoadFailed": "Google sign-in load nahi ho saki. Ad-blocker band karke dobara koshish karein."
+    "googleLoadFailed": "Google sign-in load nahi ho saki. Ad-blocker band karke dobara koshish karein.",
+    "codeSentTo": "Code sent to {email}",
+    "codeExpiresIn": "Code expires in {time}",
+    "codeExpired": "This code has expired. Please request a new one.",
+    "resendIn": "Resend code in {time}",
+    "resendCode": "Resend code",
+    "resending": "Sending…",
+    "emailSendFailed": "We couldn't send the email. Please try again in a minute.",
+    "resetLinkHint": "You can also use the link in that email.",
+    "newPasswordTitle": "Choose a new password",
+    "newPasswordIntro": "Enter a new password for your account.",
+    "linkInvalidTitle": "Link not valid",
+    "linkInvalid": "This reset link is invalid or has expired.",
+    "requestNewLink": "Request a new link"
   },
   "freeLimit": {
     "features": {

@@ -45,6 +45,8 @@ export const ENDPOINTS = {
   auth: {
     register: '/auth/register/',
     verifyOtp: '/auth/verify-otp/',
+    resendOtp: '/auth/resend-otp/',
+    emailStatus: '/auth/email-status/',
     login: '/auth/login/',
     forgotPassword: '/auth/forgot-password/',
     resetPassword: '/auth/reset-password/',

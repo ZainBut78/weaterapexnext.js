@@ -63,7 +63,10 @@
       "password_too_similar": "Le mot de passe ressemble trop à votre nom d’utilisateur ou à votre e-mail.",
       "password_invalid": "Veuillez choisir un mot de passe plus sûr.",
       "username_taken": "Ce nom d’utilisateur est déjà pris.",
-      "otp_invalid": "Le code est invalide ou a expiré. Veuillez en demander un nouveau.",
+      "otp_invalid": {
+        "one": "Code incorrect. Il reste {count} essai.",
+        "other": "Code incorrect. Il reste {count} essais."
+      },
       "user_not_found": "Nous n’avons pas trouvé ce compte.",
       "invalid_credentials": "E-mail/nom d’utilisateur ou mot de passe incorrect.",
       "account_not_verified": "Votre compte n’est pas encore vérifié. Saisissez le code que nous vous avons envoyé par e-mail.",
@@ -85,7 +88,11 @@
       "date_in_past": "La date ne peut pas être dans le passé.",
       "time_not_in_forecast": "Aucune prévision n’est encore disponible pour cette heure.",
       "no_forecast_for_date": "Aucune prévision n’est encore disponible pour cette date.",
-      "rate_limited": "Trop de requêtes. Patientez un instant et réessayez."
+      "rate_limited": "Trop de requêtes. Patientez un instant et réessayez.",
+      "otp_expired": "Ce code a expiré. Veuillez en demander un nouveau.",
+      "otp_attempts_exhausted": "Trop d'essais incorrects. Veuillez demander un nouveau code.",
+      "email_unavailable": "Impossible d'envoyer des e-mails pour le moment. Veuillez réessayer dans une minute.",
+      "reset_link_invalid": "Ce lien est invalide ou a expiré. Veuillez en demander un nouveau."
     }
   },
   "about": {
@@ -379,7 +386,20 @@
     "setNewPassword": "Définir le nouveau mot de passe",
     "differentEmail": "Utiliser un autre e-mail ou renvoyer le code",
     "rememberedIt": "Ça vous revient ?",
-    "googleLoadFailed": "Impossible de charger la connexion Google. Désactivez votre bloqueur de publicités et réessayez."
+    "googleLoadFailed": "Impossible de charger la connexion Google. Désactivez votre bloqueur de publicités et réessayez.",
+    "codeSentTo": "Code envoyé à {email}",
+    "codeExpiresIn": "Le code expire dans {time}",
+    "codeExpired": "Ce code a expiré. Veuillez en demander un nouveau.",
+    "resendIn": "Renvoyer le code dans {time}",
+    "resendCode": "Renvoyer le code",
+    "resending": "Envoi en cours…",
+    "emailSendFailed": "Impossible d'envoyer l'e-mail. Veuillez réessayer dans une minute.",
+    "resetLinkHint": "Vous pouvez aussi utiliser le lien dans cet e-mail.",
+    "newPasswordTitle": "Choisissez un nouveau mot de passe",
+    "newPasswordIntro": "Saisissez un nouveau mot de passe pour votre compte.",
+    "linkInvalidTitle": "Lien non valide",
+    "linkInvalid": "Ce lien est invalide ou a expiré.",
+    "requestNewLink": "Demander un nouveau lien"
   },
   "freeLimit": {
     "features": {

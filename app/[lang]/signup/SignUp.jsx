@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from '@/components/LocaleLink';
 import { useLang, useLocaleRouter, useT } from '@/i18n/client';
 import { Cloud, Mail, Lock, Eye, EyeOff, User, ArrowLeft } from 'lucide-react';
-import { registerUser, verifyOtp, googleLogin } from '@/services/authService';
+import { registerUser, resendOtp, verifyOtp, googleLogin } from '@/services/authService';
 import { useAuth } from '@/context/AuthContext';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { GOOGLE_CLIENT_ID } from '@/config/googleAuth';
 import { authErrorMessage } from '@/utils/authErrors';
+import OtpStatus from '@/components/OtpStatus';
+import { useOtpSession } from '@/hooks/useOtpSession';
+import { maskEmail } from '@/utils/otpTimer';
 
 export default function SignUp() {
   const router = useLocaleRouter();
@@ -21,8 +24,20 @@ export default function SignUp() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState('');
+  const [resending, setResending] = useState(false);
+  const otpSession = useOtpSession('signup');
+  const { session, ready } = otpSession;
+  const registeredEmail = session?.email || '';
   const inputRefs = useRef([]);
+
+  // Refresh ke baad (ya login se unverified account aaya) wapas code wali screen par, wahi timer
+  useEffect(() => {
+    if (ready && session) setStep('otp');
+  }, [ready, session]);
+
+  useEffect(() => {
+    if (step === 'otp') inputRefs.current[0]?.focus();
+  }, [step]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -36,7 +51,7 @@ export default function SignUp() {
         password: form.password,
         company_name: form.company,
       });
-      setRegisteredEmail(res.email);
+      otpSession.start(res.email || form.email.trim().toLowerCase(), res);
       setStep('otp');
     } catch (err) {
       setError(authErrorMessage(err, t('auth.registrationFailed'), t, lang));
@@ -60,6 +75,36 @@ export default function SignUp() {
       setError(lang === 'en' ? (err.response?.data?.error || t('auth.googleSignUpFailed')) : authErrorMessage(err, t('auth.googleSignUpFailed'), t, lang));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const backToRegister = () => {
+    otpSession.clear();
+    setOtp(['', '', '', '', '', '']);
+    setError('');
+    setStep('register');
+  };
+
+  const handleResend = async () => {
+    // Pehli email hi nahi gayi → backend ne naya account wapas le liya; form se dobara
+    if (otpSession.deliveryFailed) {
+      backToRegister();
+      setError(t('auth.emailSendFailed'));
+      return;
+    }
+    setError('');
+    setResending(true);
+    try {
+      const res = await resendOtp(registeredEmail);
+      otpSession.start(registeredEmail, res);
+      setOtp(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+    } catch (err) {
+      const wait = Number(err?.response?.data?.retry_after);
+      if (err?.response?.status === 429 && wait) otpSession.waitFor(wait);
+      setError(authErrorMessage(err, t('auth.sendCodeFailed'), t, lang));
+    } finally {
+      setResending(false);
     }
   };
 
@@ -111,6 +156,7 @@ export default function SignUp() {
         email: registeredEmail,
         otp: otpValue,
       });
+      otpSession.clear();
       login(registeredEmail, res.access_token, res.refresh_token);
       router.push('/');
     } catch (err) {
@@ -252,7 +298,7 @@ export default function SignUp() {
             </Link>
             <h1 className="text-2xl font-extrabold text-[#002244]">{t('auth.verifyEmailTitle')}</h1>
             <p className="text-sm text-gray-500 mt-1">
-              {t.rich('auth.verifyEmailText', { email: <span className="font-semibold text-gray-700">{registeredEmail}</span> })}
+              {t.rich('auth.codeSentTo', { email: <span className="font-semibold text-gray-700">{maskEmail(registeredEmail)}</span> })}
             </p>
           </div>
 
@@ -296,10 +342,20 @@ export default function SignUp() {
             </button>
           </form>
 
-          <div className="text-center mt-6">
+          <div className="mt-6">
+            <OtpStatus
+              resendIn={otpSession.resendIn}
+              expiresIn={otpSession.expiresIn}
+              resending={resending}
+              deliveryFailed={otpSession.deliveryFailed}
+              onResend={handleResend}
+            />
+          </div>
+
+          <div className="text-center mt-4">
             <button
               type="button"
-              onClick={() => setStep('register')}
+              onClick={backToRegister}
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0077b6] hover:text-[#005a8d] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> {t('auth.backToSignUp')}

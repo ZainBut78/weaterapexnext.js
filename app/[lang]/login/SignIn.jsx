@@ -4,11 +4,12 @@ import { useState } from 'react';
 import Link from '@/components/LocaleLink';
 import { useLang, useLocaleRouter, useT } from '@/i18n/client';
 import { Cloud, Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { loginUser, googleLogin } from '@/services/authService';
+import { loginUser, googleLogin, resendOtp } from '@/services/authService';
 import { useAuth } from '@/context/AuthContext';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { GOOGLE_CLIENT_ID } from '@/config/googleAuth';
 import { authErrorMessage } from '@/utils/authErrors';
+import { makeSession, saveSession } from '@/utils/otpTimer';
 
 export default function SignIn() {
   const router = useLocaleRouter();
@@ -29,10 +30,31 @@ export default function SignIn() {
       login(res.username, res.access_token, res.refresh_token);
       router.push('/');
     } catch (err) {
-      setError(authErrorMessage(err, t('auth.loginFailed'), t, lang));
+      // Password sahi, email verify nahi: naya code bhej kar sign-up ki code wali screen par
+      if (err?.response?.data?.code === 'account_not_verified' && err.response.data.email) {
+        if (await sendVerificationCode(err.response.data.email)) return;
+      } else {
+        setError(authErrorMessage(err, t('auth.loginFailed'), t, lang));
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const sendVerificationCode = async (email) => {
+    try {
+      saveSession('signup', makeSession(email, await resendOtp(email)));
+    } catch (err) {
+      // Abhi hi code gaya tha (429) → wahi screen, server ke waqt se countdown
+      const wait = Number(err?.response?.data?.retry_after);
+      if (err?.response?.status !== 429 || !wait) {
+        setError(authErrorMessage(err, t('auth.sendCodeFailed'), t, lang));
+        return false;
+      }
+      saveSession('signup', makeSession(email, { retry_after: wait }));
+    }
+    router.push('/signup');
+    return true;
   };
 
   // Google popup se id_token milne par — backend use verify karke hamare

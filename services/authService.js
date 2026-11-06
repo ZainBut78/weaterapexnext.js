@@ -7,6 +7,14 @@ export const registerUser = (payload) =>
 export const verifyOtp = (payload) =>
   apiClient.post(ENDPOINTS.auth.verifyOtp, payload).then((res) => res.data);
 
+// Naya sign-up code; purana band. Jawab: { retry_after, expires_in }
+export const resendOtp = (email) =>
+  apiClient.post(ENDPOINTS.auth.resendOtp, { email }).then((res) => res.data);
+
+// Email service chal rahi hai? { ok } — global, kisi account ka nahi
+export const emailServiceStatus = () =>
+  apiClient.get(ENDPOINTS.auth.emailStatus).then((res) => res.data);
+
 export const loginUser = (payload) =>
   apiClient.post(ENDPOINTS.auth.login, payload).then((res) => res.data);
 

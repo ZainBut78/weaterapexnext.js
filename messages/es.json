@@ -63,7 +63,10 @@
       "password_too_similar": "La contraseña se parece demasiado a tu nombre de usuario o correo.",
       "password_invalid": "Elige una contraseña más segura.",
       "username_taken": "Este nombre de usuario ya está en uso.",
-      "otp_invalid": "El código no es válido o ha caducado. Solicita uno nuevo.",
+      "otp_invalid": {
+        "one": "Código incorrecto. Queda {count} intento.",
+        "other": "Código incorrecto. Quedan {count} intentos."
+      },
       "user_not_found": "No hemos encontrado esta cuenta.",
       "invalid_credentials": "Correo/nombre de usuario o contraseña incorrectos.",
       "account_not_verified": "Tu cuenta aún no está verificada. Introduce el código que te enviamos por correo.",
@@ -85,7 +88,11 @@
       "date_in_past": "La fecha no puede estar en el pasado.",
       "time_not_in_forecast": "Todavía no hay pronóstico para esta hora.",
       "no_forecast_for_date": "Todavía no hay pronóstico para esta fecha.",
-      "rate_limited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo."
+      "rate_limited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
+      "otp_expired": "Este código ha caducado. Solicita uno nuevo.",
+      "otp_attempts_exhausted": "Demasiados intentos incorrectos. Solicita un código nuevo.",
+      "email_unavailable": "Ahora mismo no podemos enviar correos. Inténtalo de nuevo en un minuto.",
+      "reset_link_invalid": "Este enlace no es válido o ha caducado. Solicita uno nuevo."
     }
   },
   "about": {
@@ -379,7 +386,20 @@
     "setNewPassword": "Guardar nueva contraseña",
     "differentEmail": "Usar otro correo o reenviar",
     "rememberedIt": "¿Ya la recuerdas?",
-    "googleLoadFailed": "No se pudo cargar el inicio de sesión con Google. Desactiva el bloqueador de anuncios e inténtalo de nuevo."
+    "googleLoadFailed": "No se pudo cargar el inicio de sesión con Google. Desactiva el bloqueador de anuncios e inténtalo de nuevo.",
+    "codeSentTo": "Código enviado a {email}",
+    "codeExpiresIn": "El código caduca en {time}",
+    "codeExpired": "Este código ha caducado. Solicita uno nuevo.",
+    "resendIn": "Reenviar el código en {time}",
+    "resendCode": "Reenviar código",
+    "resending": "Enviando…",
+    "emailSendFailed": "No hemos podido enviar el correo. Inténtalo de nuevo en un minuto.",
+    "resetLinkHint": "También puedes usar el enlace de ese correo.",
+    "newPasswordTitle": "Elige una nueva contraseña",
+    "newPasswordIntro": "Introduce una nueva contraseña para tu cuenta.",
+    "linkInvalidTitle": "Enlace no válido",
+    "linkInvalid": "Este enlace no es válido o ha caducado.",
+    "requestNewLink": "Solicitar un nuevo enlace"
   },
   "freeLimit": {
     "features": {
