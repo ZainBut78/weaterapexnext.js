@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from './LocaleLink';
-import { Cloud, Share2, AtSign, Globe } from 'lucide-react';
+import { Share2, AtSign, Globe } from 'lucide-react';
+import BrandLogo from './BrandLogo';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useT } from '@/i18n/client';
 
@@ -27,14 +28,7 @@ const Footer = () => {
           <div className="md:col-span-4 flex flex-col justify-between">
             <div>
               {/* Logo */}
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-full bg-[#0077b6] flex items-center justify-center text-white">
-                  <Cloud className="w-5 h-5 fill-current" />
-                </div>
-                <span className="text-2xl font-extrabold tracking-tight text-[#002244]">
-                  WeatherApex
-                </span>
-              </div>
+              <BrandLogo className="h-24 w-auto mb-4" />
 
               {/* Tagline / Description */}
               <p className="text-gray-600 text-sm max-w-sm leading-relaxed mb-6">

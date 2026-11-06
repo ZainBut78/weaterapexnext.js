@@ -43,10 +43,10 @@ const nextConfig = {
   // sake. Yeh do runtime par dynamic path se parhi jati hain — warna live
   // par 120 travel notes chupchap gaib, aur OG image ka font missing:
   //   services/guides.js      → content/guides/<city>/<month>.md
-  //   app/og-image/route.js   → app/og-image/Inter-Bold-latin.woff
-  // '/**' = saare routes (files chhoti hain: notes + 31 KB font).
+  //   app/og-image/route.js   → app/og-image/Inter-Bold-latin.woff, logo-mark.png
+  // '/**' = saare routes (files chhoti hain: notes + 31 KB font + logo).
   outputFileTracingIncludes: {
-    '/**': ['./content/guides/**/*', './app/og-image/*.woff'],
+    '/**': ['./content/guides/**/*', './app/og-image/*.woff', './app/og-image/*.png'],
   },
 
   // ── www → weatherapex.com (EK permanent redirect, 308) ──
@@ -123,11 +123,6 @@ const nextConfig = {
   // Live (Hostinger) par yeh khaali hoga aur browser seedha
   // api.weatherapex.com ko call karega.
   async rewrites() {
-    // Browser khud /favicon.ico maangta hai (pehle 404). Wahi brand icon
-    // dikhao jo app/icon.svg hai — WeatherApex nishan (audit 2.5, round 3 B1). Yeh rule
-    // HAMESHA rehta hai — live par bhi (proxy wale rules ke bar-aks).
-    const favicon = { source: '/favicon.ico', destination: '/favicon.svg' };
-
     // IndexNow key file: /<INDEXNOW_KEY>.txt → app/api/indexnow-key (Oct 2026).
     // Env build ke waqt parha jata hai — Hostinger par key daal kar redeploy.
     const indexNowKey = (process.env.INDEXNOW_KEY || '').trim();
@@ -136,10 +131,9 @@ const nextConfig = {
       : [];
 
     const target = process.env.API_PROXY_TARGET;
-    if (!target) return [favicon, ...indexNow];
+    if (!target) return indexNow;
     const base = target.replace(/\/+$/, '');
     return [
-      favicon,
       ...indexNow,
       // PEHLA rule: jo URL "/" par khatam ho, us ka "/" aage bhi jaye.
       // BUG JO ISNE THEEK KIYA: sirf doosra rule tha, aur `:path*`

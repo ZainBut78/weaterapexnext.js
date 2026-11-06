@@ -4,8 +4,9 @@
 // Token single use hai, backend par hash. Jawab aane tak yahin; ghalat / expire → naya link maango.
 import { useEffect, useState } from 'react';
 import Link from '@/components/LocaleLink';
+import BrandLogo from '@/components/BrandLogo';
 import { useLang, useT } from '@/i18n/client';
-import { Cloud, Lock, Eye, EyeOff } from 'lucide-react';
+import { Lock, Eye, EyeOff } from 'lucide-react';
 import { resetPassword } from '@/services/authService';
 import { authErrorMessage } from '@/utils/authErrors';
 
@@ -49,12 +50,9 @@ export default function ResetPassword({ token }) {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10">
           <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-full bg-[#0077b6] flex items-center justify-center text-white">
-                <Cloud className="w-6 h-6 fill-current" />
-              </div>
-              <span className="text-2xl font-extrabold text-[#002244]">WeatherApex</span>
-            </Link>
+            <Link href="/" className="inline-flex mb-6">
+                <BrandLogo className="h-24 w-auto" />
+              </Link>
             <h1 className="text-2xl font-extrabold text-[#002244]">{title}</h1>
             <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
           </div>

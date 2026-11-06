@@ -17,9 +17,7 @@ export default function JsonLd({ data }) {
   );
 }
 
-// Logo: public/logo.png (512×512) — Navbar wale WeatherApex nishan (neela
-// gol + badal ✓) se bana. Pehle yahan favicon.svg tha jo asal mein Vite
-// ka logo tha (owner, round 3 B1). Final brand logo aane par file badlein.
+// Logo: public/logo.png (512×512) — owner ka asal WeatherApex logo (Nov 2026).
 export const ORGANIZATION = {
   '@type': 'Organization',
   name: SITE_NAME,

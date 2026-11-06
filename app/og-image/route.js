@@ -20,6 +20,12 @@ let interBold;
 const loadInterBold = () =>
   (interBold ??= readFile(join(process.cwd(), 'app/og-image/Inter-Bold-latin.woff')));
 
+// Asal logo ka nishan (owner, Nov 2026)
+let markData;
+const loadMark = () =>
+  (markData ??= readFile(join(process.cwd(), 'app/og-image/logo-mark.png'))
+    .then((b) => `data:image/png;base64,${b.toString('base64')}`));
+
 const clean = (v, max) => (v || '').replace(/\s+/g, ' ').trim().slice(0, max);
 
 // Shehar ki photo (Pexels) — wahi `image_url` jo backend current weather
@@ -33,7 +39,7 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const title = clean(searchParams.get('title'), 110) || 'Weather Forecasts, Trip Planning & Climate Guides';
   const kicker = clean(searchParams.get('kicker'), 40);
-  const [photo, fontData] = await Promise.all([cityPhoto(searchParams.get('city')), loadInterBold()]);
+  const [photo, fontData, logo] = await Promise.all([cityPhoto(searchParams.get('city')), loadInterBold(), loadMark()]);
 
   return new ImageResponse(
     (
@@ -79,10 +85,7 @@ export async function GET(request) {
               justifyContent: 'center',
             }}
           >
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0077b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17.5 19.125A5.5 5.5 0 0 0 19 8.5a7 7 0 0 0-13.187 2.086A4.5 4.5 0 0 0 5.5 19.5h12" />
-              <path d="m9 15 2 2 4-4" />
-            </svg>
+            <img src={logo} width={56} height={50} alt="" />
           </div>
           <div style={{ marginLeft: 24, fontSize: 44, fontFamily: 'Inter', fontWeight: 700, letterSpacing: -1 }}>WeatherApex</div>
         </div>

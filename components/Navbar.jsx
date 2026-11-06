@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from './LocaleLink';
 import NavLink from './NavLink';
+import BrandLogo from './BrandLogo';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useBarePathname, useLocaleRouter, useT } from '@/i18n/client';
 import { User, LogOut, Menu, X } from 'lucide-react';
@@ -72,22 +73,9 @@ const Navbar = () => {
 
         {/* Logo Section */}
         <NavLink to="/" className="flex items-center gap-2 cursor-pointer select-none shrink-0">
-          <div className="relative flex items-center justify-center">
-            <svg
-              className="w-8 h-8 lg:w-9 lg:h-9 text-[#0077b6]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M17.5 19.125A5.5 5.5 0 0 0 19 8.5a7 7 0 0 0-13.187 2.086A4.5 4.5 0 0 0 5.5 19.5h12" />
-              <path d="m9 15 2 2 4-4" />
-            </svg>
-          </div>
-          <span className="text-xl lg:text-2xl font-bold text-[#0077b6] tracking-tight">
-            WeatherApex
+          <BrandLogo variant="mark" alt="" className="h-11 lg:h-14 w-auto" />
+          <span className="text-xl lg:text-2xl font-extrabold tracking-tight">
+            <span className="text-[#002244]">Weather</span><span className="text-[#0088e6]">Apex</span>
           </span>
         </NavLink>
 

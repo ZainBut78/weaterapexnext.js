@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from '@/components/LocaleLink';
+import BrandLogo from '@/components/BrandLogo';
 import { useLang, useLocaleRouter, useT } from '@/i18n/client';
-import { Cloud, Mail, Lock, Eye, EyeOff, User, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, ArrowLeft } from 'lucide-react';
 import { registerUser, resendOtp, verifyOtp, googleLogin } from '@/services/authService';
 import { useAuth } from '@/context/AuthContext';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
@@ -172,11 +173,8 @@ export default function SignUp() {
         <div className="w-full max-w-md">
           <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10">
             <div className="text-center mb-8">
-              <Link href="/" className="inline-flex items-center gap-2 mb-6">
-                <div className="w-10 h-10 rounded-full bg-[#0077b6] flex items-center justify-center text-white">
-                  <Cloud className="w-6 h-6 fill-current" />
-                </div>
-                <span className="text-2xl font-extrabold text-[#002244]">WeatherApex</span>
+              <Link href="/" className="inline-flex mb-6">
+                <BrandLogo className="h-24 w-auto" />
               </Link>
               <h1 className="text-2xl font-extrabold text-[#002244]">{t('auth.createAccountTitle')}</h1>
               <p className="text-sm text-gray-500 mt-1">{t('auth.getStarted')}</p>
@@ -290,12 +288,9 @@ export default function SignUp() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10">
           <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-full bg-[#0077b6] flex items-center justify-center text-white">
-                <Cloud className="w-6 h-6 fill-current" />
-              </div>
-              <span className="text-2xl font-extrabold text-[#002244]">WeatherApex</span>
-            </Link>
+            <Link href="/" className="inline-flex mb-6">
+                <BrandLogo className="h-24 w-auto" />
+              </Link>
             <h1 className="text-2xl font-extrabold text-[#002244]">{t('auth.verifyEmailTitle')}</h1>
             <p className="text-sm text-gray-500 mt-1">
               {t.rich('auth.codeSentTo', { email: <span className="font-semibold text-gray-700">{maskEmail(registeredEmail)}</span> })}

@@ -48,9 +48,8 @@ export async function generateMetadata({ params }) {
     ...(enabledLocales().includes(lang) ? {} : { robots: { index: false, follow: false } }),
     // og:locale har page ka pageMetadata() lagata hai (page ka openGraph
     // layout wale ko poora badal deta hai)
-    // Tab icon ab app/icon.svg (Next.js file convention — khud
-    // <link rel="icon"> banata hai). /favicon.ico next.config.mjs ke
-    // rewrite se wahi svg deta hai. (audit 2.5)
+    // Tab icon: app/favicon.ico, app/icon.png, app/apple-icon.png (Next.js file
+    // convention — khud <link rel="icon"> banata hai). Asal logo ka nishan (Nov 2026).
   };
 }
 
