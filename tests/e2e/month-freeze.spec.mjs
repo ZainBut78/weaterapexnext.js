@@ -10,7 +10,8 @@
 //    ENABLED_LOCALES=de,it,ja,fr,es npx next start -p 3100
 //    PW_BASE_URL=http://localhost:3100 npx playwright test month-freeze
 //  Baseline SIRF code badalne se pehle bani (git mein): tests/fixtures/month-freeze.json
-//  UPDATE_FREEZE=1 sirf tab jab local data sach mein badla ho, code ki wajah se NAHI.
+//  UPDATE_FREEZE=1: sirf naye pages jodta hai. UPDATE_FREEZE=links: sirf links ki list.
+//  Dono sirf tab jab local data sach mein badla ho, code ki wajah se NAHI.
 // ─────────────────────────────────────────────────────────────
 import { readFileSync, writeFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
@@ -69,7 +70,20 @@ async function snapshot(browser, baseURL, path) {
 
 const load = () => JSON.parse(readFileSync(FIXTURE, 'utf8'));
 
-if (process.env.UPDATE_FREEZE) {
+if (process.env.UPDATE_FREEZE === 'links') {
+  // Local DATA badla (jaise naya mukammal shehar "drier places" mein aaya): sirf links ki list.
+  // Title, headings waghera aur Trip Planner line ka faisla wahi rehta hai. Code badalne par NAHI.
+  test('update links only', async ({ browser, baseURL }) => {
+    const out = load();
+    for (const path of PAGES) {
+      const now = await snapshot(browser, baseURL, path);
+      const planner = plannerHref(out[path].links);
+      const allowed = now.links.filter((l) => !out[path].links.includes(l) && l.split(' | ')[0] === planner);
+      out[path].links = now.links.filter((l) => !allowed.includes(l)).sort();
+    }
+    writeFileSync(FIXTURE, `${JSON.stringify(out, null, 1)}\n`);
+  });
+} else if (process.env.UPDATE_FREEZE) {
   test('save baseline', async ({ browser, baseURL }) => {
     // Sirf jo pages abhi baseline mein nahi; purani baseline kabhi nahi badalti
     const out = load();

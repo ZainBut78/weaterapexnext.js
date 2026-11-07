@@ -5,10 +5,10 @@
 // Har request taaza bana hai, magar backend ka data fetch cache (tag "blog",
 // "cities") se aata hai — Django publish /api/revalidate se woh tag saaf karta
 // hai → agli request mein naya child sitemap. Bots ke liye sasta.
-import { children, sitemapIndex, xmlResponse } from '@/services/sitemap';
+import { children, sitemapIndex, withSitemapBackend, xmlResponse } from '@/services/sitemap';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  return xmlResponse(sitemapIndex(await children()));
+  return withSitemapBackend(async () => xmlResponse(sitemapIndex(await children())));
 }

@@ -17,9 +17,11 @@ const NOINDEX = process.env.SITE_NOINDEX === '1';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ISR pages ki stale-while-revalidate 1 saal ki jagah zyada se zyada 2 din
-  // (sab se lamba page revalidate 1 din). SEO fixes Oct 2026.
-  expireTime: 172800,
+  // ISR pages ki stale-while-revalidate 1 saal ki jagah 30 din (Step 2, Nov 2026; pehle 2 din).
+  // Is se purana page Next ke liye "expired": agli request stale nahi leti, wahin ruk kar
+  // banati hai. Backend band ho to 500, aur crawl par dheema. Kam crawl hone wale pages 2 din
+  // mein aksar expire ho jate the. Data badle to tags se foran naya (weather/indexnow_pages.py).
+  expireTime: 2592000,
   // Metadata (title, canonical, hreflang) HAMESHA pehle HTML ke <head> mein (Nov 2026).
   // Default mein Next aam browsers / curl / SEO tools ke liye metadata "stream" karta
   // hai: data der se aaye (naye tarjume ki pehli, bina cache request) to tags shell

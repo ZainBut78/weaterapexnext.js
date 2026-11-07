@@ -30,7 +30,7 @@
 // ─────────────────────────────────────────────────────────────
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { serverGet } from './serverApi';
+import { backendDownError, serverGet } from './serverApi';
 import { ENDPOINTS } from '@/config/endpoints';
 import { getCityRegistry } from './cityRegistry';
 import { COUNTRIES, countryPath } from '@/data/countries';
@@ -96,18 +96,15 @@ export const xmlResponse = (xml) => new Response(xml, {
 // ── data ──
 async function allPosts(lang = DEFAULT_LOCALE) {
   const posts = [];
-  try {
-    for (let page = 1; page <= 50; page++) {
-      const params = lang === DEFAULT_LOCALE ? { page } : { page, lang };
-      const data = await serverGet(ENDPOINTS.blog.list, { params, revalidate: BLOG_REVALIDATE, tags: ['blog'] });
-      // Purana backend `?lang=` nahi samajhta (English bhejta) → doosri zaban = koi post nahi
-      if (lang !== DEFAULT_LOCALE && data?.lang !== lang) break;
-      if (!data?.posts?.length) break;
-      posts.push(...data.posts);
-      if (!data.has_next || data.current_page !== page) break;
-    }
-  } catch {
-    // backend band → baqi sitemap phir bhi bane
+  // Backend band → throw (503, neeche withSitemapBackend). Adhoori list kabhi nahi.
+  for (let page = 1; page <= 50; page++) {
+    const params = lang === DEFAULT_LOCALE ? { page } : { page, lang };
+    const data = await serverGet(ENDPOINTS.blog.list, { params, revalidate: BLOG_REVALIDATE, tags: ['blog'] });
+    // Purana backend `?lang=` nahi samajhta (English bhejta) → doosri zaban = koi post nahi
+    if (lang !== DEFAULT_LOCALE && data?.lang !== lang) break;
+    if (!data?.posts?.length) break;
+    posts.push(...data.posts);
+    if (!data.has_next || data.current_page !== page) break;
   }
   return posts;
 }
@@ -144,7 +141,7 @@ export async function blogEntries() {
 }
 
 export async function placeEntries() {
-  const reg = await getCityRegistry();
+  const reg = await fullRegistry();
   const newestOf = (list) => list.reduce((a, c) => max(a, isoDay(cityDate(c))), null);
   return [
     { path: '/weather', lastmod: newestOf(reg.cities) },
@@ -156,16 +153,41 @@ export async function placeEntries() {
 
 // Har shehar-mahine ki aakhri asli tabdeeli (backend, internal key). Na mile → shehar ki tareekh.
 async function monthDates() {
+  const data = await serverGet(ENDPOINTS.weather.climateLastmod, { revalidate: 3600, tags: ['cities'] });
+  return data?.cities || {};
+}
+
+// Backend band: registry sirf static list hoti hai (adhoore shehar shamil, DB ke gayab).
+async function fullRegistry() {
+  const reg = await getCityRegistry();
+  if (reg.degraded) throw backendDownError('sitemap city list');
+  return reg;
+}
+
+const SITEMAP_RETRY_AFTER_SECONDS = 300;
+
+/**
+ * Sitemap sirf poore data se. Backend ka cached data ho to wahi (aakhri achhi list); warna
+ * 503 + Retry-After, jo kabhi cache nahi hota. Google adhoori list se URLs nahi girata.
+ */
+export async function withSitemapBackend(build) {
   try {
-    const data = await serverGet(ENDPOINTS.weather.climateLastmod, { revalidate: 3600, tags: ['cities'] });
-    return data?.cities || {};
-  } catch {
-    return {};
+    return await build();
+  } catch (e) {
+    if (!e?.status) throw e;    // hamara apna bug: chhupana nahi
+    return new Response('Sitemap temporarily unavailable.\n', {
+      status: 503,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Retry-After': String(SITEMAP_RETRY_AFTER_SECONDS),
+        'Cache-Control': 'no-store',
+      },
+    });
   }
 }
 
 export async function monthEntries() {
-  const [reg, dates] = await Promise.all([getCityRegistry(), monthDates()]);
+  const [reg, dates] = await Promise.all([fullRegistry(), monthDates()]);
   const out = [];
   // Mukammal shehar → 12 month pages; adhoora (search / month page se kuch
   // mahine aaye) → sirf woh mahine jin ka poora 20-saal data hai (owner, Oct 2026)

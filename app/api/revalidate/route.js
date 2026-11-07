@@ -12,8 +12,8 @@
 //  bhejta hai — dono deploy ke baad query wala raasta hata sakte hain.
 //  Body: {"paths": ["/blog/<slug>", "/blog", "/sitemap.xml"],
 //         "tags": ["blog:<slug>", "blog", "cities"]}  (ya `?path=` / `?tag=`).
-//  Tags (fetch data cache) foran expire ({ expire: 0 }) — agla visitor naya
-//  data dekhe. Sirf apni site ke path / blog tags — baqi rad.
+//  Blog tags foran expire ({ expire: 0 }) — agla visitor naya data dekhe. Data tags
+//  'max' (neeche). Sirf apni site ke path / allowed tags — baqi rad.
 // ─────────────────────────────────────────────────────────────
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { timingSafeEqual } from 'node:crypto';
@@ -22,7 +22,8 @@ import { LOCALES } from '@/i18n/config';
 export const dynamic = 'force-dynamic';
 
 // blog:<slug> · blog:<lang>:<slug> (tarjuma, Phase 4) · blog · cities (history_complete index, 1 h)
-const ALLOWED_TAG = /^(blog(:([a-z]{2}:)?[a-z0-9-]+)?|cities)$/;
+// · history:<shehar> · climate-summary (services/history.js: data badla to naya number)
+const ALLOWED_TAG = /^(blog(:([a-z]{2}:)?[a-z0-9-]+)?|cities|history:[a-z0-9-]+|climate-summary)$/;
 // Zaban ka prefix (/de/blog/<slug>) bhi — tarjume ka slug alag hota hai
 const ALLOWED = /^(\/(blog(\/[a-z0-9-]+)?|weather(\/[a-z0-9-]+){0,3}|sitemap\.xml|sitemap\/[a-z0-9-]+\.xml|)|\/(de|it|ja|fr|es)(\/(blog(\/[a-z0-9-]+)?|weather(\/[a-z0-9-]+){0,3}))?)$/;
 const PREFIXED = /^\/(de|it|ja|fr|es)(?=\/|$)/;
@@ -62,7 +63,10 @@ export async function POST(request) {
   if ((!paths.length && !tags.length) || bad.length) {
     return Response.json({ revalidated: false, error: 'invalid paths/tags', bad }, { status: 400 });
   }
-  for (const t of tags) revalidateTag(t, { expire: 0 });
+  // Blog: agla visitor foran naya. Data (cities, history, summary): 'max', purana page chalta
+  // rehta hai aur peeche naya banta hai. expire: 0 par har page ruk kar banta tha, aur backend
+  // us waqt band ho to poori site 5xx (cities tag har page par hai).
+  for (const t of tags) revalidateTag(t, t.startsWith('blog') ? { expire: 0 } : 'max');
   // i18n (Oct 2026): pages app/[lang]/ mein — English bhi andar se /en/...
   // Bina prefix path (/blog/x) → har zaban ka path. Prefix wala (/de/blog/y,
   // blog tarjuma) → sirf wahi. Sitemaps root par hain (zaban nahi).

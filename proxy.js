@@ -37,8 +37,19 @@ import { cityPath, getCountry } from './data/countries';
 import { buildRegistry } from './utils/cityRegistryCore';
 import { duplicateBlogBase } from './utils/blogDuplicate';
 import { DEFAULT_LOCALE, localePath, parseEnabledLocales, splitLocale } from './i18n/config';
+import { createProbe, healthUrl, isOutageTest, serveDuringOutage, shouldGate } from './utils/outageGate';
 
 const API_INTERNAL_URL = (process.env.API_INTERNAL_URL || 'http://127.0.0.1:8000/api').replace(/\/+$/, '');
+
+// Backend band: 500 ki jagah cached page ya 503 + Retry-After (utils/outageGate.js).
+// Sirf OUTAGE_GATE=1 par; band ho to yeh code chalta hi nahi.
+const OUTAGE_GATE = process.env.OUTAGE_GATE === '1';
+const selfOrigin = () => process.env.OUTAGE_SELF_ORIGIN || `http://127.0.0.1:${process.env.PORT || 3000}`;
+let backendProbe = null;
+function backendIsDown() {
+  backendProbe ||= createProbe({ url: healthUrl(API_INTERNAL_URL), fetchImpl: fetch });
+  return !backendProbe.isUp();
+}
 const INDEX_TTL_MS = 60 * 60 * 1000;
 let registryCache = { at: 0, reg: null };
 
@@ -128,7 +139,8 @@ export async function proxy(request) {
         // 3) mulk ka sirf 1 shehar → seedha us ka page (ek hi hop, 308)
         const reg = await cityRegistry();
         const list = reg.citiesOfCountry(slug);
-        if (list.length === 1) path = reg.cityPath(list[0].slug);
+        // degraded: backend band, sirf static list. Yeh ginti sach nahi, permanent redirect nahi.
+        if (list.length === 1 && !reg.degraded) path = reg.cityPath(list[0].slug);
       } else {
         // 5) DB ka shehar (search se aaya, jaise /weather/tulum) → us ka page (308)
         const reg = await cityRegistry();
@@ -152,6 +164,12 @@ export async function proxy(request) {
     const url = new URL(request.url);
     url.pathname = target;
     return NextResponse.redirect(url, status);
+  }
+
+  // Test header (sahi secret) flag band ho to bhi chalta hai: live par on karne se pehle aazmane ko
+  const simulate = isOutageTest(request, process.env.REVALIDATE_SECRET);
+  if (shouldGate(request) && (simulate || (OUTAGE_GATE && backendIsDown()))) {
+    return serveDuringOutage(request, { selfOrigin: selfOrigin(), fetchImpl: fetch, simulate });
   }
 
   if (lang === DEFAULT_LOCALE) {

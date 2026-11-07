@@ -19,6 +19,8 @@ import { HISTORY_READY } from '../data/historyReady';
 import { historyYearRange } from '../utils/climateMath';
 
 export const HISTORY_REVALIDATE = 60 * 60 * 24;
+// Data badle to backend yeh tag expire karta hai (weather/indexnow_pages.py): 24 h ka intezar nahi
+const historyTag = (citySlug) => `history:${citySlug}`;
 export const MAX_FANOUT = 6;
 
 /**
@@ -45,35 +47,31 @@ export async function getClimateSummary({ cities, month } = {}) {
   const params = {};
   if (cities?.length) params.cities = [...cities].sort().join(',');
   if (month) params.month = month;
-  try {
-    const data = await serverGet(ENDPOINTS.weather.climateSummary, { params, revalidate: HISTORY_REVALIDATE });
-    if (!data || !Array.isArray(data.cities)) return null;
-    return new Map(data.cities.map((c) => [c.slug, c]));
-  } catch {
-    return null;
-  }
+  // 5xx / timeout → throw (Step 2): warna page bina in numbers ke ban kar poora waqt cache
+  // rehta. Page 5xx deta hai, purana achha page ISR mein rehta hai. 404 → null (purana backend).
+  const data = await serverGet(ENDPOINTS.weather.climateSummary, { params, revalidate: HISTORY_REVALIDATE, tags: ['climate-summary'] });
+  if (!data || !Array.isArray(data.cities)) return null;
+  return new Map(data.cities.map((c) => [c.slug, c]));
 }
 
 /**
  * Shehar ki saal-wari mahana rows (Step 5). 1 call shehar ke 13 pages ke liye, sirf DB.
- * Na milen → null: block nahi dikhta, page nahi tootta.
+ * 404 / purana jawab → null: block nahi dikhta. 5xx / timeout → throw (Step 2): block ke
+ * baghair page cache na ho.
  */
 export async function getCityYears(citySlug) {
-  try {
-    const data = await serverGet(ENDPOINTS.weather.climateYears, { params: { city: citySlug }, revalidate: HISTORY_REVALIDATE });
-    // Guard ka faisla na mile to block bhi nahi
-    return Array.isArray(data?.rows) && Array.isArray(data?.flagged_months)
-      ? { rows: data.rows, flagged: data.flagged_months }
-      : null;
-  } catch {
-    return null;
-  }
+  const data = await serverGet(ENDPOINTS.weather.climateYears, { params: { city: citySlug }, revalidate: HISTORY_REVALIDATE, tags: [historyTag(citySlug)] });
+  // Guard ka faisla na mile to block bhi nahi
+  return Array.isArray(data?.rows) && Array.isArray(data?.flagged_months)
+    ? { rows: data.rows, flagged: data.flagged_months }
+    : null;
 }
 
 export const getHistory = (citySlug) =>
   serverGet(ENDPOINTS.weather.history, {
     params: { city: citySlug },
     revalidate: HISTORY_REVALIDATE,
+    tags: [historyTag(citySlug)],
   });
 
 // ── Kis shehar ka 20-saal data mukammal hai (owner review, Oct 2026) ──
@@ -113,6 +111,7 @@ export const getHistoryMonth = (citySlug, month) =>
   serverGet(ENDPOINTS.weather.history, {
     params: { city: citySlug, month },
     revalidate: HISTORY_REVALIDATE,
+    tags: [historyTag(citySlug)],
   });
 
 // City / month page ka data (owner review, Oct 2026):

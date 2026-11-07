@@ -6,6 +6,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { getCountry } from '@/data/countries';
 import { monthBySlug } from '@/utils/climateMath';
 import { getCityRegistry } from '@/services/cityRegistry';
+import { backendDownError } from '@/services/serverApi';
 import { localePath } from '@/i18n/config';
 import { currentLang } from '@/i18n/server';
 
@@ -21,6 +22,9 @@ export async function resolveCity(countrySlug, citySlug, monthSlug = null) {
     permanentRedirect(localePath(lang, monthSlug ? reg.monthPath(canonical, monthSlug) : reg.cityPath(canonical)));
   }
   const city = reg.get(slug);
+  // Backend band: sirf static list hai, DB ka shehar us mein nahi. Asli 404 nahi hai:
+  // notFound() cache ho kar achhe page ki jagah le leta hai, recovery ke baad bhi.
+  if (!city && reg.degraded) throw backendDownError(`city ${slug}`);
   if (!city || city.countrySlug !== country.slug) notFound();
   return { country, city, reg };
 }

@@ -72,8 +72,10 @@ export async function POST(request) {
   if (data.status === 'limit') return reply({ status: 'limit' }, 429);
   if (data.status !== 'ok' || !data.city?.slug) return reply({ status: 'error', reason: data.reason || null }, 503);
 
-  // Shehar DB mein — registry taaza (cache nahi) se us ka URL
-  revalidateTag('cities', { expire: 0 });
+  // Shehar DB mein — registry taaza (cache nahi) se us ka URL.
+  // Sirf jab sach mein kuch naya aaya: yeh tag har page par hai, expire: 0 sab ko rok deta.
+  // Yahan zaroori hai: redirect ke foran baad naya shehar page par milna chahiye.
+  if (data.created || data.history?.api_calls) revalidateTag('cities', { expire: 0 });
   let reg;
   try {
     const idx = await serverGet(ENDPOINTS.weather.cities, { noStore: true });

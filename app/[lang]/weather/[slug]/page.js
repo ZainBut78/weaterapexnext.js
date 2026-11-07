@@ -18,6 +18,7 @@ import { getCityRegistry } from '@/services/cityRegistry';
 import { pageMetadata } from '@/utils/seo';
 import { getCityPhoto } from '@/services/cityPhoto';
 import { getClimateSummary, getHistories } from '@/services/history';
+import { backendDownError } from '@/services/serverApi';
 import { localePath } from '@/i18n/config';
 import { currentLang, getT } from '@/i18n/server';
 import ClientMessages from '@/i18n/ClientMessages';
@@ -42,6 +43,8 @@ async function resolve(rawSlug) {
   if (!country) notFound();
   const reg = await getCityRegistry();
   const list = reg.citiesOfCountry(country.slug);
+  // Backend band: static list ki ginti sach nahi. Na 404, na permanent redirect cache ho.
+  if (reg.degraded && list.length < 2) throw backendDownError(`country ${country.slug}`);
   if (list.length === 1) permanentRedirect(localePath(lang, reg.cityPath(list[0].slug)));
   if (list.length === 0) notFound();
   return { kind: 'country', country, list, reg };
@@ -80,6 +83,8 @@ export default async function WeatherSlugPage({ params }) {
     // hadd nahi). Summary na mile (purana backend) → purana rasta (≤ 6 calls).
     const summary = await getClimateSummary({ cities: list.map((c) => c.slug) });
     const histories = summary || (await getHistories(list.map((c) => c.slug))).data;
+    // Kisi shehar ka data nahi: thin 200 page cache na ho (poora ghanta rehta tha)
+    if (!histories.size) throw backendDownError(`country ${r.country.slug}`);
     // Photos: cities index (1 call, 1 h cache) — sirf jin ka data aaya
     const photos = new Map(await Promise.all([...histories.keys()].map(async (s) => [s, await getCityPhoto(s)])));
     const cities = list.map((c) => ({ slug: c.slug, name: c.name, names: c.names, href: r.reg.cityPath(c.slug), photo: photos.get(c.slug) || null }));

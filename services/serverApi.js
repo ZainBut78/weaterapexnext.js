@@ -25,6 +25,14 @@ const INTERNAL_KEY = process.env.BACKEND_INTERNAL_KEY || '';
 // pehle koi timeout nahi tha, latka hua backend page ko bhi latka deta.
 const TIMEOUT_MS = Number(process.env.BACKEND_TIMEOUT_MS || 15000);
 
+/** Backend ke baghair faisla nahi ho sakta: page 5xx de, Next isay cache nahi karta. */
+export function backendDownError(what) {
+  const err = new Error(`Backend unreachable: ${what}`);
+  err.status = 503;
+  err.backendDown = true;
+  return err;
+}
+
 // 404 → null (page `notFound()` dikhaye). Baqi har ghalti (5xx, timeout,
 // network) → throw: page 5xx deta hai aur Next usay cache NAHI karta (ISR
 // purana achha page hi rakhta hai). Ghalat 200 "not found" kabhi nahi.

@@ -83,6 +83,7 @@
    "/trip-planner | Trip Planner",
    "/trip-planner?city=london | Open the Trip Planner",
    "/weather | Weather",
+   "/weather/azerbaijan/baku/march | BakuAzerbaijanHigh 11°C5 rainy daysDrier",
    "/weather/france/marseille/march | MarseilleFranceHigh 15°C10 rainy daysWarmerDrier",
    "/weather/france/toulouse/march | ToulouseFranceHigh 14°C16 rainy daysWarmer",
    "/weather/italy/milan/march | MilanItalyHigh 14°C12 rainy daysWarmer",
@@ -117,8 +118,7 @@
    "/weather/united-kingdom/london/october | October",
    "/weather/united-kingdom/london/september | 19°CSep",
    "/weather/united-kingdom/london/september | September",
-   "/weather/united-kingdom/manchester/march | ManchesterHigh 10°C · 81 mm",
-   "/weather/united-states/new-york/march | New YorkUSAHigh 10°C10 rainy daysDrier"
+   "/weather/united-kingdom/manchester/march | ManchesterHigh 10°C · 81 mm"
   ],
   "xRobotsTag": null
  },
@@ -421,6 +421,7 @@
    "/de/trip-planner | Reiseplaner",
    "/de/trip-planner?city=london | Reiseplaner öffnen",
    "/de/weather | Wetter",
+   "/de/weather/azerbaijan/baku/march | BakuAserbaidschanMax. 11°C5 RegentageTrockener",
    "/de/weather/france/marseille/march | MarseilleFrankreichMax. 15°C10 RegentageWärmerTrockener",
    "/de/weather/france/toulouse/march | ToulouseFrankreichMax. 14°C16 RegentageWärmer",
    "/de/weather/italy/milan/march | MailandItalienMax. 14°C12 RegentageWärmer",
@@ -456,7 +457,6 @@
    "/de/weather/united-kingdom/london/september | 19°CSep",
    "/de/weather/united-kingdom/london/september | September",
    "/de/weather/united-kingdom/manchester/march | ManchesterMax. 10°C · 81 mm",
-   "/de/weather/united-states/new-york/march | New YorkUSAMax. 10°C10 RegentageTrockener",
    "/es/weather/united-kingdom/london/march | Español (Spanish)",
    "/fr/weather/united-kingdom/london/march | Français (French)",
    "/it/weather/united-kingdom/london/march | Italiano (Italian)",
@@ -536,6 +536,7 @@
    "/fr/trip-planner | Planificateur de voyage",
    "/fr/trip-planner?city=london | Ouvrir le planificateur de voyage",
    "/fr/weather | Météo",
+   "/fr/weather/azerbaijan/baku/march | BakouAzerbaïdjanMax 11°C5 jours de pluiePlus sec",
    "/fr/weather/france/marseille/march | MarseilleFranceMax 15°C10 jours de pluiePlus chaudPlus sec",
    "/fr/weather/france/toulouse/march | ToulouseFranceMax 14°C16 jours de pluiePlus chaud",
    "/fr/weather/italy/milan/march | MilanItalieMax 14°C12 jours de pluiePlus chaud",
@@ -571,7 +572,6 @@
    "/fr/weather/united-kingdom/london/september | 19°Csept",
    "/fr/weather/united-kingdom/london/september | septembre",
    "/fr/weather/united-kingdom/manchester/march | ManchesterMax 10°C · 81 mm",
-   "/fr/weather/united-states/new-york/march | New YorkÉtats-UnisMax 10°C10 jours de pluiePlus sec",
    "/it/weather/united-kingdom/london/march | Italiano (Italian)",
    "/ja/weather/united-kingdom/london/march | 日本語 (Japanese)",
    "/weather/united-kingdom/london/march | English"
@@ -651,6 +651,7 @@
    "/ja/trip-planner | 旅行プランナー",
    "/ja/trip-planner?city=london | 旅行プランナーを開く",
    "/ja/weather | 天気",
+   "/ja/weather/azerbaijan/baku/march | バクーアゼルバイジャン最高11°C雨の日 5日より乾燥",
    "/ja/weather/france/marseille/march | マルセイユフランス最高15°C雨の日 10日より暖かいより乾燥",
    "/ja/weather/france/toulouse/march | トゥールーズフランス最高14°C雨の日 16日より暖かい",
    "/ja/weather/italy/milan/march | ミラノイタリア最高14°C雨の日 12日より暖かい",
@@ -686,7 +687,6 @@
    "/ja/weather/united-kingdom/london/september | 19°C9月",
    "/ja/weather/united-kingdom/london/september | 9月",
    "/ja/weather/united-kingdom/manchester/march | マンチェスター最高10°C · 81mm",
-   "/ja/weather/united-states/new-york/march | ニューヨークアメリカ最高10°C雨の日 10日より乾燥",
    "/weather/united-kingdom/london/march | English"
   ],
   "xRobotsTag": null
