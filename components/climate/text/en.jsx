@@ -103,14 +103,14 @@ const en = {
   }),
   monthH1: (cityN, monthN) => `${cityN} Weather in ${monthN}`,
   stat: { avgHigh: 'Avg high', avgLow: 'Avg low', rainfall: 'Rainfall', rainyDays: 'Rainy days', sunshine: 'Sunshine', humidity: 'Humidity' },
-  statDays: (n) => `${n} days`,
+  statDays: (n) => `${n} ${n === 1 ? 'day' : 'days'}`,
   statSun: (h) => `${h} h / day`,
   Latest: ({ monthN, latest, row, years }) => (
     <>
       <span className="font-semibold text-gray-700">Latest actual — {monthN} {latest.year}:</span>{' '}
       high <UnitTemp c={latest.avg_high} />, low <UnitTemp c={latest.avg_low} />
       {latest.avg_rainfall != null && <>, {Math.round(latest.avg_rainfall)} mm rain</>}
-      {latest.rainy_days != null && <> on {latest.rainy_days} days</>}
+      {latest.rainy_days != null && <> on {latest.rainy_days} {latest.rainy_days === 1 ? 'day' : 'days'}</>}
       {' '}(the {years.start}–{years.end} average above is {latest.avg_high != null && row?.avg_high != null
         ? (latest.avg_high > row.avg_high + 0.4 ? 'cooler' : latest.avg_high < row.avg_high - 0.4 ? 'warmer' : 'about the same')
         : 'for comparison'}).

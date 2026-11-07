@@ -54,6 +54,22 @@ export async function getClimateSummary({ cities, month } = {}) {
   }
 }
 
+/**
+ * Shehar ki saal-wari mahana rows (Step 5). 1 call shehar ke 13 pages ke liye, sirf DB.
+ * Na milen → null: block nahi dikhta, page nahi tootta.
+ */
+export async function getCityYears(citySlug) {
+  try {
+    const data = await serverGet(ENDPOINTS.weather.climateYears, { params: { city: citySlug }, revalidate: HISTORY_REVALIDATE });
+    // Guard ka faisla na mile to block bhi nahi
+    return Array.isArray(data?.rows) && Array.isArray(data?.flagged_months)
+      ? { rows: data.rows, flagged: data.flagged_months }
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 export const getHistory = (citySlug) =>
   serverGet(ENDPOINTS.weather.history, {
     params: { city: citySlug },

@@ -16,7 +16,7 @@ import RelatedArticles from '@/components/RelatedArticles';
 import { countryPath } from '@/data/countries';
 import { pageMetadata } from '@/utils/seo';
 import { photoFromHistory } from '@/services/cityPhoto';
-import { getClimateSummary, getHistories, MAX_FANOUT, requireHistory, yearsOf } from '@/services/history';
+import { getCityYears, getClimateSummary, getHistories, MAX_FANOUT, requireHistory, yearsOf } from '@/services/history';
 import { incompleteRobots } from '@/utils/robots';
 import { rowFor, visitVerdict } from '@/utils/climateMath';
 import { pickElsewhere } from '@/utils/elsewhere';
@@ -65,13 +65,14 @@ export async function generateMetadata({ params }) {
 export default async function MonthPage({ params }) {
   const { country, city, month, data, reg, lang } = await load(params);
   const t = await getT(lang);
-  const [photo, note, summary] = await Promise.all([
+  const [photo, note, summary, yearData] = await Promise.all([
     photoFromHistory(data, city.slug),       // history ka image_url (0 calls); purana backend → cities index
     // content/guides/<city>/<month>.md (optional) — SIRF English. Owner (i18n):
     // doosri zabanon par yeh notes chhupe (English body text kabhi prefix ke
     // neeche nahi); tarjuma baad ke phase mein.
     lang === 'en' ? getTravelNote(city.slug, month.slug) : null,
     getClimateSummary({ month: month.num }), // saare mukammal shehar, is mahine — 1 call, 24 h
+    getCityYears(city.slug),                 // "what 20 years show" — shehar par 1 call, 24 h
   ]);
 
   // Usi mulk ke doosre shehar — saare link (internal linking). Data:
@@ -127,6 +128,7 @@ export default async function MonthPage({ params }) {
         tags={city.tags}
         note={note}
         related={<RelatedArticles city={city.slug} month={month.num} limit={3} />}
+        yearData={yearData}
         lang={lang}
       />
     </ClientMessages>

@@ -11,7 +11,7 @@
 //  Jumlon ki variety: `pick()` page ke apne numbers se ek seed banata hai
 //  (hash) — Math.random nahi, is liye ek page hamesha wahi text dikhata hai.
 // ─────────────────────────────────────────────────────────────
-import { MONTHS, rowFor, monthRanks, monthRelativeRank, visitVerdict } from './climateMath.js';
+import { MONTHS, rowFor, monthRanks, monthRelativeRank, visitVerdict, wintryBand } from './climateMath.js';
 import { monthDaylight } from './solar.js';
 
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -98,10 +98,22 @@ export function nightBand(lo) {
 export function swingBand(hi, lo) {
   if (!isNum(hi) || !isNum(lo)) return null;
   const s = hi - lo;
-  if (s < 5) return 'tiny';
-  if (s < 8) return 'small';
+  // Pehle < 8 "small" tha: London March (10.7 / 3.1, 7.6° ka farq) par "din raat mein
+  // farq nahi" likha aata tha. Sach mein chhota sirf < 4 (Singapore).
+  if (s < 4) return 'tiny';
+  if (s < 6.5) return 'small';
   if (s < 12) return 'moderate';
   return 'big';
+}
+
+/**
+ * FAQ "What should I wear": shaam ke liye kya kahein. Feel paragraph ke saath ek hi sach.
+ * same: farq sach mein chhota · warm: raat bhi garam (≥ 22°, Tips bhi layers nahi kehte)
+ * cool: baqi sab, shaam ko ek layer chahiye
+ */
+export function eveningAdvice(swing, lo) {
+  if (swing === 'tiny') return 'same';
+  return isNum(lo) && lo >= 22 ? 'warm' : 'cool';
 }
 export function humidityBand(h) {
   if (!isNum(h)) return null;
@@ -158,6 +170,59 @@ export function sunShare(row, daylight) {
   return Math.min(100, Math.round((row.sunshine_hours * 60 / daylight.dayMinutes) * 100));
 }
 
+/** Rainy days → "kitni dafa" (key + number). Rain section, FAQ aur history block sab yahi. */
+export const DAYS_IN = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+export function oftenOf(days, monthNum) {
+  if (days == null) return null;
+  const n = DAYS_IN[monthNum - 1];
+  if (days >= n * 0.6) return { key: 'most' };
+  if (days >= n * 0.45) return { key: 'everyOther' };
+  if (days < 0.5) return { key: 'never' };
+  const k = Math.round(n / days);
+  return k <= 1 ? { key: 'most' } : { key: 'oneIn', k };
+}
+
+// ── Step 2: page ke apne numbers se jumlon ke bands (Nov 2026) ───
+/** Saal mein is mahine ki jagah: peak / trough / qareeb / flat / beech (peak se kitna neeche) */
+export function warmthPosition(monthly, monthNum) {
+  const rows = (monthly || []).filter((m) => isNum(m.avg_high));
+  const cur = rowFor(monthly, monthNum);
+  if (rows.length !== 12 || !cur || !isNum(cur.avg_high)) return null;
+  const top = rows.reduce((a, b) => (b.avg_high > a.avg_high ? b : a));
+  const low = rows.reduce((a, b) => (b.avg_high < a.avg_high ? b : a));
+  const hi = cur.avg_high;
+  const base = { peakNum: top.month, delta: top.avg_high - hi };
+  if (top.avg_high - low.avg_high < 4) return { ...base, key: 'flat' };
+  if (top.month === monthNum) return { ...base, key: 'peak' };
+  if (low.month === monthNum) return { ...base, key: 'trough' };
+  if (top.avg_high - hi <= 1.5) return { ...base, key: 'nearPeak' };
+  if (hi - low.avg_high <= 1.5) return { ...base, key: 'nearTrough' };
+  return { ...base, key: 'middle' };
+}
+
+// Barish ya barf: din-raat ka average. Data barf alag nahi deta, is liye sirf "likely".
+export { wintryBand };
+
+/** Yeh mahina shehar ke saal ke average se upar / neeche (field ke margin ke saath) */
+export function relativeToYear(monthly, field, monthNum, margin) {
+  const vals = (monthly || []).map((m) => m[field]).filter(isNum);
+  const cur = rowFor(monthly, monthNum)?.[field];
+  if (vals.length !== 12 || !isNum(cur)) return null;
+  const d = cur - avg(vals);
+  return d >= margin ? 'above' : d <= -margin ? 'below' : 'same';
+}
+
+export function dayLengthBand(minutes) {
+  if (!isNum(minutes)) return null;
+  return minutes >= 840 ? 'long' : minutes < 600 ? 'short' : 'normal';
+}
+
+function nextRainDir(row, next) {
+  if (!isNum(row?.avg_rainfall) || !isNum(next?.avg_rainfall)) return null;
+  const d = next.avg_rainfall - row.avg_rainfall;
+  return d >= 15 ? 'wetter' : d <= -15 ? 'drier' : null;
+}
+
 /** Sab facts ek jagah */
 // locale (i18n): daylight ke waqt us zaban mein; en → null (pehle jaisa)
 export function monthFacts(monthly, monthNum, city, locale = null) {
@@ -169,7 +234,14 @@ export function monthFacts(monthly, monthNum, city, locale = null) {
   const highs = rows.map((m) => m.avg_high);
   return {
     row,
+    monthNum,
     seed: pageSeed(row, monthNum, city),
+    pos: warmthPosition(monthly, monthNum),
+    wintry: wintryBand(row),
+    humRel: relativeToYear(monthly, 'humidity', monthNum, 5),
+    sunRel: relativeToYear(monthly, 'sunshine_hours', monthNum, 1.5),
+    dayLen: dayLengthBand(daylight?.dayMinutes),
+    nextRain: nextRainDir(row, rowFor(monthly, nextNum)),
     season: seasonOf(monthly, monthNum, city?.lat),
     feel: feelBand(row?.avg_high),
     night: nightBand(row?.avg_low),

@@ -13,7 +13,7 @@ import Link from '@/components/LocaleLink';   // i18n: andar ke links zaban ka p
 import {
   Thermometer, ThermometerSnowflake, Droplets, CloudRain, Sun, Waves,
   Shirt, Umbrella, Glasses, ArrowRight, CalendarRange, MapPin, Info, Sparkles,
-  NotebookPen, Check, X, Compass,
+  NotebookPen, Check, X, Compass, Footprints,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -21,6 +21,8 @@ import JsonLd, { ORGANIZATION, breadcrumbs } from '@/components/JsonLd';
 import { SITE_URL } from '@/utils/seo';
 import { UnitTemp, UnitDeltaSigned } from './UnitText';
 import { monthFacts } from '@/utils/monthNarrative';
+import { monthHistoryFacts } from '@/utils/monthHistory';
+import { wearFacts } from '@/utils/monthWear';
 import UnitTempShort from './UnitTempShort';
 import { VERDICT_STYLE } from './CityByMonth';
 import { pexelsSized, pexelsSrcSet } from '@/services/cityPhoto';
@@ -35,7 +37,7 @@ import { localePath } from '@/i18n/config';
 import { cityName, countryName } from '@/i18n/places';
 import { climateText } from './text';
 
-const PACK_ICON = { layers: Shirt, rain: Umbrella, sun: Sun, warm: ThermometerSnowflake, jacket: Shirt, shades: Glasses, light: Shirt };
+const PACK_ICON = { shoes: Footprints, layers: Shirt, rain: Umbrella, sun: Sun, warm: ThermometerSnowflake, jacket: Shirt, shades: Glasses, light: Shirt };
 
 /**
  * @param p.data   history   @param p.city {slug,name}   @param p.country {slug,name}
@@ -46,9 +48,9 @@ const PACK_ICON = { layers: Shirt, rain: Umbrella, sun: Sun, warm: ThermometerSn
  * @param p.elsewhere [{slug,name,country,href,row,warmer,drier}] (utils/elsewhere.js)
  */
 // lang (i18n Phase 1): links/breadcrumb JSON-LD; copy Phase 3 mein
-export default function MonthGuide({ data, city, country, month: monthIn, photo, crumbs, cityHref, monthHref, others, years, tags, note, related = null, elsewhere = [], lang = 'en' }) {
+export default function MonthGuide({ yearData, data, city, country, month: monthIn, photo, crumbs, cityHref, monthHref, others, years, tags, note, related = null, elsewhere = [], lang = 'en' }) {
   const L = climateText(lang);
-  const { QuickAnswer, heroLine, tableIntro, FeelSection, RainSection, DaylightSection, CompareSection, quickQuestions, suitWhy, tipText } = L.story;
+  const { QuickAnswer, heroLine, tableIntro, FeelSection, RainSection, DaylightSection, CompareSection, HistorySection, WearSection, quickQuestions, suitWhy, tipText } = L.story;
   const monthly = data.monthly_data || [];
   const cityN = cityName(lang, city);
   const countryN = countryName(lang, country);
@@ -71,6 +73,9 @@ export default function MonthGuide({ data, city, country, month: monthIn, photo,
   // Range ke baad ka asal data (jaise October 2026) — backend har mahine khud laata hai
   // (owner, Oct 2026). Purana backend / abhi nahi aaya → line nahi.
   const latest = (data.recent || []).find((r) => r.month === month.num && r.year > years.end) || null;
+  // 15 se kam saal, rows headline se na milen, ya data-quality signal → null (dono blocks nahi)
+  const history = monthHistoryFacts({ rows: yearData?.rows, flagged: yearData?.flagged, monthNum: month.num, headline: row, latest });
+  const wear = wearFacts({ row, f, packing, history, monthNum: month.num });
 
   const stats = [
     { icon: Thermometer, label: L.stat.avgHigh, value: <UnitTemp c={row?.avg_high} />, tone: 'bg-orange-50 border-orange-200 text-orange-600' },
@@ -254,6 +259,7 @@ export default function MonthGuide({ data, city, country, month: monthIn, photo,
             <h2 className="text-xl font-bold text-[#002244] mb-2">{L.compareTitle(month.name)}</h2>
             <CompareSection f={f} city={geo} month={month} />
           </section>
+          {history && <HistorySection f={f} city={geo} month={month} facts={history} />}
           <section>
             <h2 className="text-xl font-bold text-[#002244] mb-3">{L.suitsTitle(month.name)}</h2>
             <ul className="grid gap-2 sm:grid-cols-2">
@@ -282,6 +288,7 @@ export default function MonthGuide({ data, city, country, month: monthIn, photo,
               })}
             </div>
           </section>
+          {wear && <WearSection city={geo} month={month} wear={wear} plannerHref={`/trip-planner?city=${city.slug}`} />}
           {questions.length > 0 && (
             <section>
               <h2 className="text-xl font-bold text-[#002244] mb-3">{L.questionsTitle}</h2>

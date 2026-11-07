@@ -73,14 +73,15 @@ export function monthRanks(monthly, num) {
     const warmRank = temps.filter((m) => m.avg_high > cur.avg_high).length + 1;
     out.warmth = warmRank <= 6
       ? { kind: 'warmest', rank: warmRank }
-      : { kind: 'coolest', rank: 13 - warmRank };
+      // Barabar mahine (Reykjavik Jan = Dec): "coolest" aur "2nd coolest" ek page par na aayein
+      : { kind: 'coolest', rank: temps.filter((m) => m.avg_high < cur.avg_high).length + 1 };
   }
   const rains = (monthly || []).filter((m) => isNum(m.avg_rainfall));
   if (cur && isNum(cur.avg_rainfall) && rains.length === 12) {
     const wetRank = rains.filter((m) => m.avg_rainfall > cur.avg_rainfall).length + 1;
     out.rain = wetRank <= 6
       ? { kind: 'wettest', rank: wetRank }
-      : { kind: 'driest', rank: 13 - wetRank };
+      : { kind: 'driest', rank: rains.filter((m) => m.avg_rainfall < cur.avg_rainfall).length + 1 };
   }
   return out;
 }
@@ -93,8 +94,17 @@ export function monthRanks(monthly, num) {
  *  • dhoop (sunshine_hours, roz ka avg)
  * Wajahein saaf likhi jati hain. Yeh historical average hai, forecast nahi.
  */
+export function wintryBand(row) {
+  if (!row || !isNum(row.avg_high) || !isNum(row.avg_low) || !(row.rainy_days >= 1)) return null;
+  const mean = (row.avg_high + row.avg_low) / 2;
+  if (mean <= 0) return 'snow';
+  return mean <= 3 ? 'mixed' : null;
+}
+
 export function visitVerdict(row) {
   if (!row) return null;
+  // Thanda mahina: "rain" nahi, "snow or rain" (score aur label wahi rehte hain)
+  const wintry = Boolean(wintryBand(row));
   let score = 10;
   const reasons = [];
   const hi = row.avg_high;
@@ -115,16 +125,17 @@ export function visitVerdict(row) {
   if (isNum(lo) && lo < 0) { score -= 1; reasons.push({ t: 'frost', text: 'freezing nights', c: lo }); }
 
   if (isNum(rainDays)) {
-    if (rainDays >= 16) { score -= 3; reasons.push({ t: 'rain', key: 'rain-most', n: rainDays, text: `rain on most days (about ${rainDays})` }); }
-    else if (rainDays >= 11) { score -= 2; reasons.push({ t: 'rain', key: 'rain-frequent', n: rainDays, text: `frequent rain (about ${rainDays} rainy days)` }); }
-    else if (rainDays >= 6) { score -= 1; reasons.push({ t: 'rain', key: 'rain-some', n: rainDays, text: `some rainy days (about ${rainDays})` }); }
-    else { reasons.push({ t: 'dry', key: 'dry', n: rainDays, text: `mostly dry (about ${rainDays} rainy days)`, good: true }); }
+    if (rainDays >= 16) { score -= 3; reasons.push(wintry ? { t: 'rain', key: 'snow-most', n: rainDays, text: `snow or rain on most days (about ${rainDays})` } : { t: 'rain', key: 'rain-most', n: rainDays, text: `rain on most days (about ${rainDays})` }); }
+    else if (rainDays >= 11) { score -= 2; reasons.push(wintry ? { t: 'rain', key: 'snow-frequent', n: rainDays, text: `frequent snow or rain (about ${rainDays} wet days)` } : { t: 'rain', key: 'rain-frequent', n: rainDays, text: `frequent rain (about ${rainDays} rainy days)` }); }
+    else if (rainDays >= 6) { score -= 1; reasons.push(wintry ? { t: 'rain', key: 'snow-some', n: rainDays, text: `some snowy or rainy days (about ${rainDays})` } : { t: 'rain', key: 'rain-some', n: rainDays, text: `some rainy days (about ${rainDays})` }); }
+    else { reasons.push({ t: 'dry', key: 'dry', n: rainDays, text: rainDays < 0.5 ? 'almost no rain' : `mostly dry (about ${rainDays} rainy ${rainDays === 1 ? 'day' : 'days'})`, good: true }); }
   }
   if (isNum(rain) && rain > 200) { score -= 1; reasons.push({ t: 'heavy', key: 'heavy', n: Math.round(rain), text: `heavy rainfall (${Math.round(rain)} mm)` }); }
 
   if (isNum(sun)) {
     if (sun < 3) { score -= 1; reasons.push({ t: 'dull', key: 'dull', n: sun, text: `short sunny spells (${sun} h a day)` }); }
-    else if (sun >= 8) { reasons.push({ t: 'sunny', key: 'sunny', n: sun, text: `plenty of sunshine (${sun} h a day)`, good: true }); }
+    // Model sunshine barish ke saath bhi uncha aata hai: 15+ rainy days par "plenty" nahi
+    else if (sun >= 8 && !(isNum(rainDays) && rainDays >= 15)) { reasons.push({ t: 'sunny', key: 'sunny', n: sun, text: `plenty of sunshine (${sun} h a day)`, good: true }); }
   }
 
   score = Math.max(1, Math.round(score * 10) / 10);
@@ -156,7 +167,11 @@ export function monthPacking(row) {
     items.push({ key: 'warm', title: 'Warm Layers', text: 'A warm jacket, a hat and gloves for cold mornings and evenings.' });
   }
   if (isNum(row.sunshine_hours) && row.sunshine_hours >= 7 && !(isNum(hi) && hi > 28)) {
-    items.push({ key: 'shades', title: 'Sunglasses', text: 'Frequent sunshine — sunglasses and a light hat.' });
+    // Model ki dhoop barish ke saath bhi uncha aati hai: 15+ rainy days par Sunglasses ki
+    // jagah joote (Option B, owner). Tips ki ginti wahi rehti hai.
+    items.push(isNum(row.rainy_days) && row.rainy_days >= 15
+      ? { key: 'shoes', title: 'Waterproof Shoes', text: 'Shoes that cope with puddles and dry quickly.' }
+      : { key: 'shades', title: 'Sunglasses', text: 'Frequent sunshine — sunglasses and a light hat.' });
   }
   if (!items.length) items.push({ key: 'light', title: 'Light Layers', text: 'Comfortable clothes with a light layer for the evening.' });
   return items;
@@ -239,12 +254,12 @@ export function monthSuits(row, tags, num) {
     why: sight ? 'daytime temperatures are fine for walking around' : rain > 50 ? 'rain falls on more than half the days' : t > 32 ? 'midday heat makes long walks hard' : 'it is cold for long walks',
     whyKey: sight ? 'ok' : rain > 50 ? 'rain' : t > 32 ? 'hot' : 'cold',
   });
-  // Parks (backend: 15–26°) — har shehar par laagu
-  const parks = t >= 15 && t <= 26 && rain <= 50;
+  // Parks: 15–28° (feel band "warm" 28° tak: wahan "too warm" page se takrata tha)
+  const parks = t >= 15 && t <= 28 && rain <= 50;
   out.push({
     key: 'parks', label: 'Parks & outdoor', ok: parks,
-    why: parks ? 'comfortable for long walks and picnics' : t > 26 ? 'afternoons are too warm to linger outside' : t < 15 ? 'too cool to sit outside for long' : 'rain interrupts outdoor plans',
-    whyKey: parks ? 'ok' : t > 26 ? 'hot' : t < 15 ? 'cold' : 'rain',
+    why: parks ? 'comfortable for long walks and picnics' : t > 28 ? 'afternoons are too warm to linger outside' : t < 15 ? 'too cool to sit outside for long' : 'rain interrupts outdoor plans',
+    whyKey: parks ? 'ok' : t > 28 ? 'hot' : t < 15 ? 'cold' : 'rain',
   });
   // Content round A2: jo cheez is shehar par laagu hi nahi (samandar /
   // trails nahi) woh row dikhate hi nahi

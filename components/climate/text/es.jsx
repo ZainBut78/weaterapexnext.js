@@ -37,13 +37,14 @@ const reasonText = (r) => {
   return {
     cold: 'días fríos', chilly: 'días frescos', 'mild-cool': 'días templados pero frescos', comfortable: 'temperaturas agradables',
     warm: 'días de cálidos a calurosos', hot: 'días calurosos', 'very-hot': 'días de calor extremo', frost: 'noches bajo cero',
+    'snow-most': `nieve o lluvia casi todos los días (unos ${n})`, 'snow-frequent': `nieve o lluvia frecuentes (unos ${n} días húmedos)`, 'snow-some': `algunos días de nieve o lluvia (unos ${n})`,
     'rain-most': `lluvia casi todos los días (unos ${n})`, 'rain-frequent': `lluvia frecuente (unos ${n} días de lluvia)`,
-    'rain-some': `algunos días de lluvia (unos ${n})`, dry: `mayormente seco (unos ${n} días de lluvia)`,
+    'rain-some': `algunos días de lluvia (unos ${n})`, dry: r.n < 0.5 ? 'casi sin lluvia' : `mayormente seco (unos ${n} ${r.n === 1 ? 'día' : 'días'} de lluvia)`,
     heavy: `lluvias intensas (${n} mm)`, dull: `poco sol (${n} h al día)`, sunny: `mucho sol (${n} h al día)`,
   }[r.key || r.t] || '';
 };
 const SUIT = { sightseeing: 'Turismo urbano', parks: 'Parques y aire libre', beach: 'Playa', hiking: 'Senderismo', indoor: 'Museos y planes bajo techo' };
-const PACK = { layers: 'Ropa por capas', rain: 'Protección para la lluvia', sun: 'Protección solar', jacket: 'Chaqueta ligera', warm: 'Ropa de abrigo', shades: 'Gafas de sol', light: 'Ropa ligera' };
+const PACK = { shoes: 'Calzado impermeable', layers: 'Ropa por capas', rain: 'Protección para la lluvia', sun: 'Protección solar', jacket: 'Chaqueta ligera', warm: 'Ropa de abrigo', shades: 'Gafas de sol', light: 'Ropa ligera' };
 
 const P = {
   month: h.month,
@@ -54,31 +55,207 @@ const P = {
   packTitle: (p) => PACK[p.key] || p.title,
   inCity: (city) => inCity('es', city),
   rank: (kind, r) => `el ${ORD[r] || ''}mes más ${KIND[kind]}`,
-  rainyDays: (n) => `${h.n1(n)} días de lluvia`,
+  rainyDays: (n) => `${h.n1(n)} ${Number(n) === 1 ? 'día' : 'días'} de lluvia`,
   sunHours: (n) => `${h.n1(n)} horas de sol`,
   mm: (n) => `${h.n0(n)} mm`,
   perDay: (v) => `unos ${h.n1(v)} mm`,
   often: (o) => ({ most: 'casi todos los días', everyOther: 'aproximadamente un día sí y otro no', never: 'casi nunca', oneIn: `aproximadamente un día de cada ${o.k}` }[o.key]),
 
-  hero: ({ monthN, place, y }) => [
-    `Cómo suele ser ${monthN} en ${place}: promedios ${y}.`,
-    `El tiempo típico de ${monthN} en ${place}, según los promedios climáticos ${y}.`,
-    `${place} ${enM(monthN)}: cómo se presenta normalmente el mes, según los promedios ${y}.`,
-  ],
-  quick: ({ monthN, inCity, cityN, hi, lo, days, mm, sun }) => [
-    <>{cap(enM(monthN))}, {inCity} se registran de media máximas de {hi} y mínimas de {lo}, con unos {days} ({mm} de lluvia) y {sun} al día.</>,
-    <>Un día típico de {monthN} {inCity} llega a {hi} y baja a {lo} por la noche; hay unos {days} ({mm} en total) y {sun} al día.</>,
-    <>{cityN} {enM(monthN)}: máximas en torno a {hi}, mínimas en torno a {lo}, unos {days} que suman {mm} y {sun} en un día medio.</>,
-  ],
-  tableExtreme: ({ monthN, inCity, warmest, rainTxt }) => [
-    <>{cap(monthN)} es <strong>el mes más {warmest ? 'cálido' : 'fresco'}</strong> {inCity}{rainTxt && <>; en cuanto a lluvia, es {rainTxt}</>}.</>,
-    <>Ningún mes es más {warmest ? 'cálido' : 'fresco'} que {monthN} {inCity}{rainTxt && <>; en cuanto a lluvia, es {rainTxt}</>}.</>,
-  ],
-  tableNormal: ({ monthN, inCity, warmer, k, rainTxt }) => [
-    <>{cap(monthN)} es más cálido que <strong>{warmer} de los otros 11 meses</strong>{rainTxt && <>, y en cuanto a lluvia es {rainTxt} {inCity}</>}.</>,
-    <>{k <= 3 ? `Solo ${k} ${k === 1 ? 'mes es' : 'meses son'}` : `${k} de los otros 11 meses son`} más cálidos que {monthN} {inCity}{rainTxt && <>; en cuanto a lluvia, es {rainTxt}</>}.</>,
-    <>Así se compara cada mes {inCity} con {monthN}{rainTxt && <>: en cuanto a lluvia, {monthN} es {rainTxt}</>}.</>,
-  ],
+  hero: ({ monthN, place, y, feelK, rainK }) => {
+    const feel = { freezing: 'gélidas', cold: 'frías', chilly: 'frescas', cool: 'fresquitas', mild: 'templadas', warm: 'cálidas', hot: 'calurosas', 'very-hot': 'muy calurosas' }[feelK] || 'típicas';
+    const rain = { dry: 'poca lluvia', occasional: 'lluvia ocasional', showery: 'chubascos regulares', wet: 'lluvia casi todos los días', wintry: 'lluvia o nieve muchos días' }[rainK];
+    return `${place} ${enM(monthN)}: tardes ${feel} y ${rain}, según las medias de ${y}.`;
+  },
+  quick: ({ monthN, cityN, hi, lo, days, mm, sun, feelK, rainK, sunK }) => {
+    const lead = { freezing: 'Un mes gélido', cold: 'Un mes frío', chilly: 'Un mes fresco', cool: 'Un mes fresquito', mild: 'Un mes templado', warm: 'Un mes cálido', hot: 'Un mes caluroso', 'very-hot': 'Un mes muy caluroso' }[feelK] || 'Un mes típico';
+    const rain = { dry: <>muy poca lluvia ({mm})</>, some: <>unos {days} ({mm})</>, wet: <>unos {days} ({mm} en total)</> }[rainK];
+    const shine = { low: <>solo {sun} al día</>, mid: <>{sun} al día</>, high: <>unas generosas {sun} al día</> }[sunK];
+    return <>{lead} en {cityN}: {enM(monthN)}, las máximas rondan {hi} y las mínimas {lo}, con {rain} y {shine}.</>;
+  },
+  tableExtreme: ({ monthN, inCity, warmest, rainTxt }) => <>{cap(monthN)} es <strong>el mes más {warmest ? 'cálido' : 'fresco'}</strong> {inCity}{rainTxt && <>; en lluvia es {rainTxt}</>}.</>,
+  tableNormal: ({ monthN, inCity, warmer, k, rainTxt, band }) => ({
+    high: <>Solo {k} {k === 1 ? 'mes es más cálido' : 'meses son más cálidos'} que {monthN} {inCity}{rainTxt && <>; en lluvia es {rainTxt}</>}.</>,
+    mid: <>{cap(monthN)} es más cálido que <strong>{warmer} de los otros 11 meses</strong>{rainTxt && <>, y es {rainTxt} {inCity}</>}.</>,
+    low: <>En temperatura, {monthN} solo supera a <strong>{warmer} de los otros 11</strong> meses{rainTxt && <>, y es {rainTxt} del año</>}.</>,
+  }[band]),
+  feelLine: ({ feelK, hi, pos, peakN, delta, wet }) => {
+    const open = feelK === 'freezing' ? <>Por la tarde apenas se superan {hi}</> : ['hot', 'very-hot'].includes(feelK) ? <>Por la tarde se alcanzan {hi}</> : <>Por la tarde se llega a unos {hi}</>;
+    const where = {
+      peak: ', el valor más alto del año',
+      trough: ', el valor más bajo del año',
+      nearPeak: <>, cerca del máximo de {peakN}</>,
+      nearTrough: ', cerca del valor más bajo del año',
+      flat: ', casi igual que cualquier otro mes aquí',
+      middle: <>, unos {delta} por debajo del máximo de {peakN}</>,
+    }[pos] || '';
+    const advice = {
+      freezing: 'incluso a mediodía se siente pleno invierno',
+      cold: 'hace falta abrigo y bufanda de la mañana a la noche',
+      chilly: 'se camina bien con una buena chaqueta',
+      cool: 'agradable para pasear con una capa encima',
+      mild: 'cómodo con ropa ligera',
+      warm: 'suficiente para ir de manga corta',
+      hot: 'las visitas funcionan mejor por la mañana o al anochecer',
+      'very-hot': 'pasar mucho tiempo fuera agota, así que conviene planificar en torno a la tarde',
+    }[feelK];
+    return <>{open}{where}: {advice}{wet ? ', entre chubasco y chubasco' : ''}.</>;
+  },
+  nightLine: ({ night, swing, lo, delta }) => {
+    const gap = {
+      tiny: 'apenas menos que por la tarde',
+      small: <>unos {delta} menos que por la tarde</>,
+      moderate: <>{delta} menos que por la tarde</>,
+      clear: <>unos claros {delta} menos que por la tarde</>,
+      big: <>una gran caída de {delta} respecto a la tarde</>,
+    }[swing];
+    const tail = {
+      'hard-frost': ', muy por debajo de cero',
+      frosty: ', así que las heladas son frecuentes',
+      cold: ', así que las mañanas empiezan frías',
+      cool: ', así que por la noche conviene una capa más',
+      mild: ', todavía agradable al aire libre',
+      warm: ', todavía suficiente para ir de manga corta',
+      sultry: ', así que el calor apenas da tregua',
+    }[night];
+    return <>Por la noche baja a unos {lo}, {gap}{tail}.</>;
+  },
+  humLine: ({ caseK, h: hum, rel }) => {
+    const r = { above: ', más húmedo de lo habitual aquí', below: ', más seco de lo habitual aquí' }[rel] || '';
+    const t = {
+      veryHumidHot: 'el aire es bochornoso y se siente más calor del que marca el termómetro',
+      dampCold: 'el aire húmedo hace que el frío se note más',
+      dampCool: 'el aire húmedo hace que un día fresco parezca más frío, sobre todo con viento',
+      humidHot: 'los ratos de calor resultan algo pegajosos',
+      humidMild: 'el aire es húmedo, aunque a estas temperaturas rara vez agobia',
+      dryHot: 'el calor es seco, así que conviene beber más de lo que parece',
+      dry: 'la piel y los labios pueden notar el aire seco',
+      comfortCold: 'el aire no es ni húmedo ni seco, así que el frío se nota limpio',
+      comfortMild: 'el aire no resulta ni pegajoso ni seco',
+      comfortHot: 'el calor rara vez resulta pegajoso',
+    }[caseK];
+    return `La humedad media es del ${h.n0(hum)} %${r}: ${t}.`;
+  },
+  rainLine: ({ freq, never, days, n, inCity, top }) => {
+    const base = never ? 'Casi nunca llueve' : {
+      dry: `La lluvia es rara, unos ${days} días húmedos de ${n}`,
+      occasional: `Llueve unos ${days} días de ${n}`,
+      showery: `Cabe esperar lluvia unos ${days} días de ${n}, con ratos secos entre medias`,
+      wet: `La lluvia cae unos ${days} días de ${n}`,
+    }[freq];
+    const t = !top ? '' : top.first ? `, lo que lo convierte en el mes más ${KIND[top.kind]} ${inCity}` : `, entre los tres meses más ${top.kind === 'wettest' ? 'lluviosos' : 'secos'} del año`;
+    return `${base}${t}`;
+  },
+  rainJoin: '; ',
+  stop: '.',
+  rainSizeLine: ({ per, sizeK, vs, year }) => {
+    const kind = {
+      lightCool: 'sobre todo llovizna fría',
+      lightWarm: 'normalmente un chubasco breve',
+      moderateCool: 'lluvia constante más que un chubasco pasajero',
+      moderateWarm: 'suficiente para mojarse sin paraguas',
+      heavyCool: 'un buen remojón',
+      heavyWarm: 'a menudo en forma de aguaceros fuertes',
+    }[sizeK];
+    const cmp = { heavier: `, más que los ${year} mm habituales de la ciudad`, lighter: `, menos que los ${year} mm habituales de la ciudad`, typical: `, cerca de los ${year} mm habituales de la ciudad` }[vs] || '';
+    return `los días húmedos dejan ${per}: ${kind}${cmp}.`;
+  },
+  snowNote: { snow: 'Con estas temperaturas, buena parte probablemente cae en forma de nieve.', mixed: 'Una parte puede caer como aguanieve o nieve.' },
+  dayLine: ({ monthN, cityN, rise, set, len, band, dir, amt, pm }) => {
+    const lead = { long: 'Días largos: a mediados de', short: 'Días cortos: a mediados de', normal: 'A mediados de' }[band] || 'A mediados de';
+    const chg = { barely: `, casi lo mismo que a mediados de ${pm}`, shorter: `, ${amt} menos que a mediados de ${pm}`, longer: `, ${amt} más que a mediados de ${pm}` }[dir];
+    return `${lead} ${monthN}, ${cityN} tiene ${len} de luz, del amanecer hacia las ${rise} al atardecer hacia las ${set}${chg}.`;
+  },
+  sunLine: ({ share, skyK, rel }) => {
+    const r = { above: ', en la parte más soleada del año aquí', below: ', en la parte menos soleada del año aquí' }[rel] || '';
+    const sky = { cloudy: 'el cielo suele estar nublado', mixed: 'sol y nubes se reparten el día', bright: 'hay muchos ratos de sol', clear: 'el cielo suele estar despejado', showery: 'cabe esperar ratos de sol entre los chubascos', clearDry: 'el cielo suele estar despejado y la lluvia es rara', clearSome: 'el cielo suele estar despejado entre los días de lluvia', brightSome: 'cabe esperar ratos de sol entre los días de lluvia' }[skyK];
+    return `Las estimaciones del modelo sitúan el sol en torno al ${share} % de las horas de luz${r}, así que ${sky}.`;
+  },
+  cmpRain: (rain) => (rain === 0 ? ', con casi la misma lluvia' : `, con ${h.n0(Math.abs(rain))} mm ${rain > 0 ? 'más' : 'menos'} de lluvia`),
+  cmpLine: ({ monthN, rankTxt, prevN, delta, warmer, mag, same, rainTxt }) => {
+    const first = rankTxt ? `${cap(monthN)} es ${rankTxt} del año` : cap(monthN);
+    if (same) return <>{first} y hace casi tanto calor como en {prevN}{rainTxt}.</>;
+    const size = { slight: 'solo ', big: 'nada menos que ', plain: '' }[mag];
+    return <>{first}; las tardes son {size}{delta} {warmer ? 'más cálidas' : 'más frescas'} que en {prevN}{rainTxt}.</>;
+  },
+  nextLine: ({ trendK, nextN, temp, rainDir }) => {
+    const base = {
+      peak: <>Después el año cambia: {nextN} ya es más fresco, con máximas cerca de {temp}</>,
+      trough: <>Este es el punto más bajo: {nextN} sube hasta unos {temp}</>,
+      warming: <>Las temperaturas siguen subiendo hacia {nextN}, hasta unos {temp}</>,
+      cooling: <>Las temperaturas siguen bajando hacia {nextN}, hasta unos {temp}</>,
+      flat: <>Las temperaturas apenas cambian hacia {nextN}, en torno a {temp}</>,
+    }[trendK];
+    const r = { wetter: ', y llueve más', drier: ', y llueve menos' }[rainDir] || '';
+    return <>{base}{r}.</>;
+  },
+  suitWhy: {
+    sightseeing: {
+      ok: 'las temperaturas diurnas son buenas para caminar', okCool: 'cómodo a pie con una chaqueta', okWarm: 'calor llevadero para pasear por la ciudad',
+      rainSnow: 'llueve o nieva más de la mitad de los días', rainMostSnow: 'llueve o nieva la mayoría de los días', rain: 'llueve más de la mitad de los días', rainMost: 'llueve la mayoría de los días', hot: 'el calor del mediodía dificulta las caminatas largas', cold: 'hace frío para pasear mucho rato', coldHard: 'demasiado frío para pasear mucho rato',
+    },
+    parks: {
+      ok: 'agradable para largos paseos y pícnics', okCool: 'agradable con una capa ligera',
+      hot: 'las tardes son demasiado cálidas para quedarse fuera', hotHard: 'las tardes son demasiado calurosas para sentarse fuera',
+      cold: 'demasiado frío para sentarse fuera mucho rato', coldHard: 'mucho frío para sentarse fuera', coldMild: 'algo fresco para sentarse fuera mucho rato',
+      rain: 'la lluvia interrumpe los planes al aire libre', rainMost: 'la lluvia interrumpe la mayoría de los planes al aire libre',
+    },
+    beach: { ok: 'cálido y mayormente seco en la costa', hot: 'calor costero', cold: 'el aire del mar es demasiado fresco', coldHard: 'demasiado frío para la playa', rain: 'demasiados días de lluvia', rainMost: 'lluvia casi todos los días' },
+    hiking: { ok: 'temperaturas suaves para los senderos', cold: 'los senderos están frescos', coldHard: 'los senderos están fríos, así que hay que abrigarse', hot: 'demasiado calor para rutas largas', rain: 'senderos mojados', rainMost: 'los senderos siguen mojados' },
+    indoor: { rainSnow: 'con lluvia o nieve casi todos los días, galerías y museos son un plan fácil', rain: 'con lluvia casi todos los días, galerías y museos son un plan fácil', hot: 'un respiro fresco en las horas de más calor', cold: 'lugares cálidos para las horas más frías' },
+  },
+  tips: {
+    layers: {
+      big: 'La tarde y la noche están muy lejos en temperatura, así que lleva prendas para quitar a mediodía y volver a poner al anochecer.',
+      cold: 'Por la mañana y por la noche hace frío comparado con el mediodía, así que vístete por capas.',
+      mild: 'Los días son claramente más cálidos que las noches: lleva capas que puedas añadir o quitar.',
+    },
+    rain: {
+      showeryLight: 'Los chubascos suelen ser ligeros, así que basta con un paraguas compacto.',
+      showeryModerate: 'Lleva un paraguas pequeño en el bolso para los días de lluvia.',
+      showeryHeavy: 'Cuando llueve puede hacerlo con fuerza: lleva una chaqueta impermeable ligera.',
+      wetLight: 'La llovizna es frecuente, así que compensa llevar un impermeable plegable.',
+      wetModerate: 'Llueve a menudo: lleva impermeable y calzado que aguante los charcos.',
+      wetHeavy: 'Llueve a menudo y con fuerza: un buen impermeable y calzado de secado rápido.',
+      wintry: 'La lluvia o la nieve son frecuentes: lleva una chaqueta impermeable y botas con buen agarre.',
+    },
+    sun: {
+      extreme: 'Calor extremo: sombrero, crema solar, ropa holgada y mucha agua.',
+      humid: 'Ropa holgada y transpirable, además de crema solar y un sombrero de ala ancha.',
+      dry: 'Protégete del sol fuerte y del aire seco: sombrero, crema solar y mucha agua.',
+      clear: 'Crema solar, sombrero y gafas de sol; ropa ligera y transpirable.',
+    },
+    jacket: {
+      cold: 'Una chaqueta para el frío de primera hora, fácil de llevar después.',
+      cool: 'Una chaqueta ligera o una prenda de punto basta para casi todo el día.',
+      mild: 'Lleva un jersey o un abrigo ligero para las tardes frescas.',
+    },
+    warm: {
+      freezing: 'Un buen abrigo de invierno, guantes y gorro, y calzado abrigado para las aceras heladas.',
+      cold: 'Un buen abrigo de invierno, con guantes y gorro para salir temprano.',
+      frost: 'Una chaqueta de abrigo, gorro y guantes para las mañanas con helada.',
+      chilly: 'Una chaqueta de abrigo y un gorro para las mañanas y noches frías.',
+    },
+    shades: {
+      clear: 'El cielo despejado es habitual, así que merece la pena llevar gafas de sol y un sombrero ligero.',
+      bright: 'Los ratos de sol son habituales, así que lleva gafas de sol y una gorra.',
+      mixed: 'El sol va y viene, pero las gafas de sol siguen mereciendo un sitio en el bolso.',
+    },
+    light: { any: 'Ropa cómoda y una capa ligera para la noche.' },
+    shoes: { any: 'Con tantos días húmedos, conviene llevar calzado que aguante los charcos y seque rápido.', heavy: 'Mucha lluvia fuerte: calzado impermeable y un par de calcetines de repuesto.', snow: 'Botas impermeables con buen agarre para aceras mojadas o heladas.' },
+  },
+  a1: ({ hi, lo, feel, warmRank }) => <>Las tardes rondan {hi} y las noches unos {lo}: días {feel} para la mayoría{warmRank && <>; es {warmRank} del año</>}.</>,
+  a2: {
+    never: ({ monthN, none }) => <>Casi nunca: {monthN} apenas tiene lluvia, {none ? 'sin ningún día de lluvia' : 'con un día de lluvia aproximadamente'} en un año típico.</>,
+    dry: ({ daysTxt, mm }) => <>No: solo unos {daysTxt} y {h.n0(mm)} mm en todo el mes.</>,
+    yes: ({ mm, often, sizeK }) => <>Sí: llueve {often} y se acumulan unos {h.n0(mm)} mm{{ light: ', sobre todo lluvia ligera', moderate: ', así que compensa llevar paraguas', heavy: ', a menudo con fuerza, así que conviene prever planes bajo techo' }[sizeK]}.</>,
+    some: ({ daysTxt, mm, light }) => <>No especialmente: unos {daysTxt} ({h.n0(mm)} mm), sobre todo lluvia {light ? 'ligera' : 'moderada'}.</>,
+  },
+  a3: ({ list, eve, cold }) => ({
+    cool: <>Lleva {list}, además de una capa para las mañanas y noches {cold ? 'frías' : 'frescas'}.</>,
+    same: <>Lleva {list}; las noches se parecen al día, así que sirve la misma ropa.</>,
+    warm: <>Lleva {list}; sigue haciendo calor al anochecer, así que no hace falta una capa extra.</>,
+  }[eve]),
+  a4: ({ win, ranks, labels, whyTxt, narrow }) => <>{cap(win)} puntúa {narrow ? 'algo' : 'claramente'} mejor en nuestro ranking climático (n.º {ranks.a} de 12 frente al n.º {ranks.b}){labels ? `, con «${labels[0]}» frente a «${labels[1]}»` : ''}.{whyTxt}</>,
   season: {
     equator: ({ cityN, monthN }) => [
       `${cityN} está cerca del ecuador, así que no tiene un invierno ni un verano de verdad: hace calor todo el año, y ${monthN} no es una excepción.`,
@@ -102,131 +279,74 @@ const P = {
     ],
   },
   feelWord: { freezing: 'gélidos', cold: 'fríos', chilly: 'frescos', cool: 'frescos', mild: 'templados', warm: 'cálidos', hot: 'calurosos', 'very-hot': 'muy calurosos' },
-  feel: {
-    freezing: ['De día las temperaturas apenas superan los cero grados: incluso a mediodía parece pleno invierno.', 'Incluso la hora más cálida del día se queda cerca de cero.'],
-    cold: ['Las temperaturas diurnas siguen siendo frías y hace falta un abrigo grueso incluso a mediodía.', 'A mediodía apenas sube la temperatura: abrigo y bufanda de la mañana a la noche.'],
-    chilly: ['Los días son frescos más que gélidos, y con una buena chaqueta se pasea sin problema.', 'El aire es fresco durante el día, pero rara vez cortante.'],
-    cool: ['Las tardes son frescas y agradables para caminar con una capa extra.', 'De día la sensación es de aire fresco más que frío.', 'Días frescos, ideales para hacer turismo a buen paso.'],
-    mild: ['Las tardes son templadas y agradables para casi todo el mundo con ropa ligera.', 'Las temperaturas diurnas son templadas: ni frío ni calor para pasear.', 'Las tardes templadas invitan a pasar muchas horas al aire libre.'],
-    warm: ['Los días son lo bastante cálidos para ir de manga corta y estar fuera resulta fácil.', 'Las tardes son cálidas y agradables, perfectas para largas jornadas de turismo.'],
-    hot: ['Las tardes son calurosas: el turismo funciona mejor por la mañana o al atardecer.', 'Las horas centrales son calurosas; en los paseos largos importan la sombra y el agua.'],
-    'very-hot': ['El calor del mediodía es intenso y la mayoría busca sombra o aire acondicionado por la tarde.', 'Las tardes son de calor extremo: los planes al aire libre salen mejor temprano o tras la puesta de sol.'],
-  },
-  nightTxt: {
-    'hard-frost': 'las noches bajan muy por debajo de cero', frosty: 'las noches rondan los cero grados y las heladas son frecuentes',
-    cold: 'las noches son frías', cool: 'las noches son frescas', mild: 'las noches son templadas', warm: 'las noches siguen siendo cálidas', sultry: 'las noches son bochornosas',
-  },
-  night: {
-    sultry: () => ['Las noches dan poco respiro: incluso la hora más fresca sigue siendo calurosa.', 'Incluso después de la puesta de sol hace calor y bochorno.'],
-    small: ({ nightTxt }) => [`Hay poca diferencia entre el día y la noche: ${nightTxt} y las noches se parecen casi a la tarde.`, `Tras la puesta de sol cambia poco: ${nightTxt}, apenas por debajo de los valores diurnos.`],
-    moderate: ({ nightTxt }) => [`Después de la puesta de sol la temperatura baja de forma notable: ${nightTxt}.`, `Al anochecer se nota un descenso claro, y ${nightTxt}.`],
-    big: ({ nightTxt, delta }) => [
-      <>La diferencia entre el día y la noche es grande (unos {delta}): {nightTxt}, así que la mañana y la noche se sienten muy distintas del mediodía.</>,
-      <>Tras la puesta de sol la temperatura baja bastante, unos {delta}, y {nightTxt}.</>,
-    ],
-  },
-  humidity: {
-    veryHumidHot: ['El aire es bochornoso, así que la sensación es más calurosa de lo que marca el termómetro.', 'La alta humedad hace que el calor se sienta pesado y pegajoso, sobre todo en las tardes sin viento.'],
-    dampCold: ['El aire húmedo hace que el frío cale más de lo que indican las cifras.', 'La humedad le da al frío un punto penetrante, sobre todo con viento.'],
-    humidHot: ['El aire tiene algo de humedad, que se nota cuando aprieta el sol.', 'El aire es algo húmedo, y en los momentos de calor se nota.'],
-    humidMild: ['El aire es bastante húmedo, pero con estas temperaturas rara vez resulta agobiante.', 'La humedad es alta, pero las temperaturas templadas la hacen llevadera.'],
-    dryHot: ['El aire seco evapora el sudor enseguida: se suda menos, pero uno se deshidrata rápido.', 'El calor es seco más que bochornoso: bebe más de lo que crees.'],
-    dry: ['El aire es seco, y la piel y los labios suelen notarlo más que la temperatura.'],
-    comfortable: ['La humedad es moderada: el aire no resulta ni pegajoso ni seco.', 'El aire es agradable, ni bochornoso ni seco.'],
-  },
-  rainFreq: {
-    dry: ({ monthN, inCity, often, never }) => [`${cap(enM(monthN))} la lluvia es rara: la mayoría de las semanas pasan sin días de lluvia.`, never ? `${cap(monthN)} es un mes seco ${inCity}; casi nunca llueve.` : `${cap(monthN)} es un mes seco ${inCity}; llueve ${often}.`, 'Predomina el tiempo seco y el paraguas puede quedarse en la maleta.'],
-    occasional: ({ often }) => [`La lluvia llega de vez en cuando, ${often}.`, `Los días de lluvia son ocasionales más que habituales: ${often}.`, `La mayoría de los días son secos; llueve ${often}.`],
-    showery: ({ often }) => [`Los chubascos son frecuentes y llegan ${often}.`, `Es un mes variable: llueve ${often}, con pausas secas entre medias.`],
-    wet: ({ monthN, often }) => [`Este mes la lluvia forma parte de la rutina y cae ${often}.`, `Aquí ${monthN} es lluvioso de forma constante: llueve ${often}.`, `Los días secos son la excepción: llueve ${often}.`],
-  },
-  rainSize: {
-    light: ({ per }) => [`La mayoría de los días de lluvia solo traen lluvia ligera, ${per} en un día de lluvia típico: llovizna o chubascos breves que rara vez estropean los planes.`, `Cuando llueve, suele ser poco: ${per} por día de lluvia, más llovizna que aguacero.`],
-    moderate: ({ per }) => [`Un día de lluvia deja de media ${per}: lluvia continua más que un chubasco pasajero.`, `Los días lluviosos dejan de media ${per}, suficiente para mojarse sin paraguas.`],
-    heavy: ({ per }) => [`La lluvia suele caer en aguaceros intensos: ${per} en un día de lluvia medio.`, `Los días de lluvia son intensos, con una media de ${per}: aguaceros más que llovizna.`],
-  },
-  rainVs: {
-    heavier: ({ cityN, year }) => `Es más que la media anual de ${cityN}, unos ${year} mm por día de lluvia.`,
-    lighter: ({ year }) => `Es menos que la media anual de la ciudad, unos ${year} mm por día de lluvia.`,
-    typical: ({ cityN, monthN, year }) => [`Está en línea con la media anual de ${cityN} (unos ${year} mm por día de lluvia).`, `A lo largo del año, ${cityN} recibe unos ${year} mm por día de lluvia, así que ${monthN} es normal.`],
-  },
-  rainRank1: ({ monthN, inCity, kind }) => `${cap(monthN)} es el mes más ${KIND[kind]} del año ${inCity}.`,
-  rainRankTop3: ({ kind }) => `Está entre los tres meses más ${kind === 'wettest' ? 'lluviosos' : 'secos'} del año.`,
   polar: {
     day: ({ monthN, inCity }) => `A mediados de ${monthN}, ${inCity} el sol no se pone.`,
     night: ({ monthN, inCity }) => `A mediados de ${monthN}, ${inCity} el sol no sale sobre el horizonte.`,
   },
-  dayMain: ({ monthN, cityN, rise, set, len }) => [
-    `El 15 de ${monthN} el sol sale hacia las ${rise} y se pone hacia las ${set} (hora local): ${len} de luz.`,
-    `A mediados de ${monthN} amanece hacia las ${rise} y anochece hacia las ${set} (hora local): ${len} de luz.`,
-    `A mitad de mes, ${cityN} tiene ${len} de luz, desde el amanecer hacia las ${rise} hasta el atardecer hacia las ${set}.`,
-  ],
-  dayChange: {
-    same: ({ pm }) => `La duración del día es prácticamente la misma que a mediados de ${pm}.`,
-    barely: ({ pm, amt, longer }) => `La duración del día apenas cambia respecto a mediados de ${pm} (${amt} ${longer ? 'más' : 'menos'}).`,
-    shorter: ({ pm, amt }) => [`Los días se acortan: ${amt} menos de luz que a mediados de ${pm}.`, `Respecto a mediados de ${pm}, el día ha perdido ${amt}.`],
-    longer: ({ pm, amt }) => [`Los días se alargan: ${amt} más de luz que a mediados de ${pm}.`, `Desde mediados de ${pm}, el día ha ganado ${amt}.`],
-  },
-  sky: { cloudy: 'el cielo suele estar nublado', mixed: 'se alternan sol y nubes', bright: 'hay muchos claros', clear: 'el cielo está mayormente despejado' },
-  sunShare: ({ share, sky }) => [`El sol brilla durante aproximadamente el ${share} % de esas horas de luz: ${sky}.`, `Aproximadamente el ${share} % de las horas de luz es soleado; en resumen, ${sky}.`],
   equatorDay: 'Cerca del ecuador, las horas de amanecer y atardecer cambian muy poco a lo largo del año.',
-  cmpFirst: ({ monthN, inCity, rankTxt }) => [`${cap(monthN)} es ${rankTxt} del año ${inCity}.`, `Según la temperatura máxima media, ${monthN} es ${rankTxt} ${inCity}.`],
-  cmpRain: (rain) => (rain === 0 ? ', con aproximadamente la misma lluvia' : `, con ${h.n0(Math.abs(rain))} mm ${rain > 0 ? 'más' : 'menos'} de lluvia`),
-  cmpSame: ({ prevN, rainTxt }) => <>Hace más o menos el mismo calor que {enM(prevN)}{rainTxt}.</>,
-  cmpPrev: ({ prevN, delta, warmer, rainTxt }) => [
-    <>En comparación con {prevN}, las tardes son {delta} más {warmer ? 'cálidas' : 'frescas'}{rainTxt}.</>,
-    <>Respecto a {prevN}, la máxima media es {delta} más {warmer ? 'alta' : 'baja'}{rainTxt}.</>,
-  ],
-  trend: {
-    peak: ({ nextN }) => [`A partir de aquí el año cambia de rumbo: ${nextN} ya es más fresco.`, `Desde este momento las temperaturas empiezan a bajar, empezando por ${nextN}.`],
-    trough: ({ nextN }) => [`Es el punto más bajo, y ${enM(nextN)} empieza a subir la temperatura.`, `De aquí en adelante solo hace más calor, empezando por ${nextN}.`],
-    warming: ({ nextN }) => [`El calentamiento continúa ${enM(nextN)}.`, `Las temperaturas siguen subiendo hasta ${nextN}.`],
-    cooling: ({ nextN }) => [`Las temperaturas siguen bajando ${enM(nextN)}.`, `El enfriamiento continúa hasta ${nextN}.`],
-    flat: () => 'Aquí las temperaturas cambian muy poco de un mes a otro.',
+  packPhrase: { shoes: 'calzado impermeable', layers: 'ropa por capas', rain: 'protección para la lluvia', sun: 'protección solar', jacket: 'una chaqueta ligera', warm: 'ropa de abrigo', shades: 'gafas de sol', light: 'ropa ligera' },
+  wear: {
+    title: ({ monthN, cityN }) => `Qué ropa llevar a ${cityN} en ${monthN}`,
+    basis: 'Son estimaciones a partir de medias mensuales, así que cada temperatura es aproximada.',
+    h3: { time: 'Según el momento del día', pack: 'Equipaje para 7 días', year: { normal: 'Año frío o cálido', winter: 'Año frío o suave', cooler: 'Año más fresco o más caluroso', hot: 'Año fresco o muy caluroso' } },
+    at: { morning: (t) => <>Mañana, unos {t}:</>, afternoon: (t) => <>Tarde, unos {t}:</>, evening: (t) => <>Noche, unos {t}:</> },
+    morning: { winter: 'un buen abrigo de invierno, guantes y gorro.', cold: 'una chaqueta de abrigo y un gorro, con una capa debajo.', mild: 'una chaqueta ligera o un jersey.', warm: 'ropa ligera con una capa fina para empezar.', hot: 'ropa ligera y holgada desde el principio del día.' },
+    afternoon: { winter: 'el abrigo sigue puesto, incluso a mediodía.', cold: 'deja la chaqueta para caminar; puedes quitarte la capa extra.', mild: 'basta una prenda ligera, con la chaqueta a mano.', warm: 'basta ropa ligera y transpirable.', warmSun: 'ropa ligera, un sombrero y protector solar.', hot: 'un sombrero, protector solar y ropa holgada, con mucha agua.' },
+    evening: { ice: 'de nuevo cerca de cero: mantén todas las capas y cuidado con las aceras heladas.', winter: 'mantén todas las capas.', cold: 'vuelve a ponerte la capa.', mild: 'vuelve a ponerte la chaqueta.', warm: 'vuelve a ponerte la capa fina.', warmNight: 'la misma ropa ligera; no hace falta otra capa.', same: 'sirve la misma ropa, porque la temperatura apenas cambia.' },
+    year: {
+      normal: ({ monthN, coldY, warmY, cold, warm }) => <>En un año frío como {coldY}, las máximas de {monthN} promediaron solo {cold}, así que conviene llevar una capa de abrigo más. En un año cálido como {warmY} llegaron a {warm}, y basta una capa más ligera.</>,
+      winter: ({ monthN, coldY, warmY, cold, warm }) => <>En un año frío como {coldY}, las máximas de {monthN} promediaron solo {cold}, así que conviene llevar una capa de abrigo más. Incluso en un año suave como {warmY} llegaron solo a {warm}, así que el abrigo de invierno sigue haciendo falta.</>,
+      cooler: ({ monthN, coldY, warmY, cold, warm }) => <>En un año más fresco como {coldY}, las máximas de {monthN} promediaron {cold}, así que conviene una capa ligera más. En un año más caluroso como {warmY} llegaron a {warm}, así que mejor ropa ligera.</>,
+      hot: ({ monthN, coldY, warmY, cold, warm, y1, y2 }) => <>Incluso el {monthN} más fresco de {y1}–{y2}, en {coldY}, promedió {cold}, y el más caluroso, en {warmY}, llegó a {warm}. En cualquier caso, no hace falta nada más abrigado.</>,
+    },
+    wet: {
+      none: 'En una semana típica no se esperan días húmedos, así que puedes dejar la ropa de lluvia en casa.',
+      some: ({ n, wintry, size, per }) => {
+        const each = n === 1 ? 'ese día' : 'cada uno';
+        const tail = !per ? '' : wintry ? <>, entre lluvia y nieve, con {per} {each}</> : size === 'light' ? <>, sobre todo lluvia ligera de {per} al día</> : size === 'heavy' ? <>, a menudo fuerte, con {per} {each}</> : <>, con {per} {each}</>;
+        return <>Cuenta con unos {n} {n === 1 ? 'día húmedo' : 'días húmedos'} por semana{tail}.</>;
+      },
+    },
+    items: { coat: 'Un abrigo de invierno', coatWet: 'Un abrigo de invierno con una capa exterior impermeable', midThermal: '2 capas intermedias de abrigo y una capa térmica', glovesHat: 'Guantes y gorro', jacketHat: 'Una chaqueta de abrigo y un gorro', mid2: '2 capas intermedias de abrigo', lightJacket: 'Una chaqueta ligera o un jersey', lightLayers: '2 o 3 capas ligeras', lightClothes: 'Ropa ligera y transpirable', thinLayer: 'Una capa fina para la mañana y la noche', looseClothes: 'Ropa holgada y transpirable', rainJacket: 'Una chaqueta de lluvia compacta', sunKit: 'Un sombrero, protector solar y gafas de sol', shades: 'Gafas de sol y un sombrero ligero', bottle: 'Una botella de agua', boots: 'Botas de abrigo con buen agarre', wpShoes: 'Zapatos impermeables que se sequen rápido', lightShoes: 'Zapatos ligeros y transpirables', walkShoes: 'Zapatos cómodos para caminar' },
+    trip: { lead: '¿Viajas en fechas concretas?', link: 'Comprueba tus fechas exactas en el planificador de viajes.' },
   },
-  nextHi: ({ nextN, temp }) => [<> {cap(enM(nextN))} la máxima media es de {temp}.</>, <> {cap(nextN)} registra de media máximas de {temp}.</>],
-  suitWhy: {
-    sightseeing: { ok: ['las temperaturas diurnas son buenas para caminar', 'lo bastante agradable para explorar a pie todo el día'], rain: ['llueve más de la mitad de los días'], hot: ['el calor del mediodía hace pesados los paseos largos'], cold: ['hace frío para paseos largos'] },
-    parks: { ok: ['agradable para paseos largos y pícnics', 'buenas condiciones para sentarse al aire libre'], hot: ['por la tarde hace demasiado calor para estar mucho tiempo fuera'], cold: ['demasiado fresco para estar sentado fuera mucho tiempo'], rain: ['la lluvia interrumpe los planes al aire libre'] },
-    beach: { ok: ['cálido y mayormente seco en la costa'], hot: ['clima costero muy caluroso'], cold: ['el aire del mar es demasiado fresco'], rain: ['demasiados días de lluvia'] },
-    hiking: { ok: ['temperaturas templadas para los senderos'], cold: ['en los senderos hace fresco'], hot: ['demasiado calor para rutas largas'], rain: ['senderos mojados'] },
-    indoor: { rain: ['con lluvia casi a diario, galerías y museos son una opción fácil'], hot: ['un respiro fresco en las horas de más calor'], cold: ['lugares cálidos para la parte más fría del día'] },
+  hist: {
+    title: ({ monthN, cityN, n }) => `${cap(monthN)} en ${cityN}: lo que muestran ${n} años`,
+    basis: ({ y1, y2 }) => `Basado en medias mensuales de ${y1}–${y2}, no en récords diarios.`,
+    h3: { range: 'Rango habitual', records: 'Récords', odds: 'Frecuencia a lo largo de los años' },
+    to: 'a',
+    range: ({ monthN, temps, rainLo, rainHi, wintry }) => <>La mayoría de los años, {monthN} promedia {temps} por la tarde, con {rainLo}–{rainHi} mm de {wintry ? 'lluvia o nieve' : 'lluvia'}.</>,
+    chance: ({ monthN, often, wintry, never }) => (never ? `Casi nunca llueve en un ${monthN} típico.` : `En un ${monthN} típico, ${wintry ? 'llueve o nieva' : 'llueve'} ${often}.`),
+    caption: ({ monthN, y1, y2 }) => `Récords de ${monthN}, ${y1}–${y2} (medias mensuales)`,
+    th: { record: 'Récord', year: 'Año', high: 'Máx. media', rain: 'Lluvia', days: 'Días de lluvia' },
+    record: {
+      warm: ({ monthN }) => `${cap(monthN)} más cálido`, cold: ({ monthN }) => `${cap(monthN)} más frío`, cool: ({ monthN }) => `${cap(monthN)} más fresco`,
+      wet: ({ monthN }) => `${cap(monthN)} más lluvioso`, dry: ({ monthN }) => `${cap(monthN)} más seco`,
+    },
+    ties: ({ count, n }) => `${count} de ${n} años`,
+    odds: {
+      rainy: ({ monthN, count, n, t, wintry }) => `En ${count} de ${n} años, ${monthN} tuvo ${t} o más días ${wintry ? 'húmedos' : 'de lluvia'}.`,
+      anyrain: ({ monthN, count, n, wintry }) => `En ${count} de ${n} años, ${monthN} tuvo al menos un día ${wintry ? 'húmedo' : 'de lluvia'}.`,
+      dry: ({ count, n, t, wintry }) => `En ${count} de ${n} años, cayeron menos de ${t} mm de ${wintry ? 'lluvia o nieve' : 'lluvia'}.`,
+      warm: ({ count, n, temp }) => <>En {count} de {n} años, la máxima media llegó a {temp} o más.</>,
+      cool: ({ count, n, temp }) => <>En {count} de {n} años, se quedó por debajo de {temp}.</>,
+    },
+    latest: ({ monthN, year, dir, rank, total, y1, high, mm, days, wintry }) => <>Entre los {total} años desde {y1}, {monthN} de {year} ocupó el puesto {rank} entre los más {dir === 'warm' ? 'cálidos' : 'fríos'} ({high}{mm ? `, ${mm}` : ''}{days != null ? `, ${days} ${days === 1 ? 'día' : 'días'} ${wintry ? (days === 1 ? 'húmedo' : 'húmedos') : 'de lluvia'}` : ''}).</>,
+    broke: {
+      warm: { beat: ({ monthN, year, y1, y2, value }) => <>{cap(monthN)} de {year} fue más cálido que cualquier {monthN} de {y1}–{y2} ({value}).</>, match: ({ monthN, year, y1, y2, value }) => <>{cap(monthN)} de {year} igualó al {monthN} más cálido de {y1}–{y2} ({value}).</> },
+      cold: { beat: ({ monthN, year, y1, y2, value }) => <>{cap(monthN)} de {year} fue más frío que cualquier {monthN} de {y1}–{y2} ({value}).</>, match: ({ monthN, year, y1, y2, value }) => <>{cap(monthN)} de {year} igualó al {monthN} más frío de {y1}–{y2} ({value}).</> },
+      wet: { beat: ({ monthN, year, y1, y2, value }) => <>{cap(monthN)} de {year} fue más lluvioso que cualquier {monthN} de {y1}–{y2} ({value}).</>, match: ({ monthN, year, y1, y2, value }) => <>{cap(monthN)} de {year} igualó al {monthN} más lluvioso de {y1}–{y2} ({value}).</> },
+      dry: { beat: ({ monthN, year, y1, y2, value }) => <>{cap(monthN)} de {year} fue más seco que cualquier {monthN} de {y1}–{y2} ({value}).</>, match: ({ monthN, year, y1, y2, value }) => <>{cap(monthN)} de {year} igualó al {monthN} más seco de {y1}–{y2} ({value}).</> },
+    },
   },
-  tips: {
-    layers: ['Los días son mucho más cálidos que las noches: lleva capas fáciles de poner y quitar.', 'Las mañanas y las noches son más frescas que el mediodía, así que vístete por capas.'],
-    rain: ['Un paraguas compacto y una chaqueta impermeable ligera.', 'Lleva un paraguas pequeño en el bolso y calzado que aguante los charcos.'],
-    sun: ['Protector solar, sombrero y gafas de sol; ropa ligera y transpirable.', 'Protégete del sol fuerte: sombrero, protector solar y mucha agua.'],
-    jacket: ['Días frescos: una chaqueta ligera o un jersey para hacer turismo.', 'Una chaqueta ligera o una rebeca bastan para casi todo el día.'],
-    warm: ['Una chaqueta de abrigo, gorro y guantes para las mañanas y noches frías.', 'Un abrigo de invierno de verdad, con guantes y gorro para salir temprano.'],
-    shades: ['Sol frecuente: gafas de sol y un sombrero ligero.', 'Días luminosos: las gafas de sol merecen un sitio en la maleta.'],
-    light: ['Ropa cómoda y una capa ligera para la noche.', 'Ropa de diario y una capa ligera para la noche.'],
-  },
-  packPhrase: { layers: 'ropa por capas', rain: 'protección para la lluvia', sun: 'protección solar', jacket: 'una chaqueta ligera', warm: 'ropa de abrigo', shades: 'gafas de sol', light: 'ropa ligera' },
-  eveCool: ['Lleva algo más para las noches más frescas.', 'Añade una capa para después de la puesta de sol.'],
-  eveSame: ['Las noches se parecen al día, así que la misma ropa sirve de la mañana a la noche.', 'No hace falta cambiarse para la noche.'],
   q1: ({ monthN, inCity }) => `¿Qué temperatura hace ${inCity} ${enM(monthN)}?`,
-  a1: ({ hi, lo, feel, warmRank }) => [
-    <>Por la tarde la media es de {hi} y por la noche de unos {lo}: días {feel} para la mayoría de la gente.{warmRank && <> Es {warmRank} del año.</>}</>,
-    <>Cuenta con unos {hi} por la tarde y {lo} por la noche: días que casi todo el mundo llamaría {feel}.</>,
-  ],
   q2: ({ monthN, inCity }) => `¿Llueve mucho ${inCity} ${enM(monthN)}?`,
-  a2: {
-    never: ({ monthN, none }) => <>Casi nunca: {monthN} es prácticamente seco, con {none ? 'ningún día de lluvia' : 'alrededor de un día de lluvia'} en un año típico.</>,
-    dry: ({ monthN, days, mm }) => [<>No: {monthN} es una de las épocas más secas, con unos {h.n1(days)} días de lluvia y {h.n0(mm)} mm en total.</>, <>Poco: solo unos {h.n1(days)} días de lluvia y {h.n0(mm)} mm en todo el mes.</>],
-    yes: ({ days, mm, often }) => [<>Sí, bastante: llueve {often} y se acumulan unos {h.n0(mm)} mm, así que conviene llevar paraguas.</>, <>Sí: unos {h.n1(days)} días de lluvia dejan unos {h.n0(mm)} mm, mejor tener algún plan bajo techo.</>],
-    some: ({ days, mm, light }) => [<>No especialmente. Hay unos {h.n1(days)} días de lluvia ({h.n0(mm)} mm), sobre todo lluvia {light ? 'ligera' : 'moderada'}.</>, <>Solo de forma moderada: unos {h.n1(days)} días húmedos y {h.n0(mm)} mm, normalmente {light ? 'chubascos breves' : 'lluvia moderada'}.</>],
-  },
   q3: ({ monthN, cityN }) => `¿Qué llevar en la maleta para ${cityN} ${enM(monthN)}?`,
-  a3: ({ list, eve }) => [<>Según los promedios: {list}. {eve}</>, <>Lleva {list}. {eve}</>],
   q4: ({ monthN, nextN, cityN }) => `¿Es mejor visitar ${cityN} ${enM(monthN)} o ${enM(nextN)}?`,
   nextWhy: ({ nextN, why }) => {
     const parts = why.map((w) => ({ warmer: 'es más cálido', cooler: 'es más fresco', fewerRain: 'tiene menos días de lluvia', moreRain: 'tiene más días de lluvia' }[w]));
     return `${cap(nextN)} ${parts.join(' y ')}.`;
   },
-  a4: ({ win, ranks, labels, whyTxt, cityN, narrow }) => [
-    <>{cap(win)} puntúa mejor en nuestra clasificación climática ({ranks.a}.º de 12 frente a {ranks.b}.º){labels ? `, con valoración «${labels[0]}» frente a «${labels[1]}»` : ''}.{whyTxt}</>,
-    <>{cap(win)}, {narrow ? 'por poco' : 'claramente'}: es el {ranks.a}.º de 12 entre los meses de {cityN}, frente al {ranks.b}.º del otro.{whyTxt}</>,
-  ],
 };
 
 const es = {
@@ -324,14 +444,14 @@ const es = {
   }),
   monthH1: (cityN, monthN) => `Clima en ${cityN} ${enM(monthN)}`,
   stat: { avgHigh: 'Máx. media', avgLow: 'Mín. media', rainfall: 'Precipitación', rainyDays: 'Días de lluvia', sunshine: 'Sol', humidity: 'Humedad' },
-  statDays: (n) => `${h.n1(n)} días`,
+  statDays: (n) => `${h.n1(n)} ${n === 1 ? 'día' : 'días'}`,
   statSun: (v) => `${h.n1(v)} h / día`,
   Latest: ({ monthN, latest, row, years }) => (
     <>
       <span className="font-semibold text-gray-700">Último dato real – {monthN} de {latest.year}:</span>{' '}
       máxima <UnitTemp c={latest.avg_high} />, mínima <UnitTemp c={latest.avg_low} />
       {latest.avg_rainfall != null && <>, {h.n0(latest.avg_rainfall)} mm de lluvia</>}
-      {latest.rainy_days != null && <> en {h.n1(latest.rainy_days)} días</>}
+      {latest.rainy_days != null && <> en {h.n1(latest.rainy_days)} {latest.rainy_days === 1 ? 'día' : 'días'}</>}
       {' '}(el promedio {years.start}–{years.end} de arriba es {latest.avg_high != null && row?.avg_high != null
         ? (latest.avg_high > row.avg_high + 0.4 ? 'más fresco' : latest.avg_high < row.avg_high - 0.4 ? 'más cálido' : 'más o menos igual')
         : 'de referencia'}).

@@ -6,6 +6,7 @@
 import { useUnits } from '@/context/UnitsContext';
 import { generateClimateNarrative } from '@/utils/climateNarrative';
 import { useT } from '@/i18n/client';
+import { whole } from '@/utils/monthHistory';
 
 // Ek temperature, dono units: "21.9°C (71.4°F)". null → "—"
 export function UnitTemp({ c }) {
@@ -29,6 +30,24 @@ export function UnitDelta({ c }) {
   const d = Math.abs(Number(c));
   const cTxt = `${units.fmt(Math.round(d * 10) / 10)}°C`;
   const fTxt = `${units.fmt(Math.round(d * 1.8 * 10) / 10)}°F`;
+  return <>{units.unit === 'F' ? `${fTxt} (${cTxt})` : `${cTxt} (${fTxt})`}</>;
+}
+
+// Range, whole degrees, dono units: "9–13°C (48–55°F)". Manfi ho to "to" wala lafz.
+export function UnitTempRange({ lo, hi, to = '–' }) {
+  const units = useUnits();
+  const f = (c) => whole((c * 9) / 5 + 32);
+  const join = whole(lo) < 0 ? ` ${to} ` : '–';
+  const cTxt = `${units.fmt(whole(lo))}${join}${units.fmt(whole(hi))}°C`;
+  const fTxt = `${units.fmt(f(lo))}${join}${units.fmt(f(hi))}°F`;
+  return <>{units.unit === 'F' ? `${fTxt} (${cTxt})` : `${cTxt} (${fTxt})`}</>;
+}
+
+// Ek temperature, whole degrees, dono units: "5°C (41°F)"
+export function UnitTempWhole({ c }) {
+  const units = useUnits();
+  const cTxt = `${units.fmt(whole(c))}°C`;
+  const fTxt = `${units.fmt(whole((c * 9) / 5 + 32))}°F`;
   return <>{units.unit === 'F' ? `${fTxt} (${cTxt})` : `${cTxt} (${fTxt})`}</>;
 }
 

@@ -37,6 +37,7 @@ import { COUNTRIES, countryPath } from '@/data/countries';
 import { MONTHS } from '@/utils/climateMath';
 import { SITE_URL } from '@/utils/seo';
 import { DEFAULT_LOCALE, localePath, parseEnabledLocales } from '@/i18n/config';
+import { dayOnly, newestDay } from '@/utils/sitemapDates';
 
 // Page ki aakhri asal tabdeeli (git log). Template/content badle → yahan bhi.
 const STATIC_PAGES = [
@@ -62,15 +63,19 @@ const LOCALE_UI_DATE = '2026-10-28';
 const LOCALE_CLIMATE_DATE = '2026-10-28';
 const LANG_STATIC = ['/', '/climate-guides'];
 
+// Month page ka TEXT aakhri dafa kab badla (kisi bhi zaban mein). Haath se badalna hai,
+// aur SIRF tab jab month page ke jumle, sections ya naye blocks sach mein live jayen:
+// us din ki tareekh likhein. Aam deploy, bug fix ya kisi aur page ki tabdeeli par NAHI —
+// warna 12,000+ pages ki lastmod bina wajah badlegi aur Google us par bharosa chhor dega.
+export const MONTH_TEXT_DATE = '2026-11-07';
+
 const otherLocales = () => parseEnabledLocales(process.env.ENABLED_LOCALES).filter((l) => l !== DEFAULT_LOCALE);
 const langPhase = () => (String(process.env.LANG_SITEMAP_PHASE || 'A').trim().toUpperCase() === 'B' ? 'B' : 'A');
 
 const xmlEscape = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 const abs = (p) => `${SITE_URL}${p === '/' ? '' : p}`;
-const isoDay = (d) => {
-  const t = new Date(d);
-  return Number.isNaN(t.getTime()) ? null : t.toISOString();
-};
+// Sirf YYYY-MM-DD, kabhi future nahi (utils/sitemapDates.js)
+const isoDay = (d) => dayOnly(d);
 
 export function urlset(entries) {
   const body = entries.map((e) => `<url><loc>${xmlEscape(abs(e.path))}</loc>${e.lastmod ? `<lastmod>${isoDay(e.lastmod)}</lastmod>` : ''}</url>`).join('\n');
@@ -149,8 +154,18 @@ export async function placeEntries() {
   ];
 }
 
+// Har shehar-mahine ki aakhri asli tabdeeli (backend, internal key). Na mile → shehar ki tareekh.
+async function monthDates() {
+  try {
+    const data = await serverGet(ENDPOINTS.weather.climateLastmod, { revalidate: 3600, tags: ['cities'] });
+    return data?.cities || {};
+  } catch {
+    return {};
+  }
+}
+
 export async function monthEntries() {
-  const reg = await getCityRegistry();
+  const [reg, dates] = await Promise.all([getCityRegistry(), monthDates()]);
   const out = [];
   // Mukammal shehar → 12 month pages; adhoora (search / month page se kuch
   // mahine aaye) → sirf woh mahine jin ka poora 20-saal data hai (owner, Oct 2026)
@@ -158,7 +173,10 @@ export async function monthEntries() {
     for (const m of MONTHS) {
       if (c.months && !c.months.includes(m.num)) continue;
       const note = await noteDate(c.slug, m.slug);
-      out.push({ path: reg.monthPath(c.slug, m.slug), lastmod: max(isoDay(cityDate(c)), note && isoDay(note)) });
+      out.push({
+        path: reg.monthPath(c.slug, m.slug),
+        lastmod: newestDay([dates[c.slug]?.[String(m.num)] || cityDate(c), note, MONTH_TEXT_DATE]),
+      });
     }
   }
   return out;
