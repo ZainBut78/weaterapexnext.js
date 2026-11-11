@@ -676,8 +676,8 @@
     "climateGuide": "Klimaguide →"
   },
   "trip": {
-    "metaTitle": "Reise-Wetterplaner",
-    "metaDescription": "Bewerten Sie jeden Reisetag nach Regen, Wind und Temperatur und sehen Sie, welcher Tag sich wofür am besten eignet.",
+    "metaTitle": "Reisewetter-Planer: die besten Tage für Ihre Reise",
+    "metaDescription": "Planen Sie Ihre Reise nach dem Wetter: Tageswert von 1–10, Vorhersage bis 15 Tage und 20-Jahres-Durchschnitte für spätere Termine.",
     "h1": "Reiseplaner",
     "intro": "Finden Sie die besten Reisetage mit wetterbasierter Tagesbewertung",
     "noImage": "Kein Bild verfügbar",
@@ -813,8 +813,8 @@
     "wind": "Wind"
   },
   "events": {
-    "metaTitle": "Wetterrisiko für Outdoor-Events",
-    "metaDescription": "Wetterrisiko-Bewertung für Hochzeiten, Konzerte, Marathons und andere Outdoor-Events – mit besseren Ausweichterminen in der Nähe.",
+    "metaTitle": "Hochzeitswetter & Event-Wetter: Risiko im Freien prüfen",
+    "metaDescription": "Wetterrisiko für Hochzeit, Konzert, Marathon oder Festival: stündliche Vorhersage, Regenwahrscheinlichkeit und bestes Zeitfenster bis 10 Tage vorher.",
     "h1": "Wetterrisiko für Outdoor-Events",
     "intro": "Planen Sie mit Sicherheit. Wir analysieren hochlokale Wettermuster, um Sicherheit und Komfort Ihrer Veranstaltung im Freien zu bewerten.",
     "dateAt": "{date} um {time}",

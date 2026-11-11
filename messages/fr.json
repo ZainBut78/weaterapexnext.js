@@ -676,8 +676,8 @@
     "climateGuide": "Guide climat →"
   },
   "trip": {
-    "metaTitle": "Planificateur météo de voyage",
-    "metaDescription": "Notez chaque jour de votre voyage selon la pluie, le vent et la température, et découvrez quel jour convient le mieux à chaque activité.",
+    "metaTitle": "Météo voyage : les meilleurs jours pour vos dates",
+    "metaDescription": "Planifiez votre voyage selon la météo : une note de 1 à 10 par jour, prévisions jusqu’à 15 jours et moyennes sur 20 ans au-delà.",
     "h1": "Planificateur de voyage",
     "intro": "Trouvez les meilleurs jours pour voyager grâce à une note météo pour chaque jour",
     "noImage": "Aucune image disponible",
@@ -813,8 +813,8 @@
     "wind": "Vent"
   },
   "events": {
-    "metaTitle": "Risque météo pour les événements en plein air",
-    "metaDescription": "Évaluation du risque météo pour les mariages, concerts, marathons et autres événements en plein air, avec de meilleures dates proches.",
+    "metaTitle": "Météo mariage et événement : risque en plein air",
+    "metaDescription": "Vérifiez le risque météo d’un mariage, concert, marathon ou festival : prévision horaire, risque de pluie et meilleur créneau jusqu’à 10 jours avant.",
     "h1": "Risque météo pour les événements en plein air",
     "intro": "Planifiez en toute confiance. Nous analysons la météo à l'échelle très locale pour évaluer la sécurité et le confort de votre événement en plein air.",
     "dateAt": "{date} à {time}",

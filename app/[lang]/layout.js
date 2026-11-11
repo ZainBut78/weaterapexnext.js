@@ -74,6 +74,8 @@ export default async function RootLayout({ children, params }) {
     // `data-saved-city` lagata hai (sirf yahi attribute ka farq)
     <html lang={lang} suppressHydrationWarning>
       <head>
+        {/* Bing zaban ke liye yeh bhi dekhta hai (html lang + Content-Language header proxy.js mein) */}
+        <meta httpEquiv="content-language" content={lang} />
         {/* Homepage server HTML default shehar (London) ka card dikhata hai.
             User ka saved shehar koi aur ho to yeh 1-line script pehle paint
             se pehle bata deta hai, aur CSS (globals.css .ssr-default-city)

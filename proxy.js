@@ -172,12 +172,16 @@ export async function proxy(request) {
     return serveDuringOutage(request, { selfOrigin: selfOrigin(), fetchImpl: fetch, simulate });
   }
 
+  // Content-Language: Bing ke liye page ki zaban (<html lang> aur meta ke saath)
   if (lang === DEFAULT_LOCALE) {
     const url = new URL(request.url);
     url.pathname = path === '/' ? '/en' : `/en${path}`;
-    return NextResponse.rewrite(url);
+    const res = NextResponse.rewrite(url);
+    res.headers.set('Content-Language', lang);
+    return res;
   }
   const res = NextResponse.next();
+  res.headers.set('Content-Language', lang);
   if (!parseEnabledLocales(process.env.ENABLED_LOCALES).includes(lang)) {
     res.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }

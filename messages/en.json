@@ -676,8 +676,8 @@
     "climateGuide": "Climate guide →"
   },
   "trip": {
-    "metaTitle": "Trip Weather Planner",
-    "metaDescription": "Score every day of your trip on rain, wind and temperature, and see which day is best for what.",
+    "metaTitle": "Trip Weather Planner: Best Days for Your Travel Dates",
+    "metaDescription": "Plan your trip around the weather: a 1–10 score for every day, live forecasts up to 15 days and 20-year averages for later dates.",
     "h1": "Trip Planner",
     "intro": "Find the best days to travel with weather-based day scoring",
     "noImage": "No image available",
@@ -813,8 +813,8 @@
     "wind": "Wind"
   },
   "events": {
-    "metaTitle": "Outdoor Event Risk Score",
-    "metaDescription": "Weather risk scoring for weddings, concerts, marathons and other outdoor events, with better nearby dates.",
+    "metaTitle": "Wedding & Event Weather Forecast: Outdoor Risk Score",
+    "metaDescription": "Check the weather risk for a wedding, concert, marathon or festival: hourly forecast, rain chance and the best time window up to 10 days ahead.",
     "h1": "Outdoor Event Risk Score",
     "intro": "Plan with confidence. We analyze hyper-local weather patterns to evaluate the safety and comfort of your outdoor events.",
     "dateAt": "{date} at {time}",

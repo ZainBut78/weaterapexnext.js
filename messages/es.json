@@ -676,8 +676,8 @@
     "climateGuide": "Guía del clima →"
   },
   "trip": {
-    "metaTitle": "Planificador del tiempo para viajes",
-    "metaDescription": "Puntúa cada día de tu viaje según la lluvia, el viento y la temperatura, y descubre qué día es mejor para cada plan.",
+    "metaTitle": "Tiempo para tu viaje: los mejores días para tus fechas",
+    "metaDescription": "Planifica tu viaje según el tiempo: puntuación del 1 al 10 por día, previsión hasta 15 días y medias de 20 años para fechas lejanas.",
     "h1": "Planificador de viajes",
     "intro": "Encuentra los mejores días para viajar con una puntuación del tiempo para cada día",
     "noImage": "No hay imagen disponible",
@@ -813,8 +813,8 @@
     "wind": "Viento"
   },
   "events": {
-    "metaTitle": "Riesgo meteorológico para eventos al aire libre",
-    "metaDescription": "Valoración del riesgo meteorológico para bodas, conciertos, maratones y otros eventos al aire libre, con mejores fechas cercanas.",
+    "metaTitle": "Tiempo para bodas y eventos: riesgo al aire libre",
+    "metaDescription": "Consulta el riesgo del tiempo para una boda, concierto, maratón o festival: previsión por horas, lluvia y mejor franja hasta 10 días antes.",
     "h1": "Riesgo meteorológico para eventos al aire libre",
     "intro": "Planifica con confianza. Analizamos el tiempo a escala hiperlocal para valorar la seguridad y la comodidad de tu evento al aire libre.",
     "dateAt": "{date} a las {time}",

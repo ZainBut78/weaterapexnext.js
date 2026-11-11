@@ -12,6 +12,7 @@ import TripPlannerTool from './TripPlannerTool';
 import { pageMetadata } from '@/utils/seo';
 import { getT } from '@/i18n/server';
 import ClientMessages from '@/i18n/ClientMessages';
+import ToolGuide from '@/components/tools/ToolGuide';
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
@@ -37,6 +38,8 @@ export default async function TripPlannerPage({ params }) {
         }
       />
       </ClientMessages>
+      {/* Tool ke neeche server content (Nov 2026) — tool waisa hi */}
+      <ToolGuide kind="trip" lang={lang} />
       </main>
       <Footer />
     </div>

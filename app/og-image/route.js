@@ -108,7 +108,9 @@ export async function GET(request) {
       width: 1200,
       height: 630,
       fonts: [{ name: 'Inter', data: fontData, weight: 700, style: 'normal' }],
-      headers: { 'Cache-Control': 'public, max-age=86400, s-maxage=604800' },
+      // noindex: Bing yeh tasveerein page ki tarah index kar raha tha (Nov 2026). robots.txt mein
+      // block NAHI: social sites ko preview ke liye yeh file lani hoti hai.
+      headers: { 'Cache-Control': 'public, max-age=86400, s-maxage=604800', 'X-Robots-Tag': 'noindex' },
     },
   );
 }

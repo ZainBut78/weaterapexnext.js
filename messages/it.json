@@ -676,8 +676,8 @@
     "climateGuide": "Guida sul clima →"
   },
   "trip": {
-    "metaTitle": "Pianificatore meteo di viaggio",
-    "metaDescription": "Valuta ogni giorno del tuo viaggio in base a pioggia, vento e temperatura e scopri quale giorno è migliore per cosa.",
+    "metaTitle": "Meteo viaggio: i giorni migliori per le tue date",
+    "metaDescription": "Organizza il viaggio in base al meteo: punteggio da 1 a 10 per ogni giorno, previsioni fino a 15 giorni e medie di 20 anni oltre.",
     "h1": "Pianificatore di viaggio",
     "intro": "Trova i giorni migliori per viaggiare con un punteggio meteo per ogni giorno",
     "noImage": "Nessuna immagine disponibile",
@@ -813,8 +813,8 @@
     "wind": "Vento"
   },
   "events": {
-    "metaTitle": "Rischio meteo per eventi all'aperto",
-    "metaDescription": "Valutazione del rischio meteo per matrimoni, concerti, maratone e altri eventi all'aperto, con date alternative migliori.",
+    "metaTitle": "Meteo matrimonio ed eventi: rischio all'aperto",
+    "metaDescription": "Controlla il rischio meteo per matrimonio, concerto, maratona o festival: previsione oraria, pioggia e fascia migliore fino a 10 giorni prima.",
     "h1": "Rischio meteo per eventi all'aperto",
     "intro": "Pianifica con fiducia. Analizziamo il meteo a livello iperlocale per valutare sicurezza e comfort del tuo evento all'aperto.",
     "dateAt": "{date} alle {time}",
