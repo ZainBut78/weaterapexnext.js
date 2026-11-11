@@ -37,7 +37,7 @@ const en = {
     score: [
       'Choose the type of event, the place and the date, up to 10 days ahead, and if you like a start time. The checker reads the hourly forecast and scores a 3-hour window from 0 to 10. The higher the number, the more the weather could disrupt your event.',
       'Four things add to the risk. Every 10% chance of rain adds 1 point. Wind adds 1 point above 15 km/h, 2 above 25 km/h and 4 above 40 km/h. Temperature adds 1 point below 10 °C, 3 below 5 °C, 2 above 32 °C and 4 above 38 °C. Humidity adds 1 point above 60% and 2 above 80%.',
-      'Each event type weighs these differently. For a wedding rain counts 1.5 times, for a marathon heat counts 1.6 times and humidity 1.4 times, and for a concert wind counts 1.5 times. Festivals use the sports weights. Up to 3 is low risk, up to 6 moderate and above 6 high. The checker also shows the best time window that day and how the nearby days compare.',
+      'Each event type weighs these differently. For a wedding rain counts 1.5 times, for a marathon heat counts 1.6 times and humidity 1.4 times, and for a concert wind counts 1.5 times. Festivals count rain 1.3 times, and picnics and barbecues 1.4 times. Up to 3 is low risk, up to 6 moderate and above 6 high. The checker also shows the best time window that day and how the nearby days compare.',
     ],
     exampleTitle: (city) => `Example: a wedding in ${city}`,
     exampleIntro: (city, from, to) => `The checker needs a real forecast, so it only works up to 10 days ahead. To show how the score behaves, here is the wedding formula applied to an average day in ${city} in each month (${from}–${to} averages: chance of rain = rainy days divided by 30, the typical afternoon high and humidity, no wind).`,
@@ -50,7 +50,7 @@ const en = {
       ['Concerts', 'Wind counts most for open-air stages and sound.'],
       ['Marathons', 'Heat and humidity count most for runners, so the start time matters.'],
       ['Festivals', 'Check each day of a multi-day festival on its own.'],
-      ['BBQs and garden parties', 'Pick "Sports" for a balanced view of rain, wind and heat.'],
+      ['BBQs and garden parties', 'Pick "Picnic/BBQ": rain counts 1.4 times and wind 1.2 times.'],
     ],
     faq: [
       ['How far ahead can I check the weather for my wedding date?', 'Up to 10 days ahead, because the score needs a real hourly forecast. For a date further away, the month page of your city shows how often it rains at that time of year.'],
@@ -95,7 +95,7 @@ const de = {
     score: [
       'Wählen Sie die Art des Events, den Ort und das Datum, bis zu 10 Tage im Voraus, und auf Wunsch eine Uhrzeit. Der Check liest die stündliche Vorhersage und bewertet ein 3-Stunden-Fenster von 0 bis 10. Je höher die Zahl, desto eher kann das Wetter Ihr Event stören.',
       'Vier Dinge erhöhen das Risiko. Je 10 % Regenwahrscheinlichkeit kommt 1 Punkt dazu. Wind bringt 1 Punkt über 15 km/h, 2 über 25 km/h und 4 über 40 km/h. Die Temperatur bringt 1 Punkt unter 10 °C, 3 unter 5 °C, 2 über 32 °C und 4 über 38 °C. Luftfeuchtigkeit bringt 1 Punkt über 60 % und 2 über 80 %.',
-      'Jede Event-Art gewichtet das anders. Bei einer Hochzeit zählt Regen 1,5-fach, beim Marathon Hitze 1,6-fach und Feuchtigkeit 1,4-fach, beim Konzert Wind 1,5-fach. Festivals nutzen die Gewichte von Sport. Bis 3 ist geringes Risiko, bis 6 mittleres und über 6 hohes. Der Check zeigt auch das beste Zeitfenster des Tages und wie die Nachbartage abschneiden.',
+      'Jede Event-Art gewichtet das anders. Bei einer Hochzeit zählt Regen 1,5-fach, beim Marathon Hitze 1,6-fach und Feuchtigkeit 1,4-fach, beim Konzert Wind 1,5-fach. Bei Festivals zählt Regen 1,3-fach, bei Picknick und Grillen 1,4-fach. Bis 3 ist geringes Risiko, bis 6 mittleres und über 6 hohes. Der Check zeigt auch das beste Zeitfenster des Tages und wie die Nachbartage abschneiden.',
     ],
     exampleTitle: (city) => `Beispiel: eine Hochzeit in ${city}`,
     exampleIntro: (city, from, to) => `Der Check braucht eine echte Vorhersage und funktioniert daher nur bis 10 Tage im Voraus. Um das Verhalten des Werts zu zeigen, hier die Hochzeitsformel für einen durchschnittlichen Tag in ${city} in jedem Monat (Durchschnitte ${from}–${to}: Regenwahrscheinlichkeit = Regentage geteilt durch 30, übliches Tagesmaximum und Luftfeuchtigkeit, kein Wind).`,
@@ -108,7 +108,7 @@ const de = {
       ['Konzerte', 'Bei Open-Air-Bühnen und Ton zählt der Wind am meisten.'],
       ['Marathons', 'Für Läufer zählen Hitze und Feuchtigkeit am meisten, daher ist die Startzeit wichtig.'],
       ['Festivals', 'Bei mehrtägigen Festivals jeden Tag einzeln prüfen.'],
-      ['Grillabende und Gartenpartys', '„Sport“ wählen für einen ausgewogenen Blick auf Regen, Wind und Hitze.'],
+      ['Grillabende und Gartenpartys', '„Picknick/Grillen“ wählen: Regen zählt 1,4-fach, Wind 1,2-fach.'],
     ],
     faq: [
       ['Wie weit im Voraus kann ich das Wetter für meinen Hochzeitstermin prüfen?', 'Bis zu 10 Tage im Voraus, weil der Wert eine echte stündliche Vorhersage braucht. Für spätere Termine zeigt die Monatsseite Ihrer Stadt, wie oft es zu dieser Jahreszeit regnet.'],
@@ -153,7 +153,7 @@ const fr = {
     score: [
       'Choisissez le type d’événement, le lieu et la date, jusqu’à 10 jours à l’avance, et si vous voulez une heure de début. L’outil lit la prévision heure par heure et note une plage de 3 heures de 0 à 10. Plus le chiffre est élevé, plus la météo risque de perturber votre événement.',
       'Quatre éléments augmentent le risque. Chaque tranche de 10 % de risque de pluie ajoute 1 point. Le vent ajoute 1 point au-delà de 15 km/h, 2 au-delà de 25 km/h et 4 au-delà de 40 km/h. La température ajoute 1 point sous 10 °C, 3 sous 5 °C, 2 au-delà de 32 °C et 4 au-delà de 38 °C. L’humidité ajoute 1 point au-delà de 60 % et 2 au-delà de 80 %.',
-      'Chaque type d’événement pondère ces éléments différemment. Pour un mariage, la pluie compte 1,5 fois ; pour un marathon, la chaleur 1,6 fois et l’humidité 1,4 fois ; pour un concert, le vent 1,5 fois. Les festivals utilisent les poids du sport. Jusqu’à 3, le risque est faible, jusqu’à 6 modéré, au-delà de 6 élevé. L’outil montre aussi le meilleur créneau du jour et la comparaison avec les jours voisins.',
+      'Chaque type d’événement pondère ces éléments différemment. Pour un mariage, la pluie compte 1,5 fois ; pour un marathon, la chaleur 1,6 fois et l’humidité 1,4 fois ; pour un concert, le vent 1,5 fois. Pour les festivals, la pluie compte 1,3 fois, et 1,4 fois pour les pique-niques et barbecues. Jusqu’à 3, le risque est faible, jusqu’à 6 modéré, au-delà de 6 élevé. L’outil montre aussi le meilleur créneau du jour et la comparaison avec les jours voisins.',
     ],
     exampleTitle: (city) => `Exemple : un mariage à ${city}`,
     exampleIntro: (city, from, to) => `L’outil a besoin d’une vraie prévision : il ne fonctionne donc que jusqu’à 10 jours à l’avance. Pour montrer comment réagit la note, voici la formule du mariage appliquée à une journée moyenne à ${city} pour chaque mois (moyennes ${from}–${to} : risque de pluie = jours de pluie divisés par 30, maximum et humidité habituels de l’après-midi, sans vent).`,
@@ -166,7 +166,7 @@ const fr = {
       ['Concerts', 'Pour une scène en plein air et le son, c’est le vent qui compte le plus.'],
       ['Marathons', 'Pour les coureurs, chaleur et humidité comptent le plus : l’heure de départ est importante.'],
       ['Festivals', 'Pour un festival de plusieurs jours, vérifiez chaque jour séparément.'],
-      ['Barbecues et fêtes au jardin', 'Choisissez « Sport » pour une vue équilibrée de la pluie, du vent et de la chaleur.'],
+      ['Barbecues et fêtes au jardin', 'Choisissez « Pique-nique/Barbecue » : la pluie compte 1,4 fois et le vent 1,2 fois.'],
     ],
     faq: [
       ['Combien de temps à l’avance puis-je vérifier la météo pour la date de mon mariage ?', 'Jusqu’à 10 jours à l’avance, car la note a besoin d’une vraie prévision horaire. Pour une date plus lointaine, la page du mois de votre ville indique à quelle fréquence il pleut à cette période.'],
@@ -211,7 +211,7 @@ const it = {
     score: [
       'Scegli il tipo di evento, il luogo e la data, fino a 10 giorni prima, e se vuoi un orario di inizio. Lo strumento legge la previsione oraria e valuta una fascia di 3 ore da 0 a 10. Più alto è il numero, più il meteo può disturbare il tuo evento.',
       'Quattro fattori aumentano il rischio. Ogni 10% di probabilità di pioggia aggiunge 1 punto. Il vento aggiunge 1 punto oltre i 15 km/h, 2 oltre i 25 km/h e 4 oltre i 40 km/h. La temperatura aggiunge 1 punto sotto i 10 °C, 3 sotto i 5 °C, 2 oltre i 32 °C e 4 oltre i 38 °C. L’umidità aggiunge 1 punto oltre il 60% e 2 oltre l’80%.',
-      'Ogni tipo di evento pesa questi fattori in modo diverso. Per un matrimonio la pioggia conta 1,5 volte, per una maratona il caldo 1,6 volte e l’umidità 1,4 volte, per un concerto il vento 1,5 volte. I festival usano i pesi dello sport. Fino a 3 il rischio è basso, fino a 6 moderato e oltre 6 alto. Lo strumento mostra anche la fascia oraria migliore del giorno e il confronto con i giorni vicini.',
+      'Ogni tipo di evento pesa questi fattori in modo diverso. Per un matrimonio la pioggia conta 1,5 volte, per una maratona il caldo 1,6 volte e l’umidità 1,4 volte, per un concerto il vento 1,5 volte. Per i festival la pioggia conta 1,3 volte, per picnic e grigliate 1,4 volte. Fino a 3 il rischio è basso, fino a 6 moderato e oltre 6 alto. Lo strumento mostra anche la fascia oraria migliore del giorno e il confronto con i giorni vicini.',
     ],
     exampleTitle: (city) => `Esempio: un matrimonio a ${city}`,
     exampleIntro: (city, from, to) => `Lo strumento ha bisogno di una previsione vera, quindi funziona solo fino a 10 giorni prima. Per mostrare come si comporta il punteggio, ecco la formula del matrimonio applicata a una giornata media a ${city} in ogni mese (medie ${from}–${to}: probabilità di pioggia = giorni di pioggia diviso 30, massima e umidità tipiche del pomeriggio, senza vento).`,
@@ -224,7 +224,7 @@ const it = {
       ['Concerti', 'Per palchi all’aperto e audio conta soprattutto il vento.'],
       ['Maratone', 'Per chi corre contano soprattutto caldo e umidità, quindi l’orario di partenza è importante.'],
       ['Festival', 'Per un festival di più giorni controlla ogni giorno separatamente.'],
-      ['Grigliate e feste in giardino', 'Scegli “Sport” per un quadro equilibrato di pioggia, vento e caldo.'],
+      ['Grigliate e feste in giardino', 'Scegli “Picnic/Grigliata”: la pioggia conta 1,4 volte e il vento 1,2 volte.'],
     ],
     faq: [
       ['Con quanto anticipo posso controllare il meteo per la data del mio matrimonio?', 'Fino a 10 giorni prima, perché il punteggio ha bisogno di una vera previsione oraria. Per una data più lontana, la pagina del mese della tua città mostra quanto spesso piove in quel periodo.'],
@@ -269,7 +269,7 @@ const es = {
     score: [
       'Elige el tipo de evento, el lugar y la fecha, hasta 10 días antes, y si quieres una hora de inicio. La herramienta lee la previsión por horas y puntúa una franja de 3 horas del 0 al 10. Cuanto más alto el número, más puede alterar el tiempo tu evento.',
       'Cuatro factores suman riesgo. Cada 10 % de probabilidad de lluvia suma 1 punto. El viento suma 1 punto por encima de 15 km/h, 2 por encima de 25 km/h y 4 por encima de 40 km/h. La temperatura suma 1 punto por debajo de 10 °C, 3 por debajo de 5 °C, 2 por encima de 32 °C y 4 por encima de 38 °C. La humedad suma 1 punto por encima del 60 % y 2 por encima del 80 %.',
-      'Cada tipo de evento pondera estos factores de forma distinta. En una boda la lluvia cuenta 1,5 veces; en un maratón el calor cuenta 1,6 veces y la humedad 1,4; en un concierto el viento cuenta 1,5 veces. Los festivales usan los pesos del deporte. Hasta 3 el riesgo es bajo, hasta 6 moderado y por encima de 6 alto. La herramienta también muestra la mejor franja del día y cómo salen los días cercanos.',
+      'Cada tipo de evento pondera estos factores de forma distinta. En una boda la lluvia cuenta 1,5 veces; en un maratón el calor cuenta 1,6 veces y la humedad 1,4; en un concierto el viento cuenta 1,5 veces. En los festivales la lluvia cuenta 1,3 veces, y en pícnics y barbacoas 1,4 veces. Hasta 3 el riesgo es bajo, hasta 6 moderado y por encima de 6 alto. La herramienta también muestra la mejor franja del día y cómo salen los días cercanos.',
     ],
     exampleTitle: (city) => `Ejemplo: una boda en ${city}`,
     exampleIntro: (city, from, to) => `La herramienta necesita una previsión real, por eso solo funciona hasta 10 días antes. Para ver cómo se comporta la puntuación, esta es la fórmula de la boda aplicada a un día medio en ${city} en cada mes (medias ${from}–${to}: probabilidad de lluvia = días de lluvia entre 30, máxima y humedad habituales de la tarde, sin viento).`,
@@ -282,7 +282,7 @@ const es = {
       ['Conciertos', 'En escenarios al aire libre y para el sonido, el viento es lo que más cuenta.'],
       ['Maratones', 'Para los corredores cuentan sobre todo el calor y la humedad, así que la hora de salida importa.'],
       ['Festivales', 'En un festival de varios días, revisa cada día por separado.'],
-      ['Barbacoas y fiestas en el jardín', 'Elige «Deporte» para una visión equilibrada de lluvia, viento y calor.'],
+      ['Barbacoas y fiestas en el jardín', 'Elige «Picnic/Barbacoa»: la lluvia cuenta 1,4 veces y el viento 1,2 veces.'],
     ],
     faq: [
       ['¿Con cuánta antelación puedo consultar el tiempo para el día de mi boda?', 'Hasta 10 días antes, porque la puntuación necesita una previsión real por horas. Para una fecha más lejana, la página del mes de tu ciudad muestra con qué frecuencia llueve en esa época.'],
@@ -327,7 +327,7 @@ const ja = {
     score: [
       'イベントの種類、場所、日付（10日先まで）を選び、必要なら開始時刻も入力します。1時間ごとの予報をもとに、3時間の枠を0〜10で評価します。数字が大きいほど、天気がイベントに影響する可能性が高くなります。',
       'リスクを上げる要素は4つです。降水確率は10%ごとに1点。風は15km/h超で1点、25km/h超で2点、40km/h超で4点。気温は10℃未満で1点、5℃未満で3点、32℃超で2点、38℃超で4点。湿度は60%超で1点、80%超で2点です。',
-      'イベントの種類によって、これらの重みが変わります。結婚式では雨が1.5倍、マラソンでは暑さが1.6倍・湿度が1.4倍、コンサートでは風が1.5倍です。フェスティバルにはスポーツの重みを使います。3以下は低リスク、6以下は中リスク、6を超えると高リスクです。その日のいちばん良い時間帯と、前後の日との比較も表示されます。',
+      'イベントの種類によって、これらの重みが変わります。結婚式では雨が1.5倍、マラソンでは暑さが1.6倍・湿度が1.4倍、コンサートでは風が1.5倍です。フェスティバルでは雨が1.3倍、ピクニック・BBQでは1.4倍です。3以下は低リスク、6以下は中リスク、6を超えると高リスクです。その日のいちばん良い時間帯と、前後の日との比較も表示されます。',
     ],
     exampleTitle: (city) => `例：${city}での結婚式`,
     exampleIntro: (city, from, to) => `このチェックには実際の予報が必要なため、10日先までしか使えません。スコアの動きを示すために、${city}の各月の平均的な一日に結婚式の計算式を当てはめました（${from}〜${to}年の平均。降水確率は雨の日数を30で割った値、午後の典型的な最高気温と湿度、風はなし）。`,
@@ -340,7 +340,7 @@ const ja = {
       ['コンサート', '野外ステージや音響では、風がいちばん影響します。'],
       ['マラソン', 'ランナーには暑さと湿度がいちばん影響するので、スタート時刻が大切です。'],
       ['フェスティバル', '数日にわたるフェスは、1日ずつ確認しましょう。'],
-      ['バーベキューやガーデンパーティー', '「スポーツ」を選ぶと、雨・風・暑さをバランスよく確認できます。'],
+      ['バーベキューやガーデンパーティー', '「ピクニック・BBQ」を選びましょう。雨は1.4倍、風は1.2倍で数えます。'],
     ],
     faq: [
       ['結婚式の日の天気は、どのくらい前から確認できますか？', '10日前から確認できます。スコアには実際の1時間ごとの予報が必要だからです。それより先の日付は、都市の月別ページで、その時期にどれくらい雨が降るかを確認できます。'],

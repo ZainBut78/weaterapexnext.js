@@ -827,7 +827,8 @@
       "marathon": "Marathon",
       "concert": "Concert",
       "sports": "Sport",
-      "festival": "Festival"
+      "festival": "Festival",
+      "picnic": "Pique-nique/Barbecue"
     },
     "eventType": "Type d'événement",
     "location": "Lieu",

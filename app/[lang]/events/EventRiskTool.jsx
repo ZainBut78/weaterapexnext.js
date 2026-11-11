@@ -106,7 +106,7 @@ const buildDatesComparison = (data, t, lang) => {
 // Server page (page.js) heading/intro text `intro` prop mein bhejta hai —
 // woh HTML server par hi banta hai (Google ke liye). Form aur results
 // yahan browser mein chalte hain.
-const EventRiskTool = ({ intro }) => {
+const EventRiskTool = ({ intro, initialType }) => {
   const [searched, setSearched] = useState(null);
   const t = useT();
   const lang = useLang();
@@ -163,7 +163,7 @@ const EventRiskTool = ({ intro }) => {
         {intro}
 
         <div ref={formRef} className="scroll-mt-4">
-          <EventSearchForm onSubmit={handleSearch} />
+          <EventSearchForm onSubmit={handleSearch} initialType={initialType} />
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import { cityName } from '@/i18n/places';
 import { buildRegistry } from '@/utils/cityRegistryCore';
 import examples from '@/data/toolGuides.json';
 import { guideText } from './guideText';
+import { UseCaseLinks } from './UseCaseGuide';
 
 // Mashhoor static shehar: in ke URLs pehle se maujood (data/cities.js)
 const POPULAR = ['london', 'paris', 'rome', 'barcelona', 'lisbon', 'new-york', 'tokyo', 'dubai'];
@@ -75,6 +76,8 @@ export default function ToolGuide({ kind, lang }) {
 
   return (
     <section className="max-w-4xl mx-auto px-4 pb-16" aria-labelledby={`${kind}-guide`}>
+      {/* Naya section (Nov 2026): har use-case page ka link */}
+      <UseCaseLinks kind={kind} lang={lang} />
       <h2 id={`${kind}-guide`} className={H2}>{L.scoreTitle}</h2>
       {L.score.map((p) => <p key={p.slice(0, 24)} className={P}>{p}</p>)}
 

@@ -820,7 +820,8 @@
       "marathon": "マラソン",
       "concert": "コンサート",
       "sports": "スポーツ",
-      "festival": "フェスティバル"
+      "festival": "フェスティバル",
+      "picnic": "ピクニック・BBQ"
     },
     "eventType": "イベントの種類",
     "location": "場所",

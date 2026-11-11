@@ -38,12 +38,13 @@ import { MONTHS } from '@/utils/climateMath';
 import { SITE_URL } from '@/utils/seo';
 import { DEFAULT_LOCALE, localePath, parseEnabledLocales } from '@/i18n/config';
 import { dayOnly, newestDay } from '@/utils/sitemapDates';
+import { TOOLS_CONTENT_DATE, USECASE_PATHS } from '@/utils/useCases';
 
 // Page ki aakhri asal tabdeeli (git log). Template/content badle → yahan bhi.
 const STATIC_PAGES = [
   ['/', '2026-10-18'],
-  ['/trip-planner', '2026-10-06'],
-  ['/events', '2026-10-03'],
+  ['/trip-planner', TOOLS_CONTENT_DATE],   // Nov 2026: guide + "Plan by use case"
+  ['/events', TOOLS_CONTENT_DATE],
   ['/climate-guides', '2026-10-18'],
   ['/about', '2026-10-03'],
   ['/terms', '2026-10-03'],
@@ -211,6 +212,16 @@ const toLang = (lang, entries, textDate) => entries.map((e) => ({
   lastmod: max(e.lastmod && isoDay(e.lastmod), isoDay(textDate)),
 }));
 
+// Use-case pages (Nov 2026): English mein 8 pages (hubs static mein hain);
+// doosri zaban mein hubs bhi, kyunke woh us zaban ke kisi aur sitemap mein nahi.
+export async function toolEntries() {
+  return USECASE_PATHS.map((p) => ({ path: p, lastmod: TOOLS_CONTENT_DATE }));
+}
+
+export async function langToolEntries(lang) {
+  return ['/trip-planner', '/events', ...USECASE_PATHS].map((p) => ({ path: localePath(lang, p), lastmod: TOOLS_CONTENT_DATE }));
+}
+
 export async function langStaticEntries(lang) {
   return LANG_STATIC.map((p) => ({ path: localePath(lang, p), lastmod: LOCALE_UI_DATE }));
 }
@@ -250,6 +261,7 @@ export async function children() {
     { name: 'blog', lastmod: newest(bl) },
     { name: 'places', lastmod: newest(pl) },
     ...chunks('months', mo),
+    { name: 'tools', lastmod: TOOLS_CONTENT_DATE },
   ];
   // Sirf ENABLED zabanein; khaali set (jaise abhi blog) index mein nahi
   for (const lang of otherLocales()) {
@@ -258,6 +270,7 @@ export async function children() {
     if (lbl.length) list.push({ name: `blog-${lang}`, lastmod: newest(lbl) });
     if (lpl.length) list.push({ name: `places-${lang}`, lastmod: newest(lpl) });
     list.push(...chunks(`months-${lang}`, lmo));
+    list.push({ name: `tools-${lang}`, lastmod: TOOLS_CONTENT_DATE });
   }
   return list;
 }
@@ -274,15 +287,17 @@ export async function childEntries(name) {
   if (name === 'static') return staticEntries();
   if (name === 'blog') return blogEntries();
   if (name === 'places') return placeEntries();
+  if (name === 'tools') return toolEntries();
   const m = /^months-(\d+)$/.exec(name);
   if (m) return part(await monthEntries(), m[1]);
 
-  const l = /^(static|blog|places|months)-([a-z]{2})(?:-(\d+))?$/.exec(name);
+  const l = /^(static|blog|places|months|tools)-([a-z]{2})(?:-(\d+))?$/.exec(name);
   if (!l || !otherLocales().includes(l[2])) return null;
   const [, kind, lang, n] = l;
   if (kind === 'months') return n ? part(await langMonthEntries(lang), n) : null;
   if (n) return null;
   if (kind === 'static') return langStaticEntries(lang);
+  if (kind === 'tools') return langToolEntries(lang);
   if (kind === 'blog') return orNull(await langBlogEntries(lang));
   return orNull(await langPlaceEntries(lang));
 }

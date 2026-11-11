@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Heart, User, Music, Circle, Building2, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { Heart, User, Music, Circle, Building2, Flame, MapPin, Calendar, ArrowRight } from 'lucide-react';
 import { useT } from '@/i18n/client';
 import { canonicalCityName } from '@/utils/fuzzyCity';
 
@@ -12,10 +12,13 @@ const EVENT_TYPES = [
   { key: 'concert', icon: Music },
   { key: 'sports', icon: Circle },
   { key: 'festival', icon: Building2 },
+  // Nov 2026 (owner): apne weights (backend events/0002)
+  { key: 'picnic', icon: Flame },
 ];
 
-const EventSearchForm = ({ onSubmit }) => {
-  const [eventType, setEventType] = useState('wedding');
+// initialType: use-case page (/events/<slug>) apna type pehle se chuna hua bhejta hai
+const EventSearchForm = ({ onSubmit, initialType = 'wedding' }) => {
+  const [eventType, setEventType] = useState(initialType);
   const t = useT();
   const [city, setCity] = useState('');
   const [date, setDate] = useState('');
@@ -54,7 +57,7 @@ const EventSearchForm = ({ onSubmit }) => {
         <label className="block text-sm font-semibold text-slate-700 mb-3">
           {t('events.eventType')}
         </label>
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-6">
           {EVENT_TYPES.map(({ key, icon: Icon }) => {
             const label = t(`events.types.${key}`);
             const isActive = eventType === key;
