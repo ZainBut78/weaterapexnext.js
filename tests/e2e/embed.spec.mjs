@@ -42,6 +42,27 @@ test('widget numbers match the month page (3 cities)', async ({ request }) => {
   }
 });
 
+// Rainy days: year chart (12 mahine) == month widget == month page, 3 shehar (Nov 2026). Teeno
+// ek hi DB field (CityClimateNormal.rainy_days) se; local aur live ka farq data ka hoga, code ka nahi.
+const MONTH_SLUGS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+const cardValue = (html, label) => new RegExp(`<div class="card"><b>([\\d.,]+)</b><span>${label}</span>`).exec(html)?.[1];
+for (const place of ['united-kingdom/london', 'japan/tokyo', 'portugal/lisbon']) {
+  test(`rainy days: year chart == month widget == month page, ${place}`, async ({ request }) => {
+    const year = await (await request.get(`/embed/${place}`)).text();
+    // Year chart mein baarish ke din: bina class wale grey labels, mahine ke hisaab se tarteeb mein
+    const chart = /<svg class="yr"[\s\S]*?<\/svg>\s*<p/.exec(year)[0];
+    const yearDays = [...chart.matchAll(/<text x="[^"]+" y="[^"]+" fill="var\(--mu\)">(\d+)<\/text>/g)].map((m) => Number(m[1]));
+    expect(yearDays).toHaveLength(12);
+    for (const [i, month] of MONTH_SLUGS.entries()) {
+      const widget = await (await request.get(`/embed/${place}/${month}`)).text();
+      const pageText = (await (await request.get(`/weather/${place}/${month}`)).text()).replace(/<[^>]*>/g, '\n');
+      const pageDays = /\nRainy days\n+\s*(\d+) days/.exec(pageText)?.[1];
+      expect(Number(cardValue(widget, 'Rainy days')), `${month} widget`).toBe(yearDays[i]);
+      expect(Number(pageDays), `${month} page`).toBe(yearDays[i]);
+    }
+  });
+}
+
 for (const lang of LANGS) {
   for (const [place, month] of SAMPLES.slice(0, 1)) {
     for (const path of [`/embed/${place}`, `/embed/${place}/${month}`]) {
