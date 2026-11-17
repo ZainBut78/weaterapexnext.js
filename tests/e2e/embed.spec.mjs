@@ -93,18 +93,31 @@ test('widgets stay out of the sitemap', async ({ request }) => {
   for (const k of kids) expect(await (await request.get(k)).text(), k).not.toContain('/embed/');
 });
 
-// Copy code ki unchai (utils/embedWidget.js): 300px aur 1000px chaudai par iframe ke andar scroll
-// nahi; full-year mein neeche zyada khaali jagah bhi nahi. Har zaban, dono theme.
-const YEAR_BLANK_MAX = 60;
+// Copy code ki unchai (utils/embedWidget.js): 280 se 1000px tak HAR 20px par iframe ke andar
+// scroll nahi (live bug, Nov 2026: 416px par full-year mein scroll aata tha). Ek hi iframe, us ki
+// chaudai badal kar naapte hain. Full-year: neeche zyada khaali jagah bhi nahi.
+const WIDTHS = Array.from({ length: 37 }, (_, i) => 280 + i * 20);
+const YEAR_BLANK_MAX = 70;
+const SWEEP = [
+  ['/embed/united-kingdom/london', YEAR_HEIGHT, 'year'],
+  ['/embed/japan/tokyo', YEAR_HEIGHT, 'year'],
+  ['/embed/portugal/lisbon', YEAR_HEIGHT, 'year'],
+  ['/embed/united-kingdom/london/march', MONTH_HEIGHT, 'month'],
+  ['/embed/japan/tokyo/december', MONTH_HEIGHT, 'month'],
+  ['/embed/portugal/lisbon/july', MONTH_HEIGHT, 'month'],
+];
 for (const lang of LANGS) {
-  for (const [path, height, kind] of [['/embed/united-kingdom/london/march', MONTH_HEIGHT, 'month'], ['/embed/united-kingdom/london', YEAR_HEIGHT, 'year'], ['/embed/japan/tokyo/december', MONTH_HEIGHT, 'month']]) {
-    test(`iframe ${height}px tall at 300 and 1000 wide, no scroll: ${url(lang, path)}`, async ({ page }) => {
-      for (const width of [300, 1000]) {
-        for (const theme of ['light', 'dark']) {
-          await page.setViewportSize({ width: width + 40, height: height + 40 });
-          await page.goto(`${blogUrl}?w=${width}&h=${height}&src=${encodeURIComponent(`${BASE}${url(lang, path)}?theme=${theme}`)}`);
-          await expect(page.frameLocator('iframe').locator('h1')).toBeVisible();
-          const inner = await (await page.$('iframe')).contentFrame();
+  for (const [path, height, kind] of SWEEP) {
+    test(`iframe ${height}px tall, 280–1000 wide every 20px, no scroll: ${url(lang, path)}`, async ({ page }) => {
+      for (const theme of ['light', 'dark']) {
+        await page.setViewportSize({ width: 1040, height: height + 40 });
+        await page.goto(`${blogUrl}?w=1000&h=${height}&src=${encodeURIComponent(`${BASE}${url(lang, path)}?theme=${theme}`)}`);
+        await expect(page.frameLocator('iframe').locator('h1')).toBeVisible();
+        const inner = await (await page.$('iframe')).contentFrame();
+        // Theme layout nahi badalta: dark mein sirf 3 chaudaiyan
+        for (const width of theme === 'light' ? WIDTHS : [280, 420, 1000]) {
+          await page.evaluate((w) => { document.querySelector('iframe').width = String(w); }, width);
+          await expect.poll(() => inner.evaluate(() => window.innerWidth)).toBe(width);
           const size = await inner.evaluate(() => ({
             scroll: document.documentElement.scrollHeight,
             content: Math.ceil(document.body.getBoundingClientRect().height),
@@ -119,6 +132,31 @@ for (const lang of LANGS) {
     });
   }
 }
+
+// Saal ka chart: unchai chaudai se azad, labels apas mein nahi takrate, chart left par
+test('year chart: fixed height, labels do not overlap, left aligned', async ({ page }) => {
+  for (const lang of LANGS) {
+    for (const width of [280, 416, 600, 1000]) {
+      await page.setViewportSize({ width, height: 700 });
+      await page.goto(url(lang, '/embed/united-kingdom/london'));
+      const r = await page.evaluate(() => {
+        const svg = document.querySelector('svg.yr').getBoundingClientRect();
+        const boxes = [...document.querySelectorAll('svg.yr > text')].filter((t) => getComputedStyle(t).display !== 'none')
+          .map((t) => { const b = t.getBoundingClientRect(); return { x1: b.left, x2: b.right, y1: b.top, y2: b.bottom, t: t.textContent }; });
+        const hits = [];
+        for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+          const a = boxes[i]; const b = boxes[j];
+          if (a.x1 < b.x2 - 1 && b.x1 < a.x2 - 1 && a.y1 < b.y2 - 1 && b.y1 < a.y2 - 1) hits.push(`${a.t}/${b.t}`);
+        }
+        return { h: svg.height, left: svg.left - document.body.getBoundingClientRect().left, hits };
+      });
+      const tag = `${lang || 'en'} ${width}px`;
+      expect(r.h, `${tag} height`).toBe(160);
+      expect(r.left, `${tag} left`).toBeLessThanOrEqual(14);
+      expect(r.hits, `${tag} overlap`).toEqual([]);
+    }
+  }
+});
 
 // ── Step 2: "Use this data on your site" city aur month pages par ──
 const decode = (s) => s.replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
