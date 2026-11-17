@@ -29,6 +29,7 @@ import { SITE_URL } from '@/utils/seo';
 import { localePath } from '@/i18n/config';
 import { cityName, countryName, inCity } from '@/i18n/places';
 import { climateText } from './text';
+import EmbedSection from './EmbedSection';
 
 // Purane Section 1 wali packing (wahi qawaid) — text zaban ki file se (L.cityPacking[key])
 function packingFor(monthly) {
@@ -374,6 +375,9 @@ export default function CityByMonth({ data, city, country, photo, crumbs, monthH
           <Info className="inline w-4 h-4 -mt-0.5 mr-1.5 align-middle" />
           {L.cityDataNote(years)}
         </p>
+
+        {/* Naya (Nov 2026): bloggers ke liye widget + copy code */}
+        <EmbedSection lang={lang} city={city} country={country} />
       </div>
 
       </main>

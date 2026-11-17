@@ -88,17 +88,24 @@ const nextConfig = {
     const security = {
       source: '/:path*',
       headers: [
-        { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
         { key: 'X-Content-Type-Options', value: 'nosniff' },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
         { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
       ],
     };
-    if (!NOINDEX) return [icons, security];
+    // Framing: har route SAMEORIGIN, sivaye widget ke (/embed/*, /<lang>/embed/*), jo bloggers
+    // iframe mein lagate hain. Widget apna `frame-ancestors *` khud bhejta hai (services/embedData.js).
+    // Root "/" alag rule, kyunke khaali path is pattern mein nahi aata.
+    const framing = [
+      { source: '/', headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }] },
+      { source: '/:path((?!embed/|[a-z]{2}/embed/).+)', headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }] },
+    ];
+    if (!NOINDEX) return [icons, security, ...framing];
     return [
       icons,
       security,
+      ...framing,
       {
         source: '/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],

@@ -38,6 +38,8 @@ import { buildRegistry } from './utils/cityRegistryCore';
 import { duplicateBlogBase } from './utils/blogDuplicate';
 import { DEFAULT_LOCALE, localePath, parseEnabledLocales, splitLocale } from './i18n/config';
 import { createProbe, healthUrl, isOutageTest, serveDuringOutage, shouldGate } from './utils/outageGate';
+import { createHitCollector } from './utils/embedHits';
+import { SITE_URL } from './utils/seo';
 
 const API_INTERNAL_URL = (process.env.API_INTERNAL_URL || 'http://127.0.0.1:8000/api').replace(/\/+$/, '');
 
@@ -50,6 +52,21 @@ function backendIsDown() {
   backendProbe ||= createProbe({ url: healthUrl(API_INTERNAL_URL), fetchImpl: fetch });
   return !backendProbe.isUp();
 }
+// Widget kin sites par laga (utils/embedHits.js): /embed/* ka Referer domain memory mein ginte hain;
+// din badalne par pichle din ki ginti ek POST mein backend ko. Backend band → chup chaap skip.
+const embedHits = createHitCollector({ ownDomains: ['weatherapex.com', new URL(SITE_URL).hostname, 'localhost'] });
+function sendEmbedHits(payload, event) {
+  if (!payload) return;
+  const key = process.env.BACKEND_INTERNAL_KEY;
+  const send = fetch(`${API_INTERNAL_URL}/weather/embed-hits/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(key ? { 'X-Internal-Key': key } : {}) },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(3000),
+  }).catch(() => {});
+  event?.waitUntil?.(send);
+}
+
 const INDEX_TTL_MS = 60 * 60 * 1000;
 let registryCache = { at: 0, reg: null };
 
@@ -109,7 +126,7 @@ async function blogPostLive(slug, lang) {
 // [lang] ke bahar hain — un ko chhona nahi.
 const ROOT_ROUTES = ['/og-image'];
 
-export async function proxy(request) {
+export async function proxy(request, event) {
   const original = request.nextUrl.pathname;
   if (ROOT_ROUTES.some((r) => original === r || original.startsWith(`${r}/`))) return NextResponse.next();
 
@@ -117,6 +134,10 @@ export async function proxy(request) {
   const { lang, path: bare } = explicitEn
     ? { lang: DEFAULT_LOCALE, path: original.slice(3) || '/' }
     : splitLocale(original);
+  // Widget ka Referer; har request par din badalne ki jaanch (ginti bhejni ho to)
+  sendEmbedHits(bare.startsWith('/embed/') && !request.headers.get('x-outage-check')
+    ? embedHits.note(request.headers.get('referer'))
+    : embedHits.due(), event);
   let path = bare;
   let status = 308;
 

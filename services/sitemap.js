@@ -39,6 +39,7 @@ import { SITE_URL } from '@/utils/seo';
 import { DEFAULT_LOCALE, localePath, parseEnabledLocales } from '@/i18n/config';
 import { dayOnly, newestDay } from '@/utils/sitemapDates';
 import { TOOLS_CONTENT_DATE, USECASE_PATHS } from '@/utils/useCases';
+import { WIDGET_PAGE, WIDGET_PAGE_DATE } from '@/utils/embedConst';
 
 // Page ki aakhri asal tabdeeli (git log). Template/content badle → yahan bhi.
 const STATIC_PAGES = [
@@ -214,12 +215,16 @@ const toLang = (lang, entries, textDate) => entries.map((e) => ({
 
 // Use-case pages (Nov 2026): English mein 8 pages (hubs static mein hain);
 // doosri zaban mein hubs bhi, kyunke woh us zaban ke kisi aur sitemap mein nahi.
+// Bloggers ki widget landing page (Nov 2026, Embed Step 3) bhi tools mein, apni tareekh ke saath
+const widgetEntry = (lang) => ({ path: localePath(lang, WIDGET_PAGE), lastmod: WIDGET_PAGE_DATE });
+const TOOLS_DATE = max(TOOLS_CONTENT_DATE, WIDGET_PAGE_DATE);
+
 export async function toolEntries() {
-  return USECASE_PATHS.map((p) => ({ path: p, lastmod: TOOLS_CONTENT_DATE }));
+  return [...USECASE_PATHS.map((p) => ({ path: p, lastmod: TOOLS_CONTENT_DATE })), widgetEntry(DEFAULT_LOCALE)];
 }
 
 export async function langToolEntries(lang) {
-  return ['/trip-planner', '/events', ...USECASE_PATHS].map((p) => ({ path: localePath(lang, p), lastmod: TOOLS_CONTENT_DATE }));
+  return [...['/trip-planner', '/events', ...USECASE_PATHS].map((p) => ({ path: localePath(lang, p), lastmod: TOOLS_CONTENT_DATE })), widgetEntry(lang)];
 }
 
 export async function langStaticEntries(lang) {
@@ -261,7 +266,7 @@ export async function children() {
     { name: 'blog', lastmod: newest(bl) },
     { name: 'places', lastmod: newest(pl) },
     ...chunks('months', mo),
-    { name: 'tools', lastmod: TOOLS_CONTENT_DATE },
+    { name: 'tools', lastmod: TOOLS_DATE },
   ];
   // Sirf ENABLED zabanein; khaali set (jaise abhi blog) index mein nahi
   for (const lang of otherLocales()) {
@@ -270,7 +275,7 @@ export async function children() {
     if (lbl.length) list.push({ name: `blog-${lang}`, lastmod: newest(lbl) });
     if (lpl.length) list.push({ name: `places-${lang}`, lastmod: newest(lpl) });
     list.push(...chunks(`months-${lang}`, lmo));
-    list.push({ name: `tools-${lang}`, lastmod: TOOLS_CONTENT_DATE });
+    list.push({ name: `tools-${lang}`, lastmod: TOOLS_DATE });
   }
   return list;
 }

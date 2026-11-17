@@ -1,0 +1,223 @@
+// ─────────────────────────────────────────────────────────────
+//  /weather-widget landing page ka text, 6 zabanein (Nov 2026, Embed Step 3).
+//  Bloggers ke liye: outreach emails mein yahi page jata hai. FAQ ki JSON-LD yahi strings
+//  hoobahoo leti hai (app/[lang]/weather-widget/page.js).
+// ─────────────────────────────────────────────────────────────
+const en = {
+  metaTitle: 'Free weather widget for travel blogs',
+  metaDescription: 'Free climate widget for travel blogs: 20-year monthly averages for any city or month, in 6 languages. No ads, no cookies, no JavaScript. Copy the code and paste.',
+  h1: 'Free weather widget for travel blogs',
+  intro: 'Show your readers what the weather is really like before they book. The widget gives 20-year monthly averages for a city, or for one month in that city, and fits into any article.',
+  showsTitle: 'What the widget shows',
+  shows: [
+    'Average high and low, rainy days, rainfall and hours of sun, from 20 years of daily data.',
+    'For one month: the odds of rain, heat or cold, and the records for that month.',
+    'For a whole year: a month-by-month chart with the best months and the least pleasant ones.',
+    'Light or dark theme, in English, German, French, Italian, Spanish or Japanese.',
+    'A small, fast page: no ads, no cookies, no tracking scripts and no JavaScript.',
+  ],
+  demoTitle: 'Live demo',
+  demoIntro: 'This is the widget for Paris in May, exactly as your readers will see it.',
+  demoTitleAttr: 'Weather widget demo: Paris in May',
+  pickTitle: 'Get the code',
+  pickIntro: 'Pick a city, then the month or the whole year, the language and the theme. Copy the code and paste it into your page.',
+  city: 'City',
+  howTitle: 'How to add it to your blog',
+  how: [
+    'Copy the code with the button above.',
+    'In WordPress, add a “Custom HTML” block. In Blogger, Ghost, Squarespace or Wix, use the HTML or embed block.',
+    'Paste the code and publish. The widget adjusts to the width of your column.',
+  ],
+  faqTitle: 'FAQ',
+  faq: [
+    ['Is the widget free?', 'Yes. The widget is free for blogs and websites, including commercial ones. We only ask you to keep the link under the widget, so readers know where the data comes from.'],
+    ['Where does the data come from?', 'From 20 years of daily weather records (Open-Meteo historical data), averaged by month. These are the same numbers as on our city and month pages.'],
+    ['Will it slow down my page?', 'No. The widget is a small HTML page with no JavaScript, and it loads only when the reader scrolls to it.'],
+    ['Does it use cookies or track my readers?', 'No. The widget sets no cookies and has no ads or tracking scripts.'],
+    ['Can I change the size or the colours?', 'The widget fills the width of your column. You can choose a light or dark theme; the height is set in the code so the widget never needs a scroll bar.'],
+  ],
+  sectionLink: 'How the free widget works',
+};
+
+const de = {
+  metaTitle: 'Kostenloses Wetter-Widget für Reiseblogs',
+  metaDescription: 'Kostenloses Klima-Widget für Reiseblogs: Monatswerte aus 20 Jahren für jede Stadt und jeden Monat, in 6 Sprachen. Ohne Werbung, Cookies und JavaScript. Code kopieren, einfügen.',
+  h1: 'Kostenloses Wetter-Widget für Reiseblogs',
+  intro: 'Zeigen Sie Ihren Lesern, wie das Wetter wirklich ist, bevor sie buchen. Das Widget zeigt Monatsmittel aus 20 Jahren für eine Stadt oder für einen Monat in dieser Stadt und passt in jeden Artikel.',
+  showsTitle: 'Was das Widget zeigt',
+  shows: [
+    'Durchschnittliche Höchst- und Tiefstwerte, Regentage, Niederschlag und Sonnenstunden aus 20 Jahren täglicher Daten.',
+    'Für einen Monat: die Wahrscheinlichkeit für Regen, Hitze oder Kälte und die Rekorde dieses Monats.',
+    'Für das ganze Jahr: ein Diagramm Monat für Monat mit den besten und den ungemütlichsten Monaten.',
+    'Helles oder dunkles Design, auf Deutsch, Englisch, Französisch, Italienisch, Spanisch oder Japanisch.',
+    'Eine kleine, schnelle Seite: keine Werbung, keine Cookies, keine Tracking-Skripte und kein JavaScript.',
+  ],
+  demoTitle: 'Live-Demo',
+  demoIntro: 'So sieht das Widget für Paris im Mai aus, genau wie Ihre Leser es sehen.',
+  demoTitleAttr: 'Demo des Wetter-Widgets: Paris im Mai',
+  pickTitle: 'Code holen',
+  pickIntro: 'Wählen Sie eine Stadt, dann den Monat oder das ganze Jahr, die Sprache und das Design. Code kopieren und in Ihre Seite einfügen.',
+  city: 'Stadt',
+  howTitle: 'So bauen Sie es in Ihren Blog ein',
+  how: [
+    'Kopieren Sie den Code mit der Schaltfläche oben.',
+    'In WordPress fügen Sie einen Block „Individuelles HTML“ hinzu. In Blogger, Ghost, Squarespace oder Wix nutzen Sie den HTML- oder Einbettungsblock.',
+    'Code einfügen und veröffentlichen. Das Widget passt sich der Breite Ihrer Spalte an.',
+  ],
+  faqTitle: 'Häufige Fragen',
+  faq: [
+    ['Ist das Widget kostenlos?', 'Ja. Das Widget ist für Blogs und Websites kostenlos, auch für kommerzielle. Wir bitten nur darum, den Link unter dem Widget stehen zu lassen, damit Ihre Leser sehen, woher die Daten stammen.'],
+    ['Woher kommen die Daten?', 'Aus 20 Jahren täglicher Wetteraufzeichnungen (historische Daten von Open-Meteo), gemittelt nach Monat. Es sind dieselben Werte wie auf unseren Stadt- und Monatsseiten.'],
+    ['Macht es meine Seite langsamer?', 'Nein. Das Widget ist eine kleine HTML-Seite ohne JavaScript und lädt erst, wenn der Leser dorthin scrollt.'],
+    ['Setzt es Cookies oder verfolgt es meine Leser?', 'Nein. Das Widget setzt keine Cookies und enthält weder Werbung noch Tracking-Skripte.'],
+    ['Kann ich Größe oder Farben ändern?', 'Das Widget füllt die Breite Ihrer Spalte. Sie können ein helles oder dunkles Design wählen; die Höhe steht im Code, damit das Widget nie einen Scrollbalken braucht.'],
+  ],
+  sectionLink: 'So funktioniert das kostenlose Widget',
+};
+
+const fr = {
+  metaTitle: 'Widget météo gratuit pour blogs de voyage',
+  metaDescription: 'Widget climat gratuit pour blogs de voyage : moyennes mensuelles sur 20 ans pour chaque ville et chaque mois, en 6 langues. Sans pub, sans cookies, sans JavaScript.',
+  h1: 'Widget météo gratuit pour blogs de voyage',
+  intro: 'Montrez à vos lecteurs le temps qu’il fait vraiment avant qu’ils réservent. Le widget donne les moyennes mensuelles sur 20 ans pour une ville, ou pour un mois dans cette ville, et s’intègre à n’importe quel article.',
+  showsTitle: 'Ce que montre le widget',
+  shows: [
+    'Températures maximales et minimales moyennes, jours de pluie, précipitations et heures de soleil, sur 20 ans de données quotidiennes.',
+    'Pour un mois : les probabilités de pluie, de chaleur ou de froid, et les records de ce mois.',
+    'Pour toute l’année : un graphique mois par mois avec les meilleurs mois et les moins agréables.',
+    'Thème clair ou sombre, en français, anglais, allemand, italien, espagnol ou japonais.',
+    'Une page légère et rapide : sans publicité, sans cookies, sans script de suivi et sans JavaScript.',
+  ],
+  demoTitle: 'Démo en direct',
+  demoIntro: 'Voici le widget pour Paris en mai, tel que vos lecteurs le verront.',
+  demoTitleAttr: 'Démo du widget météo : Paris en mai',
+  pickTitle: 'Obtenir le code',
+  pickIntro: 'Choisissez une ville, puis le mois ou toute l’année, la langue et le thème. Copiez le code et collez-le dans votre page.',
+  city: 'Ville',
+  howTitle: 'Comment l’ajouter à votre blog',
+  how: [
+    'Copiez le code avec le bouton ci-dessus.',
+    'Dans WordPress, ajoutez un bloc « HTML personnalisé ». Dans Blogger, Ghost, Squarespace ou Wix, utilisez le bloc HTML ou d’intégration.',
+    'Collez le code et publiez. Le widget s’adapte à la largeur de votre colonne.',
+  ],
+  faqTitle: 'Questions fréquentes',
+  faq: [
+    ['Le widget est-il gratuit ?', 'Oui. Le widget est gratuit pour les blogs et les sites, y compris commerciaux. Nous demandons seulement de garder le lien sous le widget, pour que vos lecteurs sachent d’où viennent les données.'],
+    ['D’où viennent les données ?', 'De 20 ans de relevés météo quotidiens (données historiques Open-Meteo), en moyenne par mois. Ce sont les mêmes chiffres que sur nos pages de villes et de mois.'],
+    ['Va-t-il ralentir ma page ?', 'Non. Le widget est une petite page HTML sans JavaScript, chargée seulement quand le lecteur arrive à sa hauteur.'],
+    ['Utilise-t-il des cookies ou suit-il mes lecteurs ?', 'Non. Le widget ne dépose aucun cookie et ne contient ni publicité ni script de suivi.'],
+    ['Puis-je changer la taille ou les couleurs ?', 'Le widget occupe la largeur de votre colonne. Vous pouvez choisir un thème clair ou sombre ; la hauteur est fixée dans le code pour que le widget n’ait jamais besoin de barre de défilement.'],
+  ],
+  sectionLink: 'Comment fonctionne le widget gratuit',
+};
+
+const it = {
+  metaTitle: 'Widget meteo gratuito per blog di viaggio',
+  metaDescription: 'Widget sul clima gratuito per blog di viaggio: medie mensili di 20 anni per ogni città e ogni mese, in 6 lingue. Senza pubblicità, cookie né JavaScript. Copia e incolla.',
+  h1: 'Widget meteo gratuito per blog di viaggio',
+  intro: 'Mostra ai tuoi lettori com’è davvero il tempo prima che prenotino. Il widget riporta le medie mensili di 20 anni per una città, o per un mese in quella città, e si adatta a qualsiasi articolo.',
+  showsTitle: 'Cosa mostra il widget',
+  shows: [
+    'Massime e minime medie, giorni di pioggia, precipitazioni e ore di sole, da 20 anni di dati giornalieri.',
+    'Per un mese: le probabilità di pioggia, caldo o freddo e i record di quel mese.',
+    'Per tutto l’anno: un grafico mese per mese con i mesi migliori e quelli meno piacevoli.',
+    'Tema chiaro o scuro, in italiano, inglese, tedesco, francese, spagnolo o giapponese.',
+    'Una pagina piccola e veloce: niente pubblicità, cookie, script di tracciamento o JavaScript.',
+  ],
+  demoTitle: 'Demo dal vivo',
+  demoIntro: 'Ecco il widget per Parigi a maggio, esattamente come lo vedranno i tuoi lettori.',
+  demoTitleAttr: 'Demo del widget meteo: Parigi a maggio',
+  pickTitle: 'Ottieni il codice',
+  pickIntro: 'Scegli una città, poi il mese o tutto l’anno, la lingua e il tema. Copia il codice e incollalo nella tua pagina.',
+  city: 'Città',
+  howTitle: 'Come aggiungerlo al tuo blog',
+  how: [
+    'Copia il codice con il pulsante qui sopra.',
+    'In WordPress aggiungi un blocco “HTML personalizzato”. In Blogger, Ghost, Squarespace o Wix usa il blocco HTML o di incorporamento.',
+    'Incolla il codice e pubblica. Il widget si adatta alla larghezza della colonna.',
+  ],
+  faqTitle: 'Domande frequenti',
+  faq: [
+    ['Il widget è gratuito?', 'Sì. Il widget è gratuito per blog e siti, anche commerciali. Ti chiediamo solo di lasciare il link sotto il widget, così i lettori sanno da dove vengono i dati.'],
+    ['Da dove vengono i dati?', 'Da 20 anni di rilevazioni meteo giornaliere (dati storici Open-Meteo), con la media per mese. Sono gli stessi numeri delle nostre pagine di città e di mese.'],
+    ['Rallenterà la mia pagina?', 'No. Il widget è una piccola pagina HTML senza JavaScript e si carica solo quando il lettore ci arriva scorrendo.'],
+    ['Usa cookie o traccia i miei lettori?', 'No. Il widget non imposta cookie e non contiene pubblicità né script di tracciamento.'],
+    ['Posso cambiare dimensioni o colori?', 'Il widget occupa la larghezza della colonna. Puoi scegliere il tema chiaro o scuro; l’altezza è indicata nel codice, così il widget non ha mai bisogno della barra di scorrimento.'],
+  ],
+  sectionLink: 'Come funziona il widget gratuito',
+};
+
+const es = {
+  metaTitle: 'Widget del tiempo gratis para blogs de viajes',
+  metaDescription: 'Widget del clima gratis para blogs de viajes: medias mensuales de 20 años para cualquier ciudad o mes, en 6 idiomas. Sin anuncios, cookies ni JavaScript. Copia y pega.',
+  h1: 'Widget del tiempo gratis para blogs de viajes',
+  intro: 'Muestra a tus lectores qué tiempo hace de verdad antes de que reserven. El widget da las medias mensuales de 20 años de una ciudad, o de un mes en esa ciudad, y encaja en cualquier artículo.',
+  showsTitle: 'Qué muestra el widget',
+  shows: [
+    'Máximas y mínimas medias, días de lluvia, precipitación y horas de sol, a partir de 20 años de datos diarios.',
+    'Para un mes: la probabilidad de lluvia, calor o frío, y los récords de ese mes.',
+    'Para todo el año: un gráfico mes a mes con los mejores meses y los menos agradables.',
+    'Tema claro u oscuro, en español, inglés, alemán, francés, italiano o japonés.',
+    'Una página pequeña y rápida: sin anuncios, sin cookies, sin scripts de seguimiento y sin JavaScript.',
+  ],
+  demoTitle: 'Demo en vivo',
+  demoIntro: 'Este es el widget de París en mayo, tal como lo verán tus lectores.',
+  demoTitleAttr: 'Demo del widget del tiempo: París en mayo',
+  pickTitle: 'Consigue el código',
+  pickIntro: 'Elige una ciudad, luego el mes o todo el año, el idioma y el tema. Copia el código y pégalo en tu página.',
+  city: 'Ciudad',
+  howTitle: 'Cómo añadirlo a tu blog',
+  how: [
+    'Copia el código con el botón de arriba.',
+    'En WordPress, añade un bloque «HTML personalizado». En Blogger, Ghost, Squarespace o Wix, usa el bloque HTML o de inserción.',
+    'Pega el código y publica. El widget se adapta al ancho de tu columna.',
+  ],
+  faqTitle: 'Preguntas frecuentes',
+  faq: [
+    ['¿El widget es gratis?', 'Sí. El widget es gratis para blogs y webs, también comerciales. Solo te pedimos que mantengas el enlace bajo el widget, para que tus lectores sepan de dónde vienen los datos.'],
+    ['¿De dónde salen los datos?', 'De 20 años de registros meteorológicos diarios (datos históricos de Open-Meteo), promediados por mes. Son las mismas cifras que en nuestras páginas de ciudades y meses.'],
+    ['¿Hará más lenta mi página?', 'No. El widget es una página HTML pequeña sin JavaScript y solo se carga cuando el lector llega hasta él.'],
+    ['¿Usa cookies o rastrea a mis lectores?', 'No. El widget no instala cookies y no tiene anuncios ni scripts de seguimiento.'],
+    ['¿Puedo cambiar el tamaño o los colores?', 'El widget ocupa el ancho de tu columna. Puedes elegir el tema claro u oscuro; la altura va en el código para que el widget nunca necesite barra de desplazamiento.'],
+  ],
+  sectionLink: 'Cómo funciona el widget gratuito',
+};
+
+const ja = {
+  metaTitle: '旅行ブログ向けの無料天気ウィジェット',
+  metaDescription: '旅行ブログ向けの無料気候ウィジェット。世界各地の都市・月ごとに過去20年の月別平均を6言語で表示。広告・Cookie・JavaScriptなし。コードをコピーして貼るだけ。',
+  h1: '旅行ブログ向けの無料天気ウィジェット',
+  intro: '予約の前に、現地の本当の天気を読者に伝えましょう。このウィジェットは、都市ごと、またはその都市の特定の月について、過去20年の月別平均を表示します。どんな記事にも組み込めます。',
+  showsTitle: 'ウィジェットに表示される内容',
+  shows: [
+    '20年分の日別データから求めた平均最高・最低気温、雨の日の数、降水量、日照時間。',
+    '1か月の場合：雨・暑さ・寒さになる確率と、その月の記録。',
+    '1年間の場合：月ごとのグラフと、ベストな月・過ごしにくい月。',
+    'ライトまたはダークのテーマ。日本語・英語・ドイツ語・フランス語・イタリア語・スペイン語に対応。',
+    '軽くて速いページ。広告・Cookie・トラッキング用スクリプト・JavaScriptはありません。',
+  ],
+  demoTitle: 'ライブデモ',
+  demoIntro: '5月のパリのウィジェットです。読者にもこのとおりに表示されます。',
+  demoTitleAttr: '天気ウィジェットのデモ：5月のパリ',
+  pickTitle: 'コードを取得',
+  pickIntro: '都市を選び、月または1年間、言語、テーマを選んでください。コードをコピーして、ページに貼り付ければ完了です。',
+  city: '都市',
+  howTitle: 'ブログへの追加方法',
+  how: [
+    '上のボタンでコードをコピーします。',
+    'WordPressでは「カスタムHTML」ブロックを追加します。はてなブログ、Blogger、Wixなどでは、HTMLまたは埋め込み用の欄を使います。',
+    'コードを貼り付けて公開します。ウィジェットは記事の幅に合わせて表示されます。',
+  ],
+  faqTitle: 'よくある質問',
+  faq: [
+    ['ウィジェットは無料ですか？', 'はい。商用サイトを含め、ブログやウェブサイトで無料でお使いいただけます。データの出典が読者に分かるよう、ウィジェットの下のリンクだけは残してください。'],
+    ['データはどこから来ていますか？', '過去20年分の日別気象記録（Open-Meteoの過去データ）を月ごとに平均したものです。当サイトの都市ページや月別ページと同じ数値です。'],
+    ['ページが重くなりませんか？', 'なりません。ウィジェットはJavaScriptを使わない小さなHTMLページで、読者がその位置までスクロールしたときに読み込まれます。'],
+    ['Cookieを使ったり、読者を追跡したりしますか？', 'いいえ。ウィジェットはCookieを設定せず、広告やトラッキング用のスクリプトもありません。'],
+    ['サイズや色は変えられますか？', 'ウィジェットは記事の幅いっぱいに表示されます。テーマはライトとダークから選べます。高さはコードで指定されているので、スクロールバーが出ることはありません。'],
+  ],
+  sectionLink: '無料ウィジェットの使い方',
+};
+
+const TEXT = { en, de, fr, it, es, ja };
+export const widgetPageText = (lang) => TEXT[lang] || en;

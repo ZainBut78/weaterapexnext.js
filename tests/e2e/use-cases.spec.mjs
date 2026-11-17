@@ -82,7 +82,8 @@ test('sitemap: all 48 use-case pages and the language hubs, in tools sitemaps wi
   const index = await (await request.get('/sitemap.xml')).text();
   const names = LANGS.map((l) => (l ? `tools-${l}` : 'tools'));
   const want = new Set([...LANGS.flatMap((l) => PATHS.map((p) => url(l, p))),
-    ...LANGS.filter(Boolean).flatMap((l) => [`/${l}/trip-planner`, `/${l}/events`])]);
+    ...LANGS.filter(Boolean).flatMap((l) => [`/${l}/trip-planner`, `/${l}/events`]),
+    ...LANGS.map((l) => url(l, '/weather-widget'))]);   // Embed Step 3 (Nov 2026)
   const got = new Map();
   for (const n of names) {
     expect(index, n).toContain(`/sitemap/${n}.xml`);

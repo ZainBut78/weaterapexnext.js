@@ -36,6 +36,7 @@ import { getCountry } from '@/data/countries';
 import { localePath } from '@/i18n/config';
 import { cityName, countryName } from '@/i18n/places';
 import { climateText } from './text';
+import EmbedSection from './EmbedSection';
 
 const PACK_ICON = { shoes: Footprints, layers: Shirt, rain: Umbrella, sun: Sun, warm: ThermometerSnowflake, jacket: Shirt, shades: Glasses, light: Shirt };
 
@@ -403,6 +404,9 @@ export default function MonthGuide({ yearData, data, city, country, month: month
           <Info className="inline w-4 h-4 -mt-0.5 mr-1.5 align-middle" />
           <L.MonthDataNote years={years} cityHref={cityHref} cityN={cityN} />
         </p>
+
+        {/* 13. Naya (Nov 2026): bloggers ke liye widget + copy code */}
+        <EmbedSection lang={lang} city={city} country={country} monthNum={month.num} />
       </div>
 
       </main>

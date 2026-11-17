@@ -50,9 +50,10 @@ const extract = () => {
     hreflang: [...document.querySelectorAll('link[rel="alternate"][hreflang]')]
       .map((l) => `${l.getAttribute('hreflang')} ${l.getAttribute('href')}`).sort(),
     h1: [...document.querySelectorAll('h1')].map(text),
-    headings: [...document.querySelectorAll('h2, h3')].map((h) => `${h.tagName} ${text(h)}`),
+    headings: [...document.querySelectorAll('h2, h3')].filter((h) => !h.closest('[data-embed-section]')).map((h) => `${h.tagName} ${text(h)}`),
     jsonLd: [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent),
-    links: [...document.querySelectorAll('a[href]')]
+    // Naya section (Nov 2026, owner): sirf is ke links ki ijazat, baqi page pehle jaisa
+    links: [...document.querySelectorAll('a[href]')].filter((a) => !a.closest('[data-embed-section]'))
       .map((a) => `${a.getAttribute('href')} | ${text(a)}`).sort(),
   };
 };
