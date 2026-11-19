@@ -34,7 +34,8 @@ const SAMPLES = [
 test('widget numbers match the month page (3 cities)', async ({ request }) => {
   for (const [place, month] of SAMPLES) {
     const pageHtml = await (await request.get(`/weather/${place}/${month}`)).text();
-    const meta = /<meta name="description" content="[^"]*?average high ([\d.]+)°C[^"]*?low ([\d.]+)°C/.exec(pageHtml);
+    // Meta (Nov 2026): "average high 51°F (10.7°C), low 38°F (3.3°C)"
+    const meta = /<meta name="description" content="[^"]*?average high -?\d+°F \((-?[\d.]+)°C\)[^"]*?low -?\d+°F \((-?[\d.]+)°C\)/.exec(pageHtml);
     expect(meta, place).toBeTruthy();
     const widget = await (await request.get(`/embed/${place}/${month}`)).text();
     expect(widget, `${place} high`).toContain(`${Number(meta[1])} °C`);

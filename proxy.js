@@ -24,6 +24,8 @@
 //      ho aur asal URL khud live NA ho (backend se poochte hain, 10 min memory).
 //      Warna 404 bilkul waise. Har zaban: /de/blog/<slug>-2 → /de/blog/<slug>
 //      sirf jab us zaban ka tarjuma <slug> published ho.
+//   7) Kabhi na bane blog posts (utils/blogDuplicate.js MOVED_POSTS): /blog/best-time-to-visit-
+//      philippines → /weather/philippines **301**, sirf jab woh post live na ho.
 //  Misal: /weather/Brisbane/ → ek hi hop (301) → /weather/australia/brisbane
 //
 //  Lowercase redirect page.js mein kyun nahi: city pages ISR hain; page se
@@ -35,7 +37,7 @@ import { NextResponse } from 'next/server';
 import { isKnownCity } from './data/cities';
 import { cityPath, getCountry } from './data/countries';
 import { buildRegistry } from './utils/cityRegistryCore';
-import { duplicateBlogBase } from './utils/blogDuplicate';
+import { duplicateBlogBase, movedBlogTarget } from './utils/blogDuplicate';
 import { DEFAULT_LOCALE, localePath, parseEnabledLocales, splitLocale } from './i18n/config';
 import { createProbe, healthUrl, isOutageTest, serveDuringOutage, shouldGate } from './utils/outageGate';
 import { createHitCollector } from './utils/embedHits';
@@ -175,6 +177,13 @@ export async function proxy(request, event) {
   const base = duplicateBlogBase(path);
   if (base && !(await blogPostLive(path.slice('/blog/'.length), lang)) && (await blogPostLive(base, lang))) {
     path = `/blog/${base}`;
+    status = 301;
+  }
+
+  // 7) kabhi na bane blog posts (GSC 404) → sab se qareeb maujood page (301)
+  const moved = movedBlogTarget(path);
+  if (moved && !(await blogPostLive(path.slice('/blog/'.length), lang))) {
+    path = moved;
     status = 301;
   }
 

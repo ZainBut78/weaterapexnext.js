@@ -431,11 +431,13 @@ const it = {
     const t = (c) => (c == null ? '—' : `${h.n1(Math.round(c * 10) / 10)} °C`);
     const inC = inCity('it', city);
     const base = `Meteo ${inC} ${aM(monthN)}: massime di ${t(row?.avg_high)}, minime di ${t(row?.avg_low)}, ${h.n1(row?.rainy_days)} giorni di pioggia e ${h.n1(row?.sunshine_hours)} ore di sole al giorno.`;
+    const short = `Meteo ${inC} ${aM(monthN)}: massime di ${t(row?.avg_high)}, minime di ${t(row?.avg_low)}, ${h.n1(row?.rainy_days)} giorni di pioggia.`;
     return {
       title: fit(60, `Meteo ${cityN} ${monthN}: temperature, pioggia e consigli`, `Meteo ${cityN} ${monthN}: temperature e pioggia`, `Meteo ${cityN} ${monthN}`),
       imageTitle: `Meteo ${cityN} ${aM(monthN)}`,
       kicker: countryN,
-      description: fit(160, `${base} Giudizio: ${verdict ? VERDICT[verdict.label] : '—'}.`, base, `Meteo ${cityN} ${aM(monthN)}: temperature, giorni di pioggia e ore di sole.`),
+      // Aakhri jumla = click ki wajah (Nov 2026); 160 se kam na ho to pehle verdict, phir dhoop hat-ti hai, phir purane variants
+      description: fit(159, `${base} Giudizio: ${verdict ? VERDICT[verdict.label] : '—'}. Record, probabilità e cosa mettere in valigia →`, `${base} Record, probabilità e cosa mettere in valigia →`, `${short} Record, probabilità e cosa mettere in valigia →`, `${base} Giudizio: ${verdict ? VERDICT[verdict.label] : '—'}.`, base, `Meteo ${cityN} ${aM(monthN)}: temperature, giorni di pioggia e ore di sole.`),
     };
   },
   monthDataset: ({ cityN, place, monthN, years }) => ({

@@ -422,11 +422,13 @@ const ja = {
   monthMeta: ({ cityN, countryN, monthN, row, verdict }) => {
     const t = (c) => (c == null ? '—' : `${h.n1(Math.round(c * 10) / 10)}℃`);
     const base = `${cityN}の${monthN}の天気と気温：平均最高気温${t(row?.avg_high)}、最低気温${t(row?.avg_low)}、雨の日${h.n1(row?.rainy_days)}日、日照は1日${h.n1(row?.sunshine_hours)}時間。`;
+    const short = `${cityN}の${monthN}の天気と気温：平均最高気温${t(row?.avg_high)}、最低気温${t(row?.avg_low)}、雨の日${h.n1(row?.rainy_days)}日。`;
     return {
       title: fit(60, `${cityN} ${monthN}の天気と気温：雨・服装・旅行のヒント`, `${cityN} ${monthN}の天気と気温`),
       imageTitle: `${cityN} ${monthN}の天気と気温`,
       kicker: countryN,
-      description: fit(160, `${base}評価：${verdict ? VERDICT[verdict.label] : '—'}。`, base),
+      // Aakhri jumla = click ki wajah (Nov 2026); 160 se kam na ho to pehle verdict, phir dhoop hat-ti hai, phir purane variants
+      description: fit(159, `${base}評価：${verdict ? VERDICT[verdict.label] : '—'}。過去の記録・確率・持ち物リストも掲載。`, `${base}過去の記録・確率・持ち物リストも掲載。`, `${short}過去の記録・確率・持ち物リストも掲載。`, `${base}評価：${verdict ? VERDICT[verdict.label] : '—'}。`, base),
     };
   },
   monthDataset: ({ cityN, place, monthN, years }) => ({

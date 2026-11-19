@@ -433,11 +433,13 @@ const fr = {
     const t = (c) => (c == null ? '—' : `${h.n1(Math.round(c * 10) / 10)} °C`);
     const inC = inCity('fr', city);
     const base = `Météo ${inC} ${enM(monthN)} : maximales de ${t(row?.avg_high)}, minimales de ${t(row?.avg_low)}, ${h.n1(row?.rainy_days)} ${row?.rainy_days < 2 ? 'jour' : 'jours'} de pluie et ${h.n1(row?.sunshine_hours)} h de soleil par jour.`;
+    const short = `Météo ${inC} ${enM(monthN)} : maximales de ${t(row?.avg_high)}, minimales de ${t(row?.avg_low)}, ${h.n1(row?.rainy_days)} ${row?.rainy_days < 2 ? 'jour' : 'jours'} de pluie.`;
     return {
       title: fit(60, `Météo ${cityN} ${monthN} : températures, pluie et conseils`, `Météo ${cityN} ${monthN} : températures et pluie`, `Météo ${cityN} ${monthN}`),
       imageTitle: `Météo ${cityN} ${enM(monthN)}`,
       kicker: countryN,
-      description: fit(160, `${base} Verdict : ${verdict ? VERDICT[verdict.label] : '—'}.`, base, `Météo ${cityN} ${enM(monthN)} : températures, jours de pluie et soleil.`),
+      // Aakhri jumla = click ki wajah (Nov 2026); 160 se kam na ho to pehle verdict, phir dhoop hat-ti hai, phir purane variants
+      description: fit(159, `${base} Verdict : ${verdict ? VERDICT[verdict.label] : '—'}. Records, probabilités et que mettre dans la valise →`, `${base} Records, probabilités et que mettre dans la valise →`, `${short} Records, probabilités et que mettre dans la valise →`, `${base} Verdict : ${verdict ? VERDICT[verdict.label] : '—'}.`, base, `Météo ${cityN} ${enM(monthN)} : températures, jours de pluie et soleil.`),
     };
   },
   monthDataset: ({ cityN, place, monthN, years }) => ({

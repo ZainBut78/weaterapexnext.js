@@ -428,11 +428,13 @@ const de = {
   monthMeta: ({ cityN, countryN, monthN, row, verdict }) => {
     const t = (c) => (c == null ? '—' : `${h.n1(Math.round(c * 10) / 10)} °C`);
     const base = `Wetter in ${cityN} im ${monthN}: tagsüber ${t(row?.avg_high)}, nachts ${t(row?.avg_low)}, ${h.n1(row?.rainy_days)} Regentage und ${h.n1(row?.sunshine_hours)} Std. Sonne am Tag.`;
+    const short = `Wetter in ${cityN} im ${monthN}: tagsüber ${t(row?.avg_high)}, nachts ${t(row?.avg_low)}, ${h.n1(row?.rainy_days)} Regentage.`;
     return {
       title: fit(60, `Wetter ${cityN} ${monthN}: Temperatur, Regen & Tipps`, `Wetter ${cityN} ${monthN}: Temperatur & Regen`, `Wetter ${cityN} im ${monthN}`),
       imageTitle: `Wetter ${cityN} im ${monthN}`,
       kicker: countryN,
-      description: fit(160, `${base} Reisezeit: ${verdict ? VERDICT[verdict.label] : '–'}.`, base, `Wetter in ${cityN} im ${monthN}: Temperaturen, Regentage und Sonnenschein.`),
+      // Aakhri jumla = click ki wajah (Nov 2026); 160 se kam na ho to pehle verdict, phir dhoop hat-ti hai, phir purane variants
+      description: fit(159, `${base} Reisezeit: ${verdict ? VERDICT[verdict.label] : '–'}. Rekorde, Wahrscheinlichkeiten und Packliste →`, `${base} Rekorde, Wahrscheinlichkeiten und Packliste →`, `${short} Rekorde, Wahrscheinlichkeiten und Packliste →`, `${base} Reisezeit: ${verdict ? VERDICT[verdict.label] : '–'}.`, base, `Wetter in ${cityN} im ${monthN}: Temperaturen, Regentage und Sonnenschein.`),
     };
   },
   monthDataset: ({ cityN, place, monthN, years }) => ({

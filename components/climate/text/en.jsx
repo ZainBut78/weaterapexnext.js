@@ -9,6 +9,7 @@ import { UnitTemp } from '../UnitText';
 import UnitTempShort from '../UnitTempShort';
 import * as story from '../MonthStory';
 import { MONTHS, mmToIn } from '@/utils/climateMath';
+const fit = (max, ...opts) => opts.find((o) => o.length <= max) || opts[opts.length - 1];
 
 const monthOf = (n) => MONTHS[(((n - 1) % 12) + 12) % 12];
 
@@ -89,12 +90,20 @@ const en = {
 
   // ── Month page ────────────────────────────────────────────
   monthMeta: ({ cityN, countryN, monthN, row, verdict }) => {
-    const f = (c) => (c == null ? '—' : `${Math.round(c * 10) / 10}°C (${Math.round((c * 9 / 5 + 32) * 10) / 10}°F)`);
+    // °F pehle (Bing par 47% US traffic, Nov 2026), poora number; °C bracket mein
+    const f = (c) => (c == null ? '—' : `${Math.round(c * 9 / 5 + 32)}°F (${Math.round(c * 10) / 10}°C)`);
+    const base = `${monthN} in ${cityN}: average high ${f(row?.avg_high)}, low ${f(row?.avg_low)}, ${row?.rainy_days ?? '—'} rainy days`;
+    const verdictLine = `${verdict ? `${verdict.label} time to visit` : 'Climate guide'}.`;
+    const more = 'Records, odds and what to pack →';
     return {
       title: `${cityN} Weather in ${monthN}: Temperature, Rain & Tips`,
       imageTitle: `${cityN} Weather in ${monthN}`,
       kicker: countryN,
-      description: `${monthN} in ${cityN}: average high ${f(row?.avg_high)}, low ${f(row?.avg_low)}, ${row?.rainy_days ?? '—'} rainy days and ${row?.sunshine_hours ?? '—'} h of sunshine a day. ${verdict ? `${verdict.label} time to visit` : 'Climate guide'} — comparisons and packing tips.`,
+      // 160 se kam: lamba naam ho to pehle dhoop, phir verdict hat-ta hai; "more" hamesha
+      description: fit(159,
+        `${base}, ${row?.sunshine_hours ?? '—'} h of sun a day. ${verdictLine} ${more}`,
+        `${base}. ${verdictLine} ${more}`,
+        `${base}. ${more}`),
     };
   },
   monthDataset: ({ cityN, place, monthN, years }) => ({

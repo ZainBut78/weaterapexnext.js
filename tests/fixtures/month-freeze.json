@@ -1,7 +1,7 @@
 {
  "/weather/united-kingdom/london/march": {
   "title": "London Weather in March: Temperature, Rain & Tips",
-  "description": "March in London: average high 10.7°C (51.3°F), low 3.3°C (37.9°F), 15 rainy days and 7.1 h of sunshine a day. Fair time to visit — comparisons and packing tips.",
+  "description": "March in London: average high 51°F (10.7°C), low 38°F (3.3°C), 15 rainy days, 7.1 h of sun a day. Fair time to visit. Records, odds and what to pack →",
   "robots": null,
   "canonical": "https://weatherapex.com/weather/united-kingdom/london/march",
   "hreflang": [
@@ -124,7 +124,7 @@
  },
  "/weather/united-arab-emirates/dubai/august": {
   "title": "Dubai Weather in August: Temperature, Rain & Tips",
-  "description": "August in Dubai: average high 41.6°C (106.9°F), low 30.1°C (86.2°F), 0 rainy days and 11.7 h of sunshine a day. Fair time to visit — comparisons and packing tips.",
+  "description": "August in Dubai: average high 107°F (41.6°C), low 86°F (30.1°C), 0 rainy days, 11.7 h of sun a day. Fair time to visit. Records, odds and what to pack →",
   "robots": null,
   "canonical": "https://weatherapex.com/weather/united-arab-emirates/dubai/august",
   "hreflang": [
@@ -233,7 +233,7 @@
  },
  "/weather/germany/berlin/march": {
   "title": "Berlin Weather in March: Temperature, Rain & Tips",
-  "description": "March in Berlin: average high 9.1°C (48.4°F), low 1°C (33.8°F), 13 rainy days and 7.3 h of sunshine a day. Fair time to visit — comparisons and packing tips.",
+  "description": "March in Berlin: average high 48°F (9.1°C), low 34°F (1°C), 13 rainy days, 7.3 h of sun a day. Fair time to visit. Records, odds and what to pack →",
   "robots": null,
   "canonical": "https://weatherapex.com/weather/germany/berlin/march",
   "hreflang": [
@@ -354,7 +354,7 @@
  },
  "/de/weather/united-kingdom/london/march": {
   "title": "Wetter London März: Temperatur, Regen & Tipps",
-  "description": "Wetter in London im März: tagsüber 10,7 °C, nachts 3,3 °C, 15 Regentage und 7,1 Std. Sonne am Tag. Reisezeit: Mittel.",
+  "description": "Wetter in London im März: tagsüber 10,7 °C, nachts 3,3 °C, 15 Regentage und 7,1 Std. Sonne am Tag. Rekorde, Wahrscheinlichkeiten und Packliste →",
   "robots": null,
   "canonical": "https://weatherapex.com/de/weather/united-kingdom/london/march",
   "hreflang": [
@@ -467,7 +467,7 @@
  },
  "/fr/weather/united-kingdom/london/march": {
   "title": "Météo Londres mars : températures, pluie et conseils",
-  "description": "Météo à Londres en mars : maximales de 10,7 °C, minimales de 3,3 °C, 15 jours de pluie et 7,1 h de soleil par jour. Verdict : Moyen.",
+  "description": "Météo à Londres en mars : maximales de 10,7 °C, minimales de 3,3 °C, 15 jours de pluie. Records, probabilités et que mettre dans la valise →",
   "robots": null,
   "canonical": "https://weatherapex.com/fr/weather/united-kingdom/london/march",
   "hreflang": [
@@ -580,7 +580,7 @@
  },
  "/ja/weather/united-kingdom/london/march": {
   "title": "ロンドン 3月の天気と気温：雨・服装・旅行のヒント",
-  "description": "ロンドンの3月の天気と気温：平均最高気温10.7℃、最低気温3.3℃、雨の日15日、日照は1日7.1時間。評価：普通。",
+  "description": "ロンドンの3月の天気と気温：平均最高気温10.7℃、最低気温3.3℃、雨の日15日、日照は1日7.1時間。評価：普通。過去の記録・確率・持ち物リストも掲載。",
   "robots": null,
   "canonical": "https://weatherapex.com/ja/weather/united-kingdom/london/march",
   "hreflang": [
@@ -693,7 +693,7 @@
  },
  "/weather/united-kingdom/london/july": {
   "title": "London Weather in July: Temperature, Rain & Tips",
-  "description": "July in London: average high 22.3°C (72.1°F), low 13.9°C (57°F), 17 rainy days and 11.4 h of sunshine a day. Good time to visit — comparisons and packing tips.",
+  "description": "July in London: average high 72°F (22.3°C), low 57°F (13.9°C), 17 rainy days, 11.4 h of sun a day. Good time to visit. Records, odds and what to pack →",
   "robots": null,
   "canonical": "https://weatherapex.com/weather/united-kingdom/london/july",
   "hreflang": [
@@ -816,7 +816,7 @@
  },
  "/de/weather/united-kingdom/london/july": {
   "title": "Wetter London Juli: Temperatur, Regen & Tipps",
-  "description": "Wetter in London im Juli: tagsüber 22,3 °C, nachts 13,9 °C, 17 Regentage und 11,4 Std. Sonne am Tag. Reisezeit: Gut.",
+  "description": "Wetter in London im Juli: tagsüber 22,3 °C, nachts 13,9 °C, 17 Regentage und 11,4 Std. Sonne am Tag. Rekorde, Wahrscheinlichkeiten und Packliste →",
   "robots": null,
   "canonical": "https://weatherapex.com/de/weather/united-kingdom/london/july",
   "hreflang": [
@@ -929,7 +929,7 @@
  },
  "/fr/weather/united-kingdom/london/july": {
   "title": "Météo Londres juillet : températures, pluie et conseils",
-  "description": "Météo à Londres en juillet : maximales de 22,3 °C, minimales de 13,9 °C, 17 jours de pluie et 11,4 h de soleil par jour. Verdict : Bon.",
+  "description": "Météo à Londres en juillet : maximales de 22,3 °C, minimales de 13,9 °C, 17 jours de pluie. Records, probabilités et que mettre dans la valise →",
   "robots": null,
   "canonical": "https://weatherapex.com/fr/weather/united-kingdom/london/july",
   "hreflang": [
@@ -1042,7 +1042,7 @@
  },
  "/it/weather/united-kingdom/london/july": {
   "title": "Meteo Londra luglio: temperature, pioggia e consigli",
-  "description": "Meteo a Londra a luglio: massime di 22,3 °C, minime di 13,9 °C, 17 giorni di pioggia e 11,4 ore di sole al giorno. Giudizio: Buono.",
+  "description": "Meteo a Londra a luglio: massime di 22,3 °C, minime di 13,9 °C, 17 giorni di pioggia. Record, probabilità e cosa mettere in valigia →",
   "robots": null,
   "canonical": "https://weatherapex.com/it/weather/united-kingdom/london/july",
   "hreflang": [
@@ -1155,7 +1155,7 @@
  },
  "/es/weather/united-kingdom/london/july": {
   "title": "Clima en Londres en julio: temperatura, lluvia y consejos",
-  "description": "Tiempo en Londres en julio: máximas de 22,3 °C, mínimas de 13,9 °C, 17 días de lluvia y 11,4 h de sol al día. Valoración: Bueno.",
+  "description": "Tiempo en Londres en julio: máximas de 22,3 °C, mínimas de 13,9 °C, 17 días de lluvia y 11,4 h de sol al día. Récords, probabilidades y qué llevar →",
   "robots": null,
   "canonical": "https://weatherapex.com/es/weather/united-kingdom/london/july",
   "hreflang": [
@@ -1268,7 +1268,7 @@
  },
  "/ja/weather/united-kingdom/london/july": {
   "title": "ロンドン 7月の天気と気温：雨・服装・旅行のヒント",
-  "description": "ロンドンの7月の天気と気温：平均最高気温22.3℃、最低気温13.9℃、雨の日17日、日照は1日11.4時間。評価：良い。",
+  "description": "ロンドンの7月の天気と気温：平均最高気温22.3℃、最低気温13.9℃、雨の日17日、日照は1日11.4時間。評価：良い。過去の記録・確率・持ち物リストも掲載。",
   "robots": null,
   "canonical": "https://weatherapex.com/ja/weather/united-kingdom/london/july",
   "hreflang": [
@@ -1381,7 +1381,7 @@
  },
  "/weather/iceland/reykjavik/january": {
   "title": "Reykjavik Weather in January: Temperature, Rain & Tips",
-  "description": "January in Reykjavik: average high 1.5°C (34.7°F), low -2.9°C (26.8°F), 19 rainy days and 1.6 h of sunshine a day. Poor time to visit — comparisons and packing tips.",
+  "description": "January in Reykjavik: average high 35°F (1.5°C), low 27°F (-2.9°C), 19 rainy days, 1.6 h of sun a day. Poor time to visit. Records, odds and what to pack →",
   "robots": null,
   "canonical": "https://weatherapex.com/weather/iceland/reykjavik/january",
   "hreflang": [

@@ -3,6 +3,8 @@
 //  — blog editor round 2. Khaali ho to kuch nahi.
 //  Sources: naya tab + admin mein chuna hua rel ("nofollow noopener" ya
 //  trusted ke liye sirf "noopener").
+//  List keys path jaisi NAHI (k0, s0): `${url}-${i}` RSC payload mein "/trip-planner-2" ban
+//  kar jata tha aur Google use link samajh kar crawl karta (GSC 404, Nov 2026).
 // ─────────────────────────────────────────────────────────────
 import Link from 'next/link';
 import { ArrowRight, BookOpen, ExternalLink } from 'lucide-react';
@@ -17,7 +19,7 @@ export function FurtherReading({ links, t }) {
       </h2>
       <ul className="grid gap-3 sm:grid-cols-2">
         {links.map((l, i) => (
-          <li key={`${l.url}-${i}`}>
+          <li key={`k${i}`}>
             <Link
               href={l.url}
               className="flex items-center justify-between gap-2 min-h-12 rounded-2xl bg-[#f3f7ff] px-4 py-3 text-sm font-semibold text-[#0077b6] hover:underline"
@@ -41,7 +43,7 @@ export function Sources({ sources, t }) {
       </h2>
       <ol className="list-decimal pl-5 space-y-1 text-sm text-gray-600">
         {sources.map((s, i) => (
-          <li key={`${s.url}-${i}`}>
+          <li key={`s${i}`}>
             <a
               href={s.url}
               target="_blank"

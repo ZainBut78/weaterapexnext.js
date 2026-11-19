@@ -10,6 +10,7 @@
 //    ENABLED_LOCALES=de,it,ja,fr,es npx next start -p 3100
 //    PW_BASE_URL=http://localhost:3100 npx playwright test month-freeze
 //  Baseline SIRF code badalne se pehle bani (git mein): tests/fixtures/month-freeze.json
+//  UPDATE_FREEZE=description: sirf meta description (owner ka faisla, Nov 2026).
 //  UPDATE_FREEZE=1: sirf naye pages jodta hai. UPDATE_FREEZE=links: sirf links ki list.
 //  Dono sirf tab jab local data sach mein badla ho, code ki wajah se NAHI.
 // ─────────────────────────────────────────────────────────────
@@ -82,6 +83,14 @@ if (process.env.UPDATE_FREEZE === 'links') {
       const allowed = now.links.filter((l) => !out[path].links.includes(l) && l.split(' | ')[0] === planner);
       out[path].links = now.links.filter((l) => !allowed.includes(l)).sort();
     }
+    writeFileSync(FIXTURE, `${JSON.stringify(out, null, 1)}\n`);
+  });
+} else if (process.env.UPDATE_FREEZE === 'description') {
+  // Owner ka faisla (Nov 2026: °F pehle + aakhri jumla): SIRF meta description. Title, URL, H1,
+  // canonical, hreflang, links, headings sab wahi rehte hain (yeh mode unhein chhoota bhi nahi).
+  test('update descriptions only', async ({ browser, baseURL }) => {
+    const out = load();
+    for (const path of PAGES) out[path].description = (await snapshot(browser, baseURL, path)).description;
     writeFileSync(FIXTURE, `${JSON.stringify(out, null, 1)}\n`);
   });
 } else if (process.env.UPDATE_FREEZE) {
